@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{3d31b5c8-deee-4007-ac1f-3bfed42c0a37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config\NewFilter1">
+      <UniqueIdentifier>{9612ee45-0b64-4856-9ac5-4250c0b5c2cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibraryDependencies">
+      <UniqueIdentifier>{59403814-3060-7419-7733-583687445925}</UniqueIdentifier>
+      <Extensions />
+    </Filter>
+    <Filter Include="LibraryDependencies\ModAAConf1">
+      <UniqueIdentifier>{95635431-7101-8925-6630-135322522272}</UniqueIdentifier>
+      <Extensions />
+    </Filter>
+    <Filter Include="LibraryDependencies\ModAAConf1\MODE0">
+      <UniqueIdentifier>{25326032-8204-6478-4318-494433351107}</UniqueIdentifier>
+      <Extensions />
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Configuration.h">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="SomeLibraryClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModAConf.h">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="blaFolder\bla.h">
+      <Filter>config\NewFilter1</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SomeLibraryClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryDependencies\ModAAConf1\Mode0\ClassToInterfaceWith.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryDependencies\ModAAConf1\Mode0\SomaLibraryClassM1AA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blaFolder\bla.cpp">
+      <Filter>config\NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryDependencies\ModAAConf1\MODE0\ClassToInterfaceWith.cpp">
+      <Filter>LibraryDependencies\ModAAConf1\MODE0</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryDependencies\ModAAConf1\MODE0\SomaLibraryClassM1AA.cpp">
+      <Filter>LibraryDependencies\ModAAConf1\MODE0</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

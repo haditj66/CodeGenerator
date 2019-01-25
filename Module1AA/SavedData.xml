@@ -1,0 +1,18 @@
+<Root>
+    <Configs>
+        <Config Prefix="GlobalConfigBuild" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\c# apps\codegenerator\codegenerator\configtest\globalbuildconfig.h" ClassName="GlobalBuildConfig">
+            <EnumDefinition PLATFORM_QP="0"/>
+            <EnumDefinition PLATFORM_IAR="1"/>
+            <EnumDefinition PLATFORM_VS="2"/>
+            <EnumDefinition BUILD_DEBUG="0"/>
+            <EnumDefinition BUILD_RELEASE="1"/>
+            <EnumDefinition BUILD_TESTING="2"/>
+        </Config>
+        <Config Prefix="ModAAConf1" myInstanceNum="0" Major="1" ConfTypePrefix="MODE0" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\c# apps\codegenerator\codegenerator\module1aa\modaaconf1.h" ClassName="ModAAConf1">
+            <EnumDefinition MODE_Fast="0"/>
+            <EnumDefinition MODE_Slow="1"/>
+        </Config>
+        <Config Prefix="ModAAConf1" myInstanceNum="1" Major="1" ConfTypePrefix="MODE0" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\c# apps\codegenerator\codegenerator\module1aa\modaaconf1.h" ClassName="ModAAConf1"/>
+        <Config Prefix="ModAAConf1" myInstanceNum="0" Major="1" ConfTypePrefix="MODE1" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\c# apps\codegenerator\codegenerator\module1aa\modaaconf1.h" ClassName="ModAAConf1"/>
+    </Configs>
+</Root>
