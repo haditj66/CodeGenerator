@@ -116,7 +116,6 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Defines.cpp" />
     <ClCompile Include="IDefine.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>

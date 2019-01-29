@@ -9,7 +9,7 @@ namespace CodeGenerator.IDESettingXMLs
 {
     public abstract class MySettingsBase
     {
-        public List<XMLSetting> XmlSettings { get; } 
+        public List<IDESetting> XmlSettings { get; } 
         public object XmlFilterClass { get; }
         public object XmlProjectClass { get; }
         public List<MyFilter> myFilters { get; private set; }
@@ -17,9 +17,9 @@ namespace CodeGenerator.IDESettingXMLs
         public List<MyCLCompileFile> CLCompileFiles { get; private set; }
         public List<MyCLIncludeFile> CLIncludeFiles { get; private set; }
 
-        public MySettingsBase(XMLSetting xmlFilterSetting, XMLSetting xmlProjectsetting)
+        public MySettingsBase(IDESetting xmlFilterSetting, IDESetting xmlProjectsetting)
         {
-            XmlSettings = new List<XMLSetting>();
+            XmlSettings = new List<IDESetting>();
             XmlSettings.Add(xmlFilterSetting);
             XmlSettings.Add(xmlProjectsetting);
             XmlFilterClass = xmlFilterSetting.RootOfSetting;

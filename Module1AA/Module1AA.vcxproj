@@ -124,7 +124,6 @@
     <ClInclude Include="ClassToInterfaceWith.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Configuration4.h" />
-    <ClInclude Include="mainCG.h" />
     <ClInclude Include="ModAAConf1.h" />
     <ClInclude Include="SomaLibraryClassM1AA.h" />
   </ItemGroup>

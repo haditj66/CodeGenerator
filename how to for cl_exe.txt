@@ -1,0 +1,5 @@
+"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+
+cl /EHsc /Fo"Debug\Dd"\ main.cpp SomeLibraryClass.cpp blaFolder\bla.cpp  /link ConfigTest.lib I/ “C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest”  /libpath:"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest"  /out:Debug/Dd/configGen.exe
+
+cl    /EHsc /MDd   /Fo"Debug\Dd"\ /I “C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest” /I “C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA” main.cpp   /link ConfigTest.lib   /libpath:"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest"    /out:Debug/Dd/configGen.exe

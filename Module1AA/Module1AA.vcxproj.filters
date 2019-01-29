@@ -48,8 +48,5 @@
     <ClInclude Include="Configuration.h">
       <Filter>Config</Filter>
     </ClInclude>
-    <ClInclude Include="mainCG.h">
-      <Filter>Config</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

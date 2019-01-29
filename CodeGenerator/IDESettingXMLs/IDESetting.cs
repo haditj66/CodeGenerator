@@ -10,14 +10,14 @@ using System.Xml.Serialization;
 
 namespace CodeGenerator.IDESettingXMLs
 {
-    public class XMLSetting
+    public class IDESetting
     {
         public dynamic RootOfSetting { get; set; }
         public string PathWithoutFileNameOfXmlSetting { get; }
         public string ProjectExtension { get; }
         public XmlSerializer Serializer { get; }
 
-        public XMLSetting(string PathWithoutFileNameOfXmlSetting, string projectExtension, Type typeOfRootSetting)
+        public IDESetting(string PathWithoutFileNameOfXmlSetting, string projectExtension, Type typeOfRootSetting)
         {
             this.PathWithoutFileNameOfXmlSetting = PathWithoutFileNameOfXmlSetting;
             ProjectExtension = projectExtension;
@@ -28,11 +28,23 @@ namespace CodeGenerator.IDESettingXMLs
                 .Where((FileInfo file) => { return file.Extension == projectExtension; }).First().FullName;
 
 
+            InitRootSetting(projFileFullPath, typeOfRootSetting);
+        }
+
+
+        public IDESetting(string projFileFullPath, Type typeOfRootSetting)
+        {
+            InitRootSetting(projFileFullPath, typeOfRootSetting);
+
+        }
+
+        private void InitRootSetting(string projFileFullPath, Type typeOfRootSetting)
+        {
             //get library project xml path  
             using (StreamReader reader = new StreamReader(projFileFullPath))
             {
                 RootOfSetting = Convert.ChangeType(Serializer.Deserialize(reader), typeOfRootSetting);
-            } 
+            }
         }
 
         protected string GetFullFilePathFromPathWithoutFile(string FullPathToPutGeneratedXMLFileWITHOUTFILENAME)

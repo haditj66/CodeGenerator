@@ -11,6 +11,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -72,16 +72,23 @@
     <Compile Include="cgenXMLSaves\SaveFileBase.cs" />
     <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenConfig.cs" />
     <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenProject.cs" />
+    <Compile Include="CMD_Handler\CLCommandBuilder.cs" />
+    <Compile Include="CMD_Handler\CMDHandler.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FileTemplates\FileTemplateBase.cs" />
+    <Compile Include="FileTemplates\FileTemplateLibConf.cs" />
+    <Compile Include="FileTemplates\FileTemplateMainCG.cs" />
     <Compile Include="IDESettingXMLs\MyCLCompileFile.cs" />
     <Compile Include="IDESettingXMLs\MyCLIncludeFile.cs" />
     <Compile Include="IDESettingXMLs\MyFilter.cs" />
     <Compile Include="IDESettingXMLs\MySettingsBase.cs" />
+    <Compile Include="IDESettingXMLs\MyStaticLib.cs" />
     <Compile Include="IDESettingXMLs\VisualStudioXMLs\Filters\VSFiltersXMLClasses.cs" />
     <Compile Include="IDESettingXMLs\VisualStudioXMLs\MySettingsVS.cs" />
     <Compile Include="IDESettingXMLs\VisualStudioXMLs\VisualStudioXMLClasses.cs" />
-    <Compile Include="IDESettingXMLs\VisualStudioXMLs\XMLSettingVSProj.cs" />
-    <Compile Include="IDESettingXMLs\XMLSetting.cs" />
+    <Compile Include="IDESettingXMLs\VisualStudioXMLs\IDESettingVSProj.cs" />
+    <Compile Include="IDESettingXMLs\IDESetting.cs" />
     <Compile Include="Library.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectBuilders\ProjectBuilderBase.cs" />
@@ -94,6 +101,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CGKeywordDefines.h" />
+    <Content Include="FileTemplates\Files\libconf.txt" />
+    <Content Include="FileTemplates\Files\mainCG.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

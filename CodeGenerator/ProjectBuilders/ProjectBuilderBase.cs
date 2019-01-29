@@ -10,10 +10,12 @@ namespace CodeGenerator.ProjectBuilders
 {
     public abstract class ProjectBuilderBase  
     {
-        public XMLSetting ConfigSettings { get; set; }
+        private IDESetting ConfigSettings { get; set; }
         public List<Library> Libraries { get; set; }
+        public Library LibTop { get; set; }
 
-        public ProjectBuilderBase(XMLSetting configSettings)
+
+    public ProjectBuilderBase(IDESetting configSettings)
         { 
             ConfigSettings = configSettings;
             Libraries = new List<Library>();
@@ -22,7 +24,7 @@ namespace CodeGenerator.ProjectBuilders
             //go through each lirary config
             foreach (var config in ConfigSettings.RootOfSetting.Configs.Config)
             { 
-                MySettingsBase Settings = CreateMySettingsBase(config);
+                MySettingsBase Settings = GetSettingsOVERRIDE(config);
                 Libraries.Add(new Library(config, Settings)); 
             }
              
@@ -32,13 +34,13 @@ namespace CodeGenerator.ProjectBuilders
                 lib.SetLibrariesIDependOn(Libraries);
             }
 
-
+            LibTop = Libraries.Where((Library lib) => { return lib.IsTopLevel == true; }).First();
         }
 
         public void RecreateLibraryDependenciesFolders()
         {
-            List<Library> allNotTopAndNotGlobal = Libraries.Where((Library lib) => { return lib.TopLevel == false && lib.config.ClassName != "GlobalBuildConfig"; }).ToList();
-            Library libTop = Libraries.Where((Library lib) => { return lib.TopLevel; }).First();
+            List<Library> allNotTopAndNotGlobal = Libraries.Where((Library lib) => { return lib.IsTopLevel == false && lib.config.ClassName != "GlobalBuildConfig"; }).ToList();
+            Library libTop = Libraries.Where((Library lib) => { return lib.IsTopLevel; }).First();
 
             if (Directory.Exists(Path.GetFullPath(Library.TopLevelDir)))
             {
@@ -63,8 +65,9 @@ namespace CodeGenerator.ProjectBuilders
             }
         }
 
-        public abstract MySettingsBase CreateMySettingsBase(Config configClass);
+        protected abstract MySettingsBase GetSettingsOVERRIDE(Config configClass);
+        public abstract void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir);
 
-         
+
     }
 }

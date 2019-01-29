@@ -4,6 +4,7 @@ using CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Filters;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 
 namespace CodeGenerator
 {
@@ -11,11 +12,11 @@ namespace CodeGenerator
     {
 
         static public string TopLevelDir { get; private set; }
-        public bool TopLevel { get; private set; }
+        public bool IsTopLevel { get; private set; }
         static public MyFilter LibraryDependencyFilter = new MyFilter("LibraryDependencies");
         public MyFilter LibraryBaseFilter { get; private set; }
         public  Config config { get; private set; } 
-        public MySettingsBase settings { get; private set; }
+        private MySettingsBase settings { get; set; }
         public List<Library> LibrariesIDependOn { get; protected set; }
 
         public Library(Config config, MySettingsBase settings)
@@ -26,7 +27,7 @@ namespace CodeGenerator
             {
                 TopLevelDir = Path.GetDirectoryName(config.FileNameString);
                 TopLevelDir = Path.Combine(TopLevelDir, "LibraryDependencies"); 
-                TopLevel = true;
+                IsTopLevel = true;
                 settings.Initiate(); 
                 
             }
@@ -50,17 +51,18 @@ namespace CodeGenerator
             } 
             this.settings = settings;
 
-            
+
         }
+
 
         public void SetLibrariesIDependOn(List<Library> FromTheseLibraries)
         {
             //if this library is top level, look for all non top level libraries that dont have depends in their configs.
-            if (this.TopLevel == true)
+            if (this.IsTopLevel == true)
             {
                 foreach (var lib in FromTheseLibraries)
                 {
-                    if (lib.TopLevel == false && lib.config.Depends.Depend.Count == 0 && lib.config.ClassName != "GlobalBuildConfig")
+                    if (lib.IsTopLevel == false && lib.config.Depends.Depend.Count == 0 && lib.config.ClassName != "GlobalBuildConfig")
                     {
                         //then add this library as a depend to the top level library
                         this.LibrariesIDependOn.Add(lib);
@@ -70,7 +72,7 @@ namespace CodeGenerator
             //if it is not top level than ignore top level library and set depends for all in its config depends that matches
             else
             {
-                var LibrarysThatStillNeedInitializing = FromTheseLibraries.Where((Library lib) => { return lib.TopLevel == false && lib.config.Depends.Depend.Count != 0 && lib.config.ClassName != "GlobalBuildConfig"; });
+                var LibrarysThatStillNeedInitializing = FromTheseLibraries.Where((Library lib) => { return lib.IsTopLevel == false && lib.config.Depends.Depend.Count != 0 && lib.config.ClassName != "GlobalBuildConfig"; });
 
                  
 
@@ -109,7 +111,7 @@ namespace CodeGenerator
         public void CreateDirectoryForLibraryPath()
         {
             //add the filters here.
-            if (config.ClassName != "GlobalBuildConfig" && this.TopLevel == false)
+            if (config.ClassName != "GlobalBuildConfig" && this.IsTopLevel == false)
             {
                 //over here use TopLevelDir
                 Directory.CreateDirectory(Path.Combine(TopLevelDir, config.Prefix));
@@ -184,6 +186,7 @@ namespace CodeGenerator
             }*/
 
         }
+          
 
     }
 

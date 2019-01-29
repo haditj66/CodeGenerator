@@ -164,3 +164,39 @@ namespace CodeGenerator.IDESettingXMLs
         }
     }
 }
+
+
+
+
+namespace ExtensionMethods
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using CodeGenerator.IDESettingXMLs;
+
+    public static class EXTFilts
+    {
+
+        public static bool DoesFilterWithNameExist(this List<MyFilter> listFilt, string name)
+        {
+            return listFilt.Where((MyFilter fil) =>
+            {
+                return (fil.DoesAddressExist(name)) != null;
+            }).First() == null ? false : true;
+        }
+         
+
+        public static MyFilter GetFilterAtAddress(this List<MyFilter> listFilt, string filterAddress)
+        {
+            return listFilt.Where((MyFilter fil) =>
+            {
+                return (fil.DoesAddressExist(filterAddress)) != null;
+            }).First();
+        }
+    }
+     
+}
+

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Extensions;
 
 namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 {
@@ -13,7 +14,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
     {
 
         static Random rng = new Random();
-        public MySettingsVS(XMLSetting xmlFilterSetting, XMLSetting xmlProjectsetting) : base(xmlFilterSetting, xmlProjectsetting)//(Filters.Project xmlFilterClass, CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project XMLProjectClass) : base(xmlFilterClass, XMLProjectClass)
+        public MySettingsVS(IDESetting xmlFilterSetting, IDESetting xmlProjectsetting) : base(xmlFilterSetting, xmlProjectsetting)//(Filters.Project xmlFilterClass, CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project XMLProjectClass) : base(xmlFilterClass, XMLProjectClass)
         {
 
         }
@@ -36,7 +37,20 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         {
             ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").First();
 
-            if (!tdgs.ClCompile.AdditionalIncludeDirectories.Contains(additionalIncludeDir))
+            List<char> cc = new  List<char>();
+            //create regex pattern by putting escapes
+            string pat = "";
+            foreach (char c in additionalIncludeDir)
+            {
+                pat += c.ToString();
+                if (c.ToString() == "\\")
+                {
+                    pat += "\\";
+                }
+            }
+            pat += ";";
+            string sofar = tdgs.ClCompile.AdditionalIncludeDirectories;   
+            if(!Regex.IsMatch(sofar, pat))//(!tdgs.ClCompile.AdditionalIncludeDirectories.ToLiteral().Contains(additionalIncludeDir.ToLiteral())) //(Regex.IsMatch((string.Format(@tdgs.ClCompile.AdditionalIncludeDirectories)), (string.Format(@additionalIncludeDir))))  //!tdgs.ClCompile.AdditionalIncludeDirectories.Contains(additionalIncludeDir))
             {
                 return false;
             }

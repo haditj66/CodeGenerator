@@ -15,7 +15,7 @@
 
 
 
-std::string const BASE_DIRECTORY = "C:\\Users\\Hadi\\OneDrive\\Documents\\VisualStudioprojects\\Projects\\c# apps\\CodeGenerator\\CodeGenerator\\ConfigTest\\";
+std::string const BASE_DIRECTORY = R"(C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest)";
 
 #define STRINGIFY(MACRO) #MACRO 
 

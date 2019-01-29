@@ -13,9 +13,9 @@ using CodeGenerator.IDESettingXMLs;
 
 namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 {
-    class XMLSettingVSProj : XMLSetting
+    public class IDESettingVSProj : IDESetting
     {
-        public XMLSettingVSProj(string PathWithoutFileNameOfXmlSetting, string projectExtension, Type typeOfRootSetting) : base(PathWithoutFileNameOfXmlSetting, projectExtension, typeOfRootSetting)
+        public IDESettingVSProj(string PathWithoutFileNameOfXmlSetting, string projectExtension, Type typeOfRootSetting) : base(PathWithoutFileNameOfXmlSetting, projectExtension, typeOfRootSetting)
         {
         }
 

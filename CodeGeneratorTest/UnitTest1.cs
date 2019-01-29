@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeGenerator.IDESettingXMLs;
+using CodeGenerator.FileTemplates;
 
 namespace CodeGeneratorTest
 {
@@ -60,9 +61,10 @@ namespace CodeGeneratorTest
         }
 
         [TestMethod]
-        public void AnimalForRizu()
+        public void MacroFileTest()
         {
-
+            FileTemplateMainCG maincgTemplate = new FileTemplateMainCG("","moda1");
+            maincgTemplate.CreateTemplate();
         }
 
 
