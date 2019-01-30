@@ -28,7 +28,8 @@ namespace CodeGenerator.IDESettingXMLs
                 .Where((FileInfo file) => { return file.Extension == projectExtension; }).First().FullName;
 
 
-            InitRootSetting(projFileFullPath, typeOfRootSetting);
+            InitRootSetting(projFileFullPath, typeOfRootSetting); 
+
         }
 
 

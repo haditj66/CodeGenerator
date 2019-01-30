@@ -23,11 +23,12 @@ int main()
 	glob.BUILD->SetValue(BuildEnum::DEBUG);
 	glob.PLATFORM->SetValue(PlatformEnum::VS);
 
-
-	ModAAConf1<ModeEnum::Fast> maa;
+	/*
+	modaaConf1<ModeEnum::Fast> maa;
 	maa.Init();
-	
 	modaConf0 m(&maa);
+	*/
+	modaConf0 m;
 	m.Init();
 	m.FEATURE->SetValue(FeatureEnum::FEATURE3);
 	*m.BUFFERSIZE = 676;

@@ -16,8 +16,6 @@
 #define BUILD_DEBUG  0
 #define BUILD_RELEASE  1
 #define BUILD_TESTING  2
-#define MODE_Fast  0
-#define MODE_Slow  1
 #define FEATURE_FEATURE1  0
 #define FEATURE_FEATURE2  1
 #define FEATURE_FEATURE3  2

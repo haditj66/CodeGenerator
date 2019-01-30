@@ -24,12 +24,14 @@ class modaConf0 : public Config
 public:
 	//ModConf1()(char* prefix, int major) : Config(prefix, major) {}
 
-	modaConf0 DEPENDS_ON1(ModAAConf1<ModeEnum::Fast>*, maa)
-		//dependency is Mod1AA   
+	//modaConf0 DEPENDS_ON1(modaaConf1<ModeEnum::Fast>*, maa)
+	modaConf0 DEPENDS_ON0()
+		//dependency is Mod1AA  
+		/*
 		maa->Init();
 	maa->BUFFERSIZE->SetValue(1800);
 	maa->MSG1->SetValue("from ModA using ModAA");
-	maa->MSG2->SetValue("ascavde");
+	maa->MSG2->SetValue("ascavde");*/
 	END
 
 

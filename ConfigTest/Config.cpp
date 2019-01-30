@@ -254,7 +254,7 @@ void Config::Init()
 
 
 		FileNameString = GetFileNameOVERRIDE();
-
+		
 		static std::vector<std::string> enumsAlreadyObtained;
 		std::vector<IDefine*> allDefines; allDefines.insert(allDefines.end(), publicDefineList.begin(), publicDefineList.end());
 		allDefines.insert(allDefines.end(), privateDefineList.begin(), privateDefineList.end());

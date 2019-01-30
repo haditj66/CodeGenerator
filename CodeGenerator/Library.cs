@@ -25,7 +25,7 @@ namespace CodeGenerator
             LibrariesIDependOn = new List<Library>();
             if (config.IsTopLevel == "true")
             {
-                TopLevelDir = Path.GetDirectoryName(config.FileNameString);
+                TopLevelDir = Path.GetDirectoryName(config.ConfigFileFullPath);
                 TopLevelDir = Path.Combine(TopLevelDir, "LibraryDependencies"); 
                 IsTopLevel = true;
                 settings.Initiate(); 
@@ -171,7 +171,7 @@ namespace CodeGenerator
             foreach (var setting in settings.XmlSettings)
             {
                 
-                setting.GenerateXMLSetting(Path.GetDirectoryName(config.FileNameString));
+                setting.GenerateXMLSetting(Path.GetDirectoryName(config.ConfigFileFullPath));
             }
 
             /*

@@ -10,6 +10,7 @@ namespace CodeGenerator.ProjectBuilders
 {
     public abstract class ProjectBuilderBase  
     {
+        public string BaseDirectoryForProject { get; protected set; }
         private IDESetting ConfigSettings { get; set; }
         public List<Library> Libraries { get; set; }
         public Library LibTop { get; set; }
@@ -22,9 +23,20 @@ namespace CodeGenerator.ProjectBuilders
             //2: get the libraries settings xml file (they will be in the same directory as the config 
             //file path )converted to the settingxml  
             //go through each lirary config
-            foreach (var config in ConfigSettings.RootOfSetting.Configs.Config)
-            { 
-                MySettingsBase Settings = GetSettingsOVERRIDE(config);
+            foreach (Config config in ConfigSettings.RootOfSetting.Configs.Config)
+            {
+                //change the configs file path string to take out any path/config at end
+                string PathToProjectSettings = Path.GetDirectoryName(config.ConfigFileFullPath);
+                bool isConfigLast = Path.GetFileName(PathToProjectSettings) == "Config";
+                if (isConfigLast)
+                {
+                    PathToProjectSettings = Path.Combine( Directory.GetParent(Path.GetDirectoryName(config.ConfigFileFullPath)).Name, Path.GetFileName(config.ConfigFileFullPath));
+  
+                } 
+                BaseDirectoryForProject = config.IsTopLevel == "true" ? PathToProjectSettings : BaseDirectoryForProject; 
+
+
+                MySettingsBase Settings = GetSettingsOVERRIDE(config, PathToProjectSettings);
                 Libraries.Add(new Library(config, Settings)); 
             }
              
@@ -33,6 +45,8 @@ namespace CodeGenerator.ProjectBuilders
             {
                 lib.SetLibrariesIDependOn(Libraries);
             }
+
+             
 
             LibTop = Libraries.Where((Library lib) => { return lib.IsTopLevel == true; }).First();
         }
@@ -65,7 +79,7 @@ namespace CodeGenerator.ProjectBuilders
             }
         }
 
-        protected abstract MySettingsBase GetSettingsOVERRIDE(Config configClass);
+        protected abstract MySettingsBase GetSettingsOVERRIDE(Config configClass,string pathToProjectSettings);
         public abstract void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir);
 
 

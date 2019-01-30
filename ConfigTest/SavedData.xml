@@ -1,6 +1,6 @@
 <Root>
     <Configs>
-        <Config Prefix="GlobalConfigBuild" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\c# apps\codegenerator\codegenerator\configtest\globalbuildconfig.h" ClassName="GlobalBuildConfig">
+        <Config Prefix="GlobalConfigBuild" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\cSharp\codegenerator\codegenerator\configtest\globalbuildconfig.h" ClassName="GlobalBuildConfig">
             <EnumsDefinintions>
                 <EnumDefinition Name="PLATFORM_QP" Value="0"/>
                 <EnumDefinition Name="PLATFORM_IAR" Value="1"/>
@@ -15,7 +15,7 @@
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="ModAAConf1" myInstanceNum="0" Major="1" ConfTypePrefix="MODE0" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\c# apps\codegenerator\codegenerator\module1aa\modaaconf1.h" ClassName="ModAAConf1">
+        <Config Prefix="ModAAConf1" myInstanceNum="0" Major="1" ConfTypePrefix="MODE0" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\cSharp\codegenerator\codegenerator\module1aa\modaaconf1.h" ClassName="ModAAConf1">
             <EnumsDefinintions>
                 <EnumDefinition Name="MODE_Fast" Value="0"/>
                 <EnumDefinition Name="MODE_Slow" Value="1"/>
@@ -30,7 +30,7 @@
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="ModAConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\c# apps\codegenerator\codegenerator\module1a\modaconf.h" ClassName="ModAConf0">
+        <Config Prefix="ModAConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\cSharp\codegenerator\codegenerator\module1a\modaconf.h" ClassName="ModAConf0">
             <EnumsDefinintions>
                 <EnumDefinition Name="FEATURE_FEATURE1" Value="0"/>
                 <EnumDefinition Name="FEATURE_FEATURE2" Value="1"/>

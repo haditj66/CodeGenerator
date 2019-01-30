@@ -73,6 +73,7 @@
     <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenConfig.cs" />
     <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenProject.cs" />
     <Compile Include="CMD_Handler\CLCommandBuilder.cs" />
+    <Compile Include="CMD_Handler\CLCommandBuilderForConfigTest.cs" />
     <Compile Include="CMD_Handler\CMDHandler.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Extensions.cs" />

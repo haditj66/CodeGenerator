@@ -65,7 +65,7 @@ namespace CodeGenerator
         [XmlAttribute(AttributeName = "isTopLevel")]
         public string IsTopLevel { get; set; }
         [XmlAttribute(AttributeName = "FileNameString")]
-        public string FileNameString { get; set; }
+        public string ConfigFileFullPath { get; set; }
         [XmlAttribute(AttributeName = "ClassName")]
         public string ClassName { get; set; }
         [XmlElement(ElementName = "Depends")]

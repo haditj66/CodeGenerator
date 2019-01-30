@@ -39,13 +39,13 @@
     <ClInclude Include="Configuration4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModAAConf1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SomaLibraryClassM1AA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Configuration.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Config\modaaConf.h">
       <Filter>Config</Filter>
     </ClInclude>
   </ItemGroup>

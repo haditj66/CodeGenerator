@@ -8,7 +8,7 @@
 #include <iostream> 
 #include <string>
 #include <algorithm>
-#include "ModAAConf1.h" 
+#include "Config/modaaConf.h" 
 #include <sstream>
 #include <string>
 #include <fstream>
@@ -57,7 +57,7 @@ int main()
 	glob.BUILD->SetValue(BuildEnum::DEBUG);
 	glob.PLATFORM->SetValue(PlatformEnum::IAR);
 
-	ModAAConf1<ModeEnum::Fast> m;
+	modaaConf1<ModeEnum::Fast> m;
 	m.Init(); 
 	m.SetPublicDefineValue<int>("BUFFERSIZE",4);// change back to vector and just iterate through to find name
 	m.BUFFERSIZE->SetValue(500);

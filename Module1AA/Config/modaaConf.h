@@ -13,12 +13,12 @@ enum ModeEnum
 
 
 template<ModeEnum MODE>
-class ModAAConf1 :
+class modaaConf1 :
 	public Config
 {
 public:
 	//ModConf1()(char* prefix, int major) : Config(prefix, major) {}
-	ModAAConf1() : Config()
+	modaaConf1() : Config()
 	{
 	}
 	 

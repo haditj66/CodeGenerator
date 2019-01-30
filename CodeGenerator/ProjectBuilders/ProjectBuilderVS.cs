@@ -19,11 +19,14 @@ namespace CodeGenerator.ProjectBuilders
         }
 
 
-        protected override MySettingsBase GetSettingsOVERRIDE(Config configClass)
+        protected override MySettingsBase GetSettingsOVERRIDE(Config configClass, string pathToProjectSettings)
         {
-            IDESettingVSProj settingProj = new IDESettingVSProj(Path.GetDirectoryName(configClass.FileNameString), ".vcxproj", typeof(IDESettingXMLs.VisualStudioXMLs.Project));
+            
 
-            IDESetting settingFilter = new IDESetting(Path.GetDirectoryName(configClass.FileNameString), ".filters", typeof(IDESettingXMLs.VisualStudioXMLs.Filters.Project));
+
+        IDESettingVSProj settingProj = new IDESettingVSProj(pathToProjectSettings, ".vcxproj", typeof(IDESettingXMLs.VisualStudioXMLs.Project));
+
+            IDESetting settingFilter = new IDESetting(pathToProjectSettings, ".filters", typeof(IDESettingXMLs.VisualStudioXMLs.Filters.Project));
 
             //create the settings
             return new MySettingsVS(settingFilter, settingProj);
@@ -49,7 +52,7 @@ namespace CodeGenerator.ProjectBuilders
 
             //-------------FolderCreation
             //does config folder exist
-            string ConfDirPath = Path.Combine(Path.GetDirectoryName(LibTop.config.FileNameString), "Config");
+            string ConfDirPath = Path.Combine(Path.GetDirectoryName(LibTop.config.ConfigFileFullPath), "Config");
             if (!Directory.Exists(ConfDirPath))
             {
                 Directory.CreateDirectory(ConfDirPath);
