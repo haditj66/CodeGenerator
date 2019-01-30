@@ -585,7 +585,7 @@ void Config::ConfigToXml()
 
 	//send to xml file.
 	std::string t = BASE_DIRECTORY;
-	XMLError eResult = xmlDoc.SaveFile(t.append("SavedData.xml").c_str());
+	XMLError eResult = xmlDoc.SaveFile(t.append("\\SavedData.xml").c_str());
 
 }
 
