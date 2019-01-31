@@ -18,6 +18,9 @@ namespace CodeGenerator.CMD_Handler
     public class CMDHandler
     {
 
+        public string Output;
+        public string Error;
+
         protected ProcessStartInfo processInfo { get; set; }
         protected Process process { get; set; } 
 
@@ -28,17 +31,17 @@ namespace CodeGenerator.CMD_Handler
             if (CMDType == CMDTYPE.VS)
             {
                 //first check if a GetVSEnironmentVariables.bat file exists
-                if (!File.Exists("GetVSEnironmentVariables.bat"))
+                if (!File.Exists(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat")))
                 {
                     //if not, create it
-                    File.WriteAllText("GetVSEnironmentVariables.bat", @"CALL ""C:\Program Files(x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86 \n SET > EnironVariables.txt");
+                    File.WriteAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), @"CALL ""C:\Program Files(x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86 \n SET > EnironVariables.txt");
                 }
 
                 //run that batch file
                 ExecuteCommand("GetVSEnironmentVariables.bat");
 
                 //now get the environment variables that the batch file produced 
-                using (StreamReader sr = new StreamReader("EnironVariables.txt"))
+                using (StreamReader sr = new StreamReader( Path.Combine(Program.DIRECTORYOFTHISCG, "EnironVariables.txt")))
                 {
                     string line;
                     while ((line = sr.ReadLine()) != null)
@@ -99,13 +102,13 @@ namespace CodeGenerator.CMD_Handler
 
             // *** Read the streams ***
             // Warning: This approach can lead to deadlocks, see Edit #2
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
+            Output = process.StandardOutput.ReadToEnd();
+            Error = process.StandardError.ReadToEnd();
 
             exitCode = process.ExitCode;
 #if DEBUG
-            Console.WriteLine("output>>" + (String.IsNullOrEmpty(output) ? "(none)" : output));
-            Console.WriteLine("error>>" + (String.IsNullOrEmpty(error) ? "(none)" : error));
+            Console.WriteLine("output>>" + (String.IsNullOrEmpty(Output) ? "(none)" : Output));
+            Console.WriteLine("error>>" + (String.IsNullOrEmpty(Error) ? "(none)" : Error));
             Console.WriteLine("ExitCode: " + exitCode.ToString(), "ExecuteCommand");
 #endif
             process.Close();

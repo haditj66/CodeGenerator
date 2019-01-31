@@ -358,13 +358,11 @@ void Config::Init()
 		ClassName = name;
 
 
+		//setting the major and adding the MAJOR define
 		int major;
 		if (name != "GlobalBuildConfig")
 		{
-
-			//add a "major" define to the privatedefinelist
-			privateDefineList.push_back((IDefine*)(new Defines<int>("MAJOR", Major, true)));
-
+			 
 
 			//get the Major of the class. make sure that there is a major, a single number at the end of the class.
 
@@ -381,6 +379,11 @@ void Config::Init()
 			else {
 				major = std::stoi(s, nullptr, 10);
 			}
+
+			//add a "major" define to the privatedefinelist
+			Defines<int>* defineMajor = new Defines<int>("MAJOR", Major, true);
+			defineMajor->SetValue(major);
+			privateDefineList.push_back((IDefine*)defineMajor);
 
 		}
 		else {
@@ -476,7 +479,7 @@ void Config::SendToFile(std::string stringToSend)
 void Config::SendToConfigFile(std::string stringToSend)
 {
 	std::fstream file;
-	file.open("Configuration4.h", std::ios::app);
+	file.open(CONFIGURATIONFILE_DIRECTORY, std::ios::app);
 
 	file.write(stringToSend.c_str(), sizeof(char) * stringToSend.length());
 	file.close();
@@ -486,7 +489,7 @@ void Config::DeleteConfigfile()
 {
 
 	std::fstream file;
-	file.open("Configuration4.h", std::ofstream::out | std::ofstream::trunc);
+	file.open(CONFIGURATIONFILE_DIRECTORY, std::ofstream::out | std::ofstream::trunc);
 
 	file.close();
 }
@@ -662,7 +665,7 @@ void Config::PrintHeader(Header theHeader)
 	std::fstream file;
 
 	//put the headers in 
-	file.open("Configuration4.h", std::ios::app);
+	file.open(CONFIGURATIONFILE_DIRECTORY, std::ios::app);
 
 
 	file.write(header.c_str(), sizeof(char) * header.length());

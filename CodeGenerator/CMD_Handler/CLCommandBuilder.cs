@@ -69,6 +69,8 @@ namespace CodeGenerator.CMD_Handler
             //set output
             string fileFullPath = Path.Combine(OutputLocation,Name);
             fileFullPath =Path.ChangeExtension(fileFullPath, ".exe");
+            //change all \ to /
+            fileFullPath = fileFullPath.Replace(@"\", @"/");
             command += @"/out:" + fileFullPath;
 
 

@@ -185,7 +185,7 @@ namespace ExtensionMethods
             return listFilt.Where((MyFilter fil) =>
             {
                 return (fil.DoesAddressExist(name)) != null;
-            }).First() == null ? false : true;
+            }).FirstOrDefault() == null ? false : true;
         }
          
 

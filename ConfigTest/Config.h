@@ -16,6 +16,9 @@
 
 
 std::string const BASE_DIRECTORY = R"(C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest)";
+std::string const CONFIGURATIONFILE_DIRECTORY = "Configuration.h";//R"(Config\Configuration.h)";
+
+
 
 #define STRINGIFY(MACRO) #MACRO 
 

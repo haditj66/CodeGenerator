@@ -16,9 +16,8 @@
     <Filter Include="Config">
       <UniqueIdentifier>{e31151b1-cb8a-4611-8429-1e9930a8d8a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LibraryDependencies">
-      <UniqueIdentifier>{85603918-3326-4516-6457-300358908385}</UniqueIdentifier>
-      <Extensions />
+    <Filter Include="bla">
+      <UniqueIdentifier>{3360f972-6731-4673-b151-753213d25fc8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -29,6 +28,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SomaLibraryClassM1AA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Config\mainCG.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="rg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -42,10 +47,13 @@
     <ClInclude Include="SomaLibraryClassM1AA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Configuration.h">
+    <ClInclude Include="Config\modaaConf.h">
       <Filter>Config</Filter>
     </ClInclude>
-    <ClInclude Include="Config\modaaConf.h">
+    <ClInclude Include="rg.h">
+      <Filter>bla</Filter>
+    </ClInclude>
+    <ClInclude Include="Config\Configuration.h">
       <Filter>Config</Filter>
     </ClInclude>
   </ItemGroup>

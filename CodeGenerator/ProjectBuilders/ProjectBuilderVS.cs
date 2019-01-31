@@ -19,21 +19,14 @@ namespace CodeGenerator.ProjectBuilders
         }
 
 
-        protected override MySettingsBase GetSettingsOVERRIDE(Config configClass, string pathToProjectSettings)
+        protected override MySettingsBase GetSettingsOVERRIDE( string pathToProjectSettings)
         {
-            
-
-
-        IDESettingVSProj settingProj = new IDESettingVSProj(pathToProjectSettings, ".vcxproj", typeof(IDESettingXMLs.VisualStudioXMLs.Project));
-
-            IDESetting settingFilter = new IDESetting(pathToProjectSettings, ".filters", typeof(IDESettingXMLs.VisualStudioXMLs.Filters.Project));
-
-            //create the settings
-            return new MySettingsVS(settingFilter, settingProj);
+             
+            return MySettingsVS.CreateMySettingsVS(pathToProjectSettings); 
         }
 
          
-
+        /*
         public override void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir)
         {
             //-------------config filter
@@ -52,13 +45,13 @@ namespace CodeGenerator.ProjectBuilders
 
             //-------------FolderCreation
             //does config folder exist
-            string ConfDirPath = Path.Combine(Path.GetDirectoryName(LibTop.config.ConfigFileFullPath), "Config");
+            string ConfDirPath = Path.Combine(BaseDirectoryForProject, "Config");// Path.Combine(Path.GetDirectoryName(LibTop.config.ConfigFileFullPath), "Config");
             if (!Directory.Exists(ConfDirPath))
             {
                 Directory.CreateDirectory(ConfDirPath);
             }
 
-            //-------------mainCG.cpp NameOfCGenProjectConf.h Files
+            //-------------mainCG.cpp NameOfCGenProjectConf.h Files  Configuration.h
             //   settings should already check if it exists before adding it
             MyCLCompileFile ccompMainCg = new MyCLCompileFile(configFilter, "mainCG", "Config");
             LibTop.AddCCompileFile(ccompMainCg);
@@ -76,6 +69,13 @@ namespace CodeGenerator.ProjectBuilders
                 maincgTemplate.CreateTemplate();
                 Console.WriteLine(NameOfCGenProject+"Conf.h" + "file created");
             }
+            if (!File.Exists(Path.Combine(ConfDirPath, "Configuration.h")))
+            {
+                File.Create(Path.Combine(ConfDirPath, "Configuration.h"));
+                Console.WriteLine("Configuration.h " + "file created");
+            }
+
+
 
 
             //add additionalinclude for configTest
@@ -83,35 +83,11 @@ namespace CodeGenerator.ProjectBuilders
 
 
             //save the settings
-            LibTop.GenerateXMLSettings();
-
-
-            /*
-            bool ShouldRecreatemainCG = false;
-            if (LibTop.GetAllCCompile().GetCCompileWithName("mainCG") != null)
-            {
-                // since one exists make sure it is in the right filter
-                ShouldRecreatemainCG = LibTop.GetAllCCompile().GetCCompileWithName("mainCG").FilterIBelongTo.GetFullAddress() == "Config";
-            }
-            else
-            {
-                //it doesnt exist so make one
-                ShouldRecreatemainCG = true;
-            } 
-            if (ShouldRecreatemainCG)
-            {
-                MyCLCompileFile ccompMainCg = new MyCLCompileFile(configFilter,"mainCG", ConfDirPath);
-                LibTop.AddCCompileFile(ccompMainCg);
-            }
-            */
-            //NameOfCGenProjectConf.h 
-
-
-
-
-            //.GetAllCCompile().First().FilterIBelongTo.Name
-
+            LibTop.GenerateXMLSettings(BaseDirectoryForProject);
+             
 
         }
+
+        */
     }
 }

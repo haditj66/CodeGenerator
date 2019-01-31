@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Extensions;
+using ExtensionMethods;
+using CodeGenerator.FileTemplates;
 
 namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 {
@@ -18,6 +20,19 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         {
 
         }
+
+
+        public static MySettingsVS CreateMySettingsVS(string pathToProjectSettings)
+        {
+
+            IDESettingVSProj settingProj = new IDESettingVSProj(pathToProjectSettings, ".vcxproj", typeof(IDESettingXMLs.VisualStudioXMLs.Project));
+
+            IDESetting settingFilter = new IDESetting(pathToProjectSettings, ".filters", typeof(IDESettingXMLs.VisualStudioXMLs.Filters.Project));
+
+            MySettingsVS vssetting = new MySettingsVS(settingFilter, settingProj);
+            vssetting.Initiate();
+            return vssetting;
+        } 
 
 
         protected override void AddSTRINGIncludeAsAdditionalIncludes(string additionalIncludeDir)
@@ -36,6 +51,10 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         protected override bool DoesAdditionalIncludesAlreadyExist(string additionalIncludeDir)
         {
             ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").First();
+            if (tdgs.ClCompile.AdditionalIncludeDirectories == null)
+            {
+                return false;
+            } 
 
             List<char> cc = new  List<char>();
             //create regex pattern by putting escapes
@@ -169,7 +188,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                         return fil.GetFilterFromAddress(clInclude.Filter) != null;
                     })
                     .First();
-                var MyClInc = new MyCLIncludeFile(filterTheCincBelongsTo, Path.GetFileName(clInclude.Include));
+                var MyClInc = new MyCLIncludeFile(filterTheCincBelongsTo, Path.GetFileName(clInclude.Include), Path.GetDirectoryName(clInclude.Include));
 
                 MyCLIncludeFileResult.Add(MyClInc);
             }
@@ -177,6 +196,65 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             return MyCLIncludeFileResult;
         }
 
+        public override void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject)
+        {
+            
+            MyFilter configFilter;
+            if (!myFilters.DoesFilterWithNameExist("Config"))
+            {
+                configFilter = new MyFilter("Config"); 
+                AddFilter(configFilter);
+            }
+            else
+            {
+                configFilter = myFilters.GetFilterAtAddress("Config");
+            }
+            
+
+            //-------------FolderCreation
+            //does config folder exist
+            string ConfDirPath = Path.Combine(Program.envIronDirectory, "Config");// Path.Combine(Path.GetDirectoryName(LibTop.config.ConfigFileFullPath), "Config");
+            if (!Directory.Exists(ConfDirPath))
+            {
+                Directory.CreateDirectory(ConfDirPath);
+            }
+
+            //-------------mainCG.cpp NameOfCGenProjectConf.h Files  Configuration.h
+            //   settings should already check if it exists before adding it
+            MyCLCompileFile ccompMainCg = new MyCLCompileFile(configFilter, "mainCG", "Config");
+            AddCLCompileFile(ccompMainCg); 
+            if (!File.Exists(Path.Combine(ConfDirPath, "mainCG.cpp")))
+            {
+                FileTemplateMainCG maincgTemplate = new FileTemplateMainCG(ConfDirPath, NameOfCGenProject);
+                maincgTemplate.CreateTemplate();
+                Console.WriteLine("mainCG.cpp" + "file created");
+            }
+            MyCLIncludeFile ccincNameOfCGenProjectConf = new MyCLIncludeFile(configFilter, NameOfCGenProject + "Conf", "Config");
+            AddCLIncludeFile(ccincNameOfCGenProjectConf);
+            if (!File.Exists(Path.Combine(ConfDirPath, NameOfCGenProject + "Conf.h")))
+            {
+                FileTemplateLibConf maincgTemplate = new FileTemplateLibConf(ConfDirPath, NameOfCGenProject);
+                maincgTemplate.CreateTemplate();
+                Console.WriteLine(NameOfCGenProject + "Conf.h" + "file created");
+            }
+            MyCLIncludeFile ccincConfiguration = new MyCLIncludeFile(configFilter, "Configuration.h", "Config");
+            AddCLIncludeFile(ccincConfiguration);
+            if (!File.Exists(Path.Combine(ConfDirPath, "Configuration.h")))
+            {
+                File.Create(Path.Combine(ConfDirPath, "Configuration.h"));
+                Console.WriteLine("Configuration.h " + "file created");
+            }
+
+
+            //add additionalinclude for configTest
+            AddAdditionalInclude(Program.PATHTOCONFIGTEST);
+            
+
+            //save the settings 
+            GenerateXMLSettings(Program.envIronDirectory);
+
+
+        }
 
         protected override void AddMyClIncludesAsCIncludes(MyCLIncludeFile CLIncludeFile)
         {
@@ -237,7 +315,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                     .Where((MyFilter fil) => { return fil.GetFilterFromAddress(cCompile.Filter) != null; })
                     .First();
 
-                var MyCComp = new MyCLCompileFile(filterTheCcompBelongsTo, Path.GetFileName(cCompile.Include));
+                var MyCComp = new MyCLCompileFile(filterTheCcompBelongsTo, Path.GetFileName(cCompile.Include), Path.GetDirectoryName(cCompile.Include));
 
                 MyCLCompileFileResult.Add(MyCComp);
             }
@@ -325,5 +403,6 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                 .ToList().First().ClCompile
                 .RemoveAll((ClCompile cl) => { return cl.Include.Contains("LibraryDependencies"); });
         }
+         
     }
 }

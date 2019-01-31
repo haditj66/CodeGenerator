@@ -16,6 +16,7 @@ namespace CodeGenerator.CMD_Handler
 
             //add .lib for configTest
             MyStaticLib lib = new MyStaticLib("ConfigTest.lib" , PathOfConfigTest);
+            Libs.Add(lib);
 
         }
     }

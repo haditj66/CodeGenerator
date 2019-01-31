@@ -1,4 +1,4 @@
-﻿#define TESTING 
+﻿//#define TESTING 
 
 using System;
 using System.Collections.Generic;
@@ -18,6 +18,7 @@ using CodeGenerator.cgenXMLSaves;
 using System.Diagnostics;
 using CodeGenerator.CMD_Handler;
 using ExtensionMethods;
+using System.Reflection;
 
 namespace CodeGenerator
 {
@@ -34,6 +35,7 @@ namespace CodeGenerator
         [Verb("generate", HelpText = "generate the code")]
         public class GenerateOptions
         {
+            /*
             [Option('t', Separator = ':')]
             public IEnumerable<string> Types { get; set; }
 
@@ -51,7 +53,7 @@ namespace CodeGenerator
 
             [Value(2)]
             public double DoubleValue { get; set; }
-
+            */
         }
 
         [Verb("degenerate", HelpText = "degenerate the code")]
@@ -83,18 +85,19 @@ namespace CodeGenerator
 
         }
 
-
-        public static string CGPROJECTBASEDIRECTORY = "CGensaveFiles";
+        public static string DIRECTORYOFTHISCG = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static string CGSAVEFILESBASEDIRECTORY = "CGensaveFiles";
+        public static string CGCONFCOMPILATOINSBASEDIRECTORY = "ConfigCompilations";
         public static string PATHTOCONFIGTEST = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest";
 
 #if TESTING
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
-
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";//
 #else
         public static string envIronDirectory = Environment.CurrentDirectory;
 #endif
-            
+
         public static SaveFilecgenProject savefileProjLocal = new SaveFilecgenProject();
         public static SaveFilecgenConfig saveFilecgenConfigLocal = new SaveFilecgenConfig();
         public static ProjectBuilderVS projectBuilderForVs;
@@ -108,7 +111,7 @@ namespace CodeGenerator
             //string e = Environment.CurrentDirectory;
             //Console.WriteLine(e);
             //ProjectVSTest();
-            CreateProjectBuilder();
+            //CreateProjectBuilder(); this should not be done here as a saveddata.xml may not even be created yet
 
             Action RunParser = () =>
             {
@@ -121,16 +124,18 @@ namespace CodeGenerator
 
 #if !TESTING
             command = args;
-              
+
             if (command.Count() != 0)
 #else
 
             //command = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
             //command = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
-            command = "init moda".Split(' ');
+            //command = "init moda".Split(' ');
             //command = ("config --directoryofconfig " +  @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest").Split(' ');
             //command = "".Split(' ');
-            //command = "generate".Split(' ');
+            command = "generate".Split(' ');
+            //command = "init ModuleB".Split(' ');
+
             if (command != null && command.Count() > 0)
 #endif 
             {
@@ -143,7 +148,7 @@ namespace CodeGenerator
                 if (IsProjectExistsAtEnvironDirectory())
                 {
                     //get the SaveFilecgenProject for this directory
-                    SaveFilecgenProject savefileAtDir = new SaveFilecgenProject(envIronDirectory + "\\" + CGPROJECTBASEDIRECTORY);
+                    SaveFilecgenProject savefileAtDir = new SaveFilecgenProject(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
 
                     var projHere = savefileProjLocal.CgenProjects.Projects.Where((cgenProject cgenproj) => cgenproj.UniqueIdentifier == savefileAtDir.CgenProjects.Projects.FirstOrDefault().UniqueIdentifier).First();
                     if (projHere != null)
@@ -168,7 +173,7 @@ namespace CodeGenerator
 
         static bool IsProjectExistsAtEnvironDirectory()
         {
-            if (Directory.Exists(envIronDirectory + "\\" + CGPROJECTBASEDIRECTORY))
+            if (Directory.Exists(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY))
             {
                 return true;
             }
@@ -182,7 +187,7 @@ namespace CodeGenerator
                 throw new Exception("there is no such project here yet");
             }
 
-            return (new SaveFilecgenProject(envIronDirectory + "\\" + CGPROJECTBASEDIRECTORY));
+            return (new SaveFilecgenProject(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY));
 
         }
 
@@ -191,9 +196,9 @@ namespace CodeGenerator
         {
             //if there is no cgenXMLSaves directory than this must be the first config run. build all the
             //config files needed here.
-            if (!Directory.Exists(CGPROJECTBASEDIRECTORY))
+            if (!Directory.Exists(CGSAVEFILESBASEDIRECTORY))
             {
-                Directory.CreateDirectory(CGPROJECTBASEDIRECTORY);
+                Directory.CreateDirectory(CGSAVEFILESBASEDIRECTORY);
             }
 
             if (opts.directoryofconfig != null || opts.directoryofconfig != "")
@@ -220,7 +225,10 @@ namespace CodeGenerator
             //check that there isnt already a project here.  
             if (IsProjectExistsAtEnvironDirectory())
             {
-                projectBuilderForVs.RecreateConfigurationFilterFolderIncludes(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Projects.First().NameOfProject, saveFilecgenConfigLocal.CgenConfig.DirectoryOfConfig);
+                //get project settings for this.
+                MySettingsVS settings = MySettingsVS.CreateMySettingsVS(envIronDirectory);
+                settings.RecreateConfigurationFilterFolderIncludes(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Projects.First().NameOfProject);
+                //projectBuilderForVs.RecreateConfigurationFilterFolderIncludes(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Projects.First().NameOfProject, saveFilecgenConfigLocal.CgenConfig.DirectoryOfConfig);
                 Console.WriteLine(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Projects.First().NameOfProject + " already exists as a project here");
                 return null;
             }
@@ -230,6 +238,10 @@ namespace CodeGenerator
             }
             else
             {
+                //get settings for poject you are wanting to init
+                MySettingsVS settings = MySettingsVS.CreateMySettingsVS(envIronDirectory);
+
+
                 //todo say that you can not put numbers in the name!! 
                 if (Regex.IsMatch(opts.name, @"\d"))
                 {
@@ -241,14 +253,14 @@ namespace CodeGenerator
                 //then I need to create a new project as none exist and user wants to create one 
                 try
                 {
-                    Directory.CreateDirectory(envIronDirectory + "\\" + CGPROJECTBASEDIRECTORY);
+                    Directory.CreateDirectory(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
                     //CREATE ALL THE FILES THAT ARE NEEDED FOR PROJECT INITIATION!
                     // creation of the SaveFilecgenProject file
-                    SaveFilecgenProject saveFilecgenProject = new SaveFilecgenProject(envIronDirectory + "\\" + CGPROJECTBASEDIRECTORY);
+                    SaveFilecgenProject saveFilecgenProject = new SaveFilecgenProject(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
                     cgenProjects projs = saveFilecgenProject.CgenProjects;
                     cgenProject projToAdd = new cgenProject();
                     projToAdd.NameOfProject = opts.name;
-                    projToAdd.PathOfProject = envIronDirectory + "\\" + CGPROJECTBASEDIRECTORY;
+                    projToAdd.PathOfProject = envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY;
                     projToAdd.UniqueIdentifier = cgenXMLMemeberCreationHelper.UniqueIdentifierCreator();
                     //also add the project to the localProjSettings
                     savefileProjLocal.CgenProjects.Projects.Add(projToAdd);
@@ -257,15 +269,16 @@ namespace CodeGenerator
                     //save created files
                     saveFilecgenProject.Save();
                     savefileProjLocal.Save();
-
-                    projectBuilderForVs.RecreateConfigurationFilterFolderIncludes(opts.name, saveFilecgenConfigLocal.CgenConfig.DirectoryOfConfig);
+                    settings.RecreateConfigurationFilterFolderIncludes(opts.name);
+                    //projectBuilderForVs.RecreateConfigurationFilterFolderIncludes(opts.name, saveFilecgenConfigLocal.CgenConfig.DirectoryOfConfig);
 
                     Console.WriteLine("Project successfully created");
 
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     Console.WriteLine("There was a problem with project creation");
+                    Console.WriteLine(e);
                 }
                 // so we have a name and no project exists here. create one 
 
@@ -285,30 +298,94 @@ namespace CodeGenerator
         }
 
         static ParserResult<object> Generate(GenerateOptions opts)
-        { 
+        {
 
-            //get all .cpp files that are in the top level library and are only in the Config Filter
-            var ccompiles = projectBuilderForVs.LibTop.GetAllCCompile().GetCCompilesFromFilter("Config");
-            CLCommandBuilderForConfigTest cl = new CLCommandBuilderForConfigTest("configGen",PATHTOCONFIGTEST, ccompiles.ToArray());
-            foreach (var include in projectBuilderForVs.LibTop.GetAllAdditionalIncludes())
+            //first make sure that a project exists here
+            if (IsProjectExistsAtEnvironDirectory())
             {
-                //just add all additional includes that show up in the top level library
-                if (include != @"%(AdditionalIncludeDirectories)")
+                //get the project settings for the project configs I want to generate. for VS for NOW!
+                MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(envIronDirectory);
+                VSsetting.Initiate();
+
+                //get all .cpp files that are in the top level library and are only in the Config Filter
+                var ccompiles = VSsetting.CLCompileFiles.GetCCompilesFromFilter("Config");//projectBuilderForVs.LibTop.GetAllCCompile().GetCCompilesFromFilter("Config");
+                CLCommandBuilderForConfigTest cl = new CLCommandBuilderForConfigTest("configGen", PATHTOCONFIGTEST, ccompiles.ToArray());
+                foreach (var include in VSsetting.StringIncludes)
                 {
-                    cl.AdditionalIncludes.Add(include);
-                } 
+                    //just add all additional includes that show up in the top level library
+                    if (include != @"%(AdditionalIncludeDirectories)")
+                    {
+                        //check if it is a relative path
+                        if (!include.Contains(@":"))
+                        {
+                            cl.AdditionalIncludes.Add(Path.Combine(envIronDirectory, include));
+                        }
+                        else
+                        {
+                            cl.AdditionalIncludes.Add(include);
+                        }
+
+                    }
+                }
+                //add additoinal include for the baseProject as well as the baseproject/Config folder
+                cl.AdditionalIncludes.Add(envIronDirectory);
+                cl.AdditionalIncludes.Add(Path.Combine(envIronDirectory, "Config"));
+
+
+                //the output will be the same path as the where the mod_conf.h file is located
+                cl.OutputLocation = CGCONFCOMPILATOINSBASEDIRECTORY;//Path.Combine(projectBuilderForVs.BaseDirectoryForProject, "Config");
+
+                //Im here. I need to grab the mainCG.cpp, copy it into a temp file locally, change mainCG() { }  to main() { }
+                var maincg = ccompiles.Where((MyCLCompileFile ccom) => { return ccom.FullLocationName == "Config\\mainCG.cpp"; }).FirstOrDefault();
+                if (maincg == null)
+                {
+                    Console.WriteLine("CGEN ERROR: missing a mainCG.cpp file in your config filter");
+                }
+                cl.FilesCComp.Remove(maincg);
+
+                string mainCGstr = File.ReadAllText(Path.Combine(envIronDirectory, maincg.FullLocationName));
+                mainCGstr = Regex.Replace(mainCGstr, @"int mainCG", @"int main");
+                //write it all to a local temp mainCG.cpp
+                File.WriteAllText("mainCG.cpp", mainCGstr);
+                //add that ccompile instead now
+                MyCLCompileFile newMAinCG = new MyCLCompileFile(maincg.FilterIBelongTo, maincg.Name, "");
+                cl.FilesCComp.Add(newMAinCG);
+
+                string ss = cl.GetCompileCommand();
+
+
+
+                CMDHandler cmdHandler = new CMDHandler(CMDTYPE.VS);
+                cmdHandler.SetWorkingDirectory(DIRECTORYOFTHISCG);
+                cmdHandler.ExecuteCommand(ss);
+                //check if compilation was succesful
+                if (cmdHandler.Output.Contains(" : error"))
+                {
+                    Console.WriteLine("ERROR: there was a problem with compilation of your configuration");
+                }
+                else
+                {
+                    //if no problem than run that config.exe, run the 
+                    cmdHandler.SetWorkingDirectory(Path.Combine(DIRECTORYOFTHISCG, CGCONFCOMPILATOINSBASEDIRECTORY));
+                    cmdHandler.ExecuteCommand("CALL configGen.exe");
+
+                    //a Configuration.h file was created. grab the contents of that and put it in the proper projectbase/config/Configuration.h file
+                    string configuration_hStr = File.ReadAllText(Path.Combine(DIRECTORYOFTHISCG, CGCONFCOMPILATOINSBASEDIRECTORY, "Configuration.h"));
+                    string ToFile = Path.Combine(envIronDirectory, "Config", "Configuration.h");
+                    File.WriteAllText(ToFile, configuration_hStr);
+
+                    Console.WriteLine("Configuration.h File Created");
+                }
+
             }
-            //the output will be the same path as the where the mod_conf.h file is located
-            cl.OutputLocation = projectBuilderForVs.BaseDirectoryForProject;
-
-            string ss = cl.GetCompileCommand();
-
-            
-
-            CMDHandler cmdHandler = new CMDHandler(CMDTYPE.VS);
-            string buildCommand = @"cl    /EHsc /MDd   /Fo""Debug\Dd""\ /I ""C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest"" /I ""C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA"" main.cpp   /link ConfigTest.lib   /libpath:""C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest""    /out:Debug/Dd/configGen.exe";
-            cmdHandler.SetWorkingDirectory(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A");
-            cmdHandler.ExecuteCommand(buildCommand);
+            else
+            {
+                //project does not exist
+                Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   ");
+            }
+            //string buildCommand = @"cl    /EHsc /MDd   /Fo""Debug\Dd""\ /I ""C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest"" /I ""C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA"" main.cpp   /link ConfigTest.lib   /libpath:""C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest""    /out:Debug/Dd/configGen.exe";
+            //cmdHandler.SetWorkingDirectory(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A");
+            //cmdHandler.ExecuteCommand(buildCommand);
             /* 
             ExecuteCommand("GetVSEnironmentVariables.bat");
             //change directories from processInfo.workingdireectory
@@ -327,12 +404,13 @@ namespace CodeGenerator
             //ExecuteCommand(@"cd C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A");
             ExecuteCommand(buildCommand);
             */
+            /*
             Console.WriteLine(string.Join(" ", command));
 
             foreach (var item in opts.IncludeFiles)
             {
                 Console.WriteLine(item);
-            }
+            }*/
             /*if (o.Verbose)
             {
                 Console.WriteLine($"Verbose output enabled. Current Arguments: -v {o.Verbose}");
@@ -368,14 +446,14 @@ namespace CodeGenerator
             //DONT WORRY ABOUT LIBRARIES THAT DEPEND ON LIBRARIES FOR NOW JUST GET THIS MUCH TO WORK.
             // steps to import a new library would be
             //1. get the libraries config xmlclasses created. (located in configTest/savedData.xml)
-            IDESetting settingConfig = new IDESetting(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest", ".xml", typeof(Root));
+            IDESetting settingConfig = new IDESetting(PATHTOCONFIGTEST, ".xml", typeof(Root));
 
 
             //2: get the libraries settings xml file (they will be in the same directory as the config 
             //file path )converted to the settingxml   
-            
+
             projectBuilderForVs = new ProjectBuilderVS(settingConfig);
-            
+
         }
 
         static void ProjectVSTest()
@@ -388,7 +466,7 @@ namespace CodeGenerator
             //  prefix(of libraries top level uses)
             //      confTypePrefix(for libraries that are same but different template type.)  
             //get the top level library
-            List<Library> libraries = projectBuilderForVs.Libraries; 
+            List<Library> libraries = projectBuilderForVs.Libraries;
             projectBuilderForVs.RecreateLibraryDependenciesFolders();
             List<Library> allNotTopAndNotGlobal = libraries.Where((Library lib) => { return lib.IsTopLevel == false && lib.config.ClassName != "GlobalBuildConfig"; }).ToList();
             Library libTop = libraries.Where((Library lib) => { return lib.IsTopLevel; }).First();
@@ -445,7 +523,7 @@ namespace CodeGenerator
 
 
             //6. Finally recreate the xml settings files. in this case there will be two .xproj and .filters
-            libTop.GenerateXMLSettings();
+            libTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
 
 
 

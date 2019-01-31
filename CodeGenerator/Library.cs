@@ -165,14 +165,9 @@ namespace CodeGenerator
             settings.AddCLIncludeFile(MyCIncludeToAdd);
         }
 
-        public void GenerateXMLSettings()
+        public void GenerateXMLSettings(string baseDirectoryForProject)
         {
-
-            foreach (var setting in settings.XmlSettings)
-            {
-                
-                setting.GenerateXMLSetting(Path.GetDirectoryName(config.ConfigFileFullPath));
-            }
+            settings.GenerateXMLSettings(baseDirectoryForProject); 
 
             /*
             if (settings.XmlFilterClass != null)
