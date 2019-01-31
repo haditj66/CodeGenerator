@@ -14,7 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Config">
-      <UniqueIdentifier>{78299894-9075-3356-5676-545484501177}</UniqueIdentifier>
+      <UniqueIdentifier>{49260761-2564-5902-5400-183609687919}</UniqueIdentifier>
       <Extensions />
     </Filter>
   </ItemGroup>
@@ -35,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="Config\mainCG.cpp">
       <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

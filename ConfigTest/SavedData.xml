@@ -10,16 +10,23 @@
                 <EnumDefinition Name="BUILD_TESTING" Value="2"/>
             </EnumsDefinintions>
             <Defines>
-                <Define DefineName="PLATFORM" Type="enum PlatformEnum" Value="2" MyPrivacy="public" PrefixName="GlobalConfigBuild" IsStatic="true"/>
+                <Define DefineName="PLATFORM" Type="enum PlatformEnum" Value="1" MyPrivacy="public" PrefixName="GlobalConfigBuild" IsStatic="true"/>
                 <Define DefineName="BUILD" Type="enum BuildEnum" Value="0" MyPrivacy="public" PrefixName="GlobalConfigBuild" IsStatic="true"/>
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="ModuleBConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B\Config\ModuleBconf.h" ClassName="ModuleBConf0">
-            <EnumsDefinintions/>
+        <Config Prefix="modaaConf1" myInstanceNum="0" Major="1" ConfTypePrefix="MODE0" isTopLevel="true" FileNameString="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA\Config\modaaconf.h" ClassName="modaaConf1">
+            <EnumsDefinintions>
+                <EnumDefinition Name="MODE_Fast" Value="0"/>
+                <EnumDefinition Name="MODE_Slow" Value="1"/>
+            </EnumsDefinintions>
             <Defines>
-                <Define DefineName="BUFFERSIZE" Type="int" Value="2000" MyPrivacy="public" PrefixName="ModuleBConf0" IsStatic="false"/>
-                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="ModuleBConf0" IsStatic="true"/>
+                <Define DefineName="BUFFERSIZE" Type="int" Value="35" MyPrivacy="public" PrefixName="modaaConf1" IsStatic="false"/>
+                <Define DefineName="MSG1" Type="string" Value="&quot;kihi&quot;" MyPrivacy="public" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="MSG2" Type="string" Value="&quot;hello again!!!&quot;" MyPrivacy="public" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="BUFFERSIZELOCAL" Type="int" Value="50" MyPrivacy="private" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="MAJOR" Type="int" Value="1" MyPrivacy="private" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="MODE" Type="enum ModeEnum" Value="0" MyPrivacy="template" PrefixName="modaaConf1" IsStatic="true"/>
             </Defines>
             <Depends/>
         </Config>

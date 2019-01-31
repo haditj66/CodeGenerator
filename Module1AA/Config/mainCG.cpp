@@ -18,7 +18,10 @@ int mainCG()
 	m.MSG2->SetValue("hello again!!!");
 
 	int y = 90;
-	y = y > 34 ? 34 : y;
+	y = y > 35 ? 35 : y;
+	y += 23;
+	
+
 	m.BUFFERSIZE->SetValue(y);
 
 	/*

@@ -1,4 +1,4 @@
-﻿//#define TESTING 
+﻿#define TESTING 
 
 using System;
 using System.Collections.Generic;
@@ -91,9 +91,9 @@ namespace CodeGenerator
         public static string PATHTOCONFIGTEST = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest";
 
 #if TESTING
-        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";//
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";//
 #else
         public static string envIronDirectory = Environment.CurrentDirectory;
 #endif
@@ -346,7 +346,7 @@ namespace CodeGenerator
                 string mainCGstr = File.ReadAllText(Path.Combine(envIronDirectory, maincg.FullLocationName));
                 mainCGstr = Regex.Replace(mainCGstr, @"int mainCG", @"int main");
                 //write it all to a local temp mainCG.cpp
-                File.WriteAllText("mainCG.cpp", mainCGstr);
+                File.WriteAllText(Path.Combine(DIRECTORYOFTHISCG, "mainCG.cpp"), mainCGstr);
                 //add that ccompile instead now
                 MyCLCompileFile newMAinCG = new MyCLCompileFile(maincg.FilterIBelongTo, maincg.Name, "");
                 cl.FilesCComp.Add(newMAinCG);
@@ -355,7 +355,7 @@ namespace CodeGenerator
 
 
 
-                CMDHandler cmdHandler = new CMDHandler(CMDTYPE.VS);
+                CMDHandler cmdHandler = new CMDHandler(CMDTYPE.VS, DIRECTORYOFTHISCG);
                 cmdHandler.SetWorkingDirectory(DIRECTORYOFTHISCG);
                 cmdHandler.ExecuteCommand(ss);
                 //check if compilation was succesful

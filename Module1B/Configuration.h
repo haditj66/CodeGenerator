@@ -16,8 +16,6 @@
 #define BUILD_DEBUG  0
 #define BUILD_RELEASE  1
 #define BUILD_TESTING  2
-#define MODE_Fast  0
-#define MODE_Slow  1
 
 
 //****************************************************
@@ -25,11 +23,8 @@
 //names of defines will be prefixName+suffixMajor_prefixInstance_defineName_instanceOfconfig
 //****************************************************
 
-#define PLATFORM  1
+#define PLATFORM  2
 #define BUILD  0
-#define BUFFERSIZE  35
-#define MSG1  "kihi"
-#define MSG2  "hello again!!!"
-#define BUFFERSIZELOCAL  50
-#define MAJOR  1
-#define MODE  0
+#define BUFFERSIZE  42
+#define BUFFERSIZE2  24
+#define MAJOR  0

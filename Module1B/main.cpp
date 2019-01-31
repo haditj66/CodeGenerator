@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ModuleBconf.h"
+#include "Config/ModuleBconf.h"
 #include "GlobalBuildConfig.h"   
 
-int mainCG()
-{  
+int main()
+{
 
 	GlobalBuildConfig glob;
 	glob.Init();
@@ -16,8 +16,8 @@ int mainCG()
 	ModuleB.Init(); //dont forget to init() every library
 	int p = 35;
 	p += 7;
-	ModuleB.BUFFERSIZE->SetValue(35);
+	ModuleB.BUFFERSIZE->SetValue(p);
 
 	Config::PrintDefines(ModuleB);
-	 return 1;
+	return 1;
 }

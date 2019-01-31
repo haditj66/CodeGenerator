@@ -25,5 +25,6 @@
 
 #define PLATFORM  2
 #define BUILD  0
-#define BUFFERSIZE  2000
+#define BUFFERSIZE  1814
+#define BUFFERSIZE2  24
 #define MAJOR  0

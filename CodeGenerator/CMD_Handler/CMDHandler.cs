@@ -24,20 +24,24 @@ namespace CodeGenerator.CMD_Handler
         protected ProcessStartInfo processInfo { get; set; }
         protected Process process { get; set; } 
 
-        public CMDHandler(CMDTYPE CMDType)
+        public CMDHandler(CMDTYPE CMDType, string StartingWorkingDirtory)
         {
             processInfo = new ProcessStartInfo("cmd.exe");
-
+            SetWorkingDirectory(StartingWorkingDirtory);
             if (CMDType == CMDTYPE.VS)
             {
                 //first check if a GetVSEnironmentVariables.bat file exists
                 if (!File.Exists(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat")))
                 {
-                    //if not, create it
-                    File.WriteAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), @"CALL ""C:\Program Files(x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86 \n SET > EnironVariables.txt");
+                    //also create environmental.txt whether it exists or not
+                    File.Create(Path.Combine(Program.DIRECTORYOFTHISCG, "EnironVariables.txt"));
+
+                    //if not, create it 
+                    File.WriteAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), @"CALL ""C:\Program Files(x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86");
+                    File.AppendAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), "\n SET > " + Path.Combine(Program.DIRECTORYOFTHISCG, "EnironVariables.txt"));
                 }
 
-                //run that batch file
+                //run that batch file 
                 ExecuteCommand("GetVSEnironmentVariables.bat");
 
                 //now get the environment variables that the batch file produced 
@@ -72,7 +76,7 @@ namespace CodeGenerator.CMD_Handler
         } 
 
 
-        public void ExecuteCommand(string command)
+        public void ExecuteCommand(string command, bool SupressErrorMsg = false)
         {
             //if this is a cd command, handle it differently
             if (Regex.IsMatch(command, @"^\s*cd\s*"))
@@ -104,6 +108,12 @@ namespace CodeGenerator.CMD_Handler
             // Warning: This approach can lead to deadlocks, see Edit #2
             Output = process.StandardOutput.ReadToEnd();
             Error = process.StandardError.ReadToEnd();
+            if (SupressErrorMsg)
+            {
+                Output = "";
+                Error = "";
+            }
+            
 
             exitCode = process.ExitCode;
 #if DEBUG
