@@ -15,8 +15,8 @@ int mainCG()
 	ModuleBConf0  ModuleB;
 	ModuleB.Init(); //dont forget to init() every library
 	int p = 35;
-	p += 7;
-	ModuleB.BUFFERSIZE->SetValue(35);
+	p += 80;
+	ModuleB.BUFFERSIZE->SetValue(p);
 
 	Config::PrintDefines(ModuleB);
 	 return 1;

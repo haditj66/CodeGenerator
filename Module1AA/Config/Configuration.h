@@ -27,7 +27,7 @@
 
 #define PLATFORM  1
 #define BUILD  0
-#define BUFFERSIZE  35
+#define BUFFERSIZE  59
 #define MSG1  "kihi"
 #define MSG2  "hello again!!!"
 #define BUFFERSIZELOCAL  50

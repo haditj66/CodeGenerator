@@ -19,7 +19,7 @@ int mainCG()
 
 	int y = 90;
 	y = y > 35 ? 35 : y;
-	y += 23;
+	y += 24;
 	
 
 	m.BUFFERSIZE->SetValue(y);

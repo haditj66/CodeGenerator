@@ -30,16 +30,24 @@ namespace CodeGenerator.CMD_Handler
             SetWorkingDirectory(StartingWorkingDirtory);
             if (CMDType == CMDTYPE.VS)
             {
+                
                 //first check if a GetVSEnironmentVariables.bat file exists
                 if (!File.Exists(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat")))
                 {
                     //also create environmental.txt whether it exists or not
-                    File.Create(Path.Combine(Program.DIRECTORYOFTHISCG, "EnironVariables.txt"));
+                    //File.Create(Path.Combine(Program.DIRECTORYOFTHISCG, "EnironVariables.txt"));
 
                     //if not, create it 
-                    File.WriteAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), @"CALL ""C:\Program Files(x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86");
+                    File.WriteAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), @"CALL ""C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86");
                     File.AppendAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), "\n SET > " + Path.Combine(Program.DIRECTORYOFTHISCG, "EnironVariables.txt"));
                 }
+                /*
+                //first check if a GetVSEnironmentVariables.bat file exists
+                if (!File.Exists(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat")))
+                {
+                    //if not, create it
+                    File.WriteAllText(Path.Combine(Program.DIRECTORYOFTHISCG, "GetVSEnironmentVariables.bat"), @"CALL ""C:\Program Files(x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86 \n SET > EnironVariables.txt");
+                }*/
 
                 //run that batch file 
                 ExecuteCommand("GetVSEnironmentVariables.bat");
