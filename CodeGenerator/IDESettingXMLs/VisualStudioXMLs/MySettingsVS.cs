@@ -45,7 +45,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
             ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").First();
 
-            tdgs.ClCompile.AdditionalIncludeDirectories += additionalIncludeDir;
+            tdgs.ClCompile.AdditionalIncludeDirectories = additionalIncludeDir + tdgs.ClCompile.AdditionalIncludeDirectories;
         }
 
         protected override bool DoesAdditionalIncludesAlreadyExist(string additionalIncludeDir)
@@ -237,12 +237,12 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                 maincgTemplate.CreateTemplate();
                 Console.WriteLine(NameOfCGenProject + "Conf.h" + "file created");
             }
-            MyCLIncludeFile ccincConfiguration = new MyCLIncludeFile(configFilter, "Configuration.h", "Config");
+            MyCLIncludeFile ccincConfiguration = new MyCLIncludeFile(configFilter, "ConfigurationCG.h", "Config");
             AddCLIncludeFile(ccincConfiguration);
-            if (!File.Exists(Path.Combine(ConfDirPath, "Configuration.h")))
+            if (!File.Exists(Path.Combine(ConfDirPath, "ConfigurationCG.h")))
             {
-                File.Create(Path.Combine(ConfDirPath, "Configuration.h"));
-                Console.WriteLine("Configuration.h " + "file created");
+                File.Create(Path.Combine(ConfDirPath, "ConfigurationCG.h"));
+                Console.WriteLine("ConfigurationCG.h " + "file created");
             }
 
 

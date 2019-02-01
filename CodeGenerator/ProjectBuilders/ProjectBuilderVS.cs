@@ -15,17 +15,77 @@ namespace CodeGenerator.ProjectBuilders
     {
         public ProjectBuilderVS(IDESetting configSettings) : base(configSettings)
         {
-            
+
         }
 
 
-        protected override MySettingsBase GetSettingsOVERRIDE( string pathToProjectSettings)
+        protected override MySettingsBase GetSettingsOVERRIDE(string pathToProjectSettings)
         {
-             
-            return MySettingsVS.CreateMySettingsVS(pathToProjectSettings); 
+
+            return MySettingsVS.CreateMySettingsVS(pathToProjectSettings);
         }
 
-         
+        public override void ImportDependentLibrariesCincAndCcompAndAdditional()
+        {
+
+            //5. I need to get all the cIncludes, cClompiles, additionalincludes from the other libraries and add to top level
+            // to the top level library. 
+
+            //getting and adding all additional includes
+            AllNotTopAndNotGlobal
+                .ForEach((Library lib) =>
+                {
+                    lib.GetAllAdditionalIncludes()
+                    .ForEach((string inc) =>
+                    {
+                        LibTop.AddAdditionalIncludes(inc);
+                    });
+                });
+
+            //List<myc> cCompToExcludeFromImporting = new List<string>();
+            //cCompToExcludeFromImporting.Add();
+
+            //CLCompile
+            AllNotTopAndNotGlobal
+            .ForEach((Library lib) =>
+            {
+                lib.GetAllCCompile()
+                .ForEach((MyCLCompileFile inc) =>
+                {
+                    //exclude files that are in the Config filter of that project or the LibraryDependencies. exclude main.cpp and as well
+                    if (ConditionForImportingDependencyCComp(inc))
+                    {  
+                        //change it so that the location of these files will be the same as the filters they are set in
+                        inc.LocationOfFile = Path.GetDirectoryName(inc.FullFilterName);
+
+                        LibTop.AddCCompileFile(inc);
+                    }
+
+                });
+
+            });
+
+            //CLinclude
+            AllNotTopAndNotGlobal
+            .ForEach((Library lib) =>
+            {
+                lib.GetAllCincludes()
+                .ForEach((MyCLIncludeFile inc) =>
+                {
+                    //exclude files that are in the Config filter of that project or the LibraryDependencies
+                    if (ConditionForImportingDependencyCInc(inc))
+                    {
+                        //change it so that the location of these files will be the same as the filters they are set in
+                        inc.LocationOfFile = Path.GetDirectoryName(inc.FullFilterName);
+
+                        LibTop.AddCIncludeFile(inc);
+                    }
+                });
+            });
+
+        }
+
+
         /*
         public override void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir)
         {

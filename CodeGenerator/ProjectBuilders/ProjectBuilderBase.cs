@@ -13,10 +13,11 @@ namespace CodeGenerator.ProjectBuilders
         public string BaseDirectoryForProject { get; protected set; }
         private IDESetting ConfigSettings { get; set; }
         public List<Library> Libraries { get; set; }
-        public Library LibTop { get; set; }
+        public Library LibTop { get; private set; }
+        public List<Library> AllNotTopAndNotGlobal { get; private set; }
 
 
-    public ProjectBuilderBase(IDESetting configSettings)
+        public ProjectBuilderBase(IDESetting configSettings)
         { 
             ConfigSettings = configSettings;
             Libraries = new List<Library>();
@@ -46,9 +47,45 @@ namespace CodeGenerator.ProjectBuilders
                 lib.SetLibrariesIDependOn(Libraries);
             }
 
-             
 
             LibTop = Libraries.Where((Library lib) => { return lib.IsTopLevel == true; }).First();
+            AllNotTopAndNotGlobal = Libraries.Where((Library lib) => { return lib.IsTopLevel == false && lib.config.ClassName != "GlobalBuildConfig"; }).ToList();
+        }
+
+
+        public static bool ConditionForImportingDependencyCComp(MyCLCompileFile CComp)
+        {
+            if ((CComp.LocationOfFile == "Config"))
+            {
+                return false;
+            }
+
+            if ((CComp.LocationOfFile.Contains("LibraryDependencies")))
+            {
+                return false;
+            }
+
+            if ((CComp.Name == "main.cpp"))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool ConditionForImportingDependencyCInc(MyCLIncludeFile Cinc)
+        { 
+            if ((Cinc.LocationOfFile == "Config"))
+            {
+                return  false;
+            }
+
+            if ((Cinc.LocationOfFile.Contains("LibraryDependencies")))
+            {
+                return false;
+            }
+             
+            return true;
         }
 
         public void RecreateLibraryDependenciesFolders()
@@ -80,6 +117,8 @@ namespace CodeGenerator.ProjectBuilders
         }
 
         protected abstract MySettingsBase GetSettingsOVERRIDE(string pathToProjectSettings);
+
+        public abstract void ImportDependentLibrariesCincAndCcompAndAdditional();
         //public abstract void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir);
 
 

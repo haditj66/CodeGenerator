@@ -30,36 +30,9 @@ namespace CodeGenerator.IDESettingXMLs
             XmlFilterClass = xmlFilterSetting.RootOfSetting;
             XmlProjectClass = xmlProjectsetting.RootOfSetting;
 
-            Debug.Assert(IsIDEProjectExistHere(), "There is no project setting here. Make sure you create cgen project at same directory of your IDE project settings.");
+             
 
-        }
-
-        public bool IsIDEProjectExistHere()
-        {
-            var t = new DirectoryInfo(Program.envIronDirectory);
-            var extensionsToCheck = XmlSettings.Select((IDESetting setting)=> { return setting.ProjectExtension; });
-            foreach (var ext in extensionsToCheck)
-            {
-                bool isfileExtensionThere = false;
-
-                foreach (var file in t.GetFiles())
-                { 
-                    if (file.Extension == ext)
-                    {
-                        isfileExtensionThere = true;
-                        break;
-                    } 
-                }
-
-                if (!isfileExtensionThere)
-                {
-                    return false;
-                }
-
-            }
-
-            return true;
-        }
+        } 
         
 
         private bool IsAlreadyInitiated = false;

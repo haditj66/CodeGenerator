@@ -16,11 +16,20 @@
     <Filter Include="Config">
       <UniqueIdentifier>{3d31b5c8-deee-4007-ac1f-3bfed42c0a37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LibraryDependencies">
+      <UniqueIdentifier>{92318434-5144-2460-2413-160744259330}</UniqueIdentifier>
+      <Extensions />
+    </Filter>
+    <Filter Include="LibraryDependencies\modaaConf1">
+      <UniqueIdentifier>{85232253-5398-8174-3835-696446179705}</UniqueIdentifier>
+      <Extensions />
+    </Filter>
+    <Filter Include="LibraryDependencies\modaaConf1\MODE0">
+      <UniqueIdentifier>{38356262-5269-2735-5942-790019907931}</UniqueIdentifier>
+      <Extensions />
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Configuration.h">
-      <Filter>Config</Filter>
-    </ClInclude>
     <ClInclude Include="SomeLibraryClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -29,6 +38,18 @@
     </ClInclude>
     <ClInclude Include="Config\modaConf.h">
       <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Config\ConfigurationCG.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="LibraryDependencies\modaaConf1\MODE0\ClassToInterfaceWith.h">
+      <Filter>LibraryDependencies\modaaConf1\MODE0</Filter>
+    </ClInclude>
+    <ClInclude Include="LibraryDependencies\modaaConf1\MODE0\SomaLibraryClassM1AA.h">
+      <Filter>LibraryDependencies\modaaConf1\MODE0</Filter>
+    </ClInclude>
+    <ClInclude Include="LibraryDependencies\modaaConf1\MODE0\rg.h">
+      <Filter>LibraryDependencies\modaaConf1\MODE0</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +61,15 @@
     </ClCompile>
     <ClCompile Include="Config\mainCG.cpp">
       <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryDependencies\modaaConf1\MODE0\ClassToInterfaceWith.cpp">
+      <Filter>LibraryDependencies\modaaConf1\MODE0</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryDependencies\modaaConf1\MODE0\SomaLibraryClassM1AA.cpp">
+      <Filter>LibraryDependencies\modaaConf1\MODE0</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryDependencies\modaaConf1\MODE0\rg.cpp">
+      <Filter>LibraryDependencies\modaaConf1\MODE0</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

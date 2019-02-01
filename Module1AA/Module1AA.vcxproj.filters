@@ -19,6 +19,10 @@
     <Filter Include="bla">
       <UniqueIdentifier>{3360f972-6731-4673-b151-753213d25fc8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LibraryDependencies">
+      <UniqueIdentifier>{24069734-4403-7748-8680-676543339191}</UniqueIdentifier>
+      <Extensions />
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassToInterfaceWith.cpp">
@@ -41,9 +45,6 @@
     <ClInclude Include="ClassToInterfaceWith.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Configuration4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SomaLibraryClassM1AA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -52,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="rg.h">
       <Filter>bla</Filter>
-    </ClInclude>
-    <ClInclude Include="Config\Configuration.h">
-      <Filter>Config</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

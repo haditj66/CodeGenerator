@@ -16,6 +16,8 @@
 #define BUILD_DEBUG  0
 #define BUILD_RELEASE  1
 #define BUILD_TESTING  2
+#define Speed_Fast  0
+#define Speed_Slow  1
 
 
 //****************************************************
@@ -25,6 +27,6 @@
 
 #define PLATFORM  2
 #define BUILD  0
-#define BUFFERSIZE  115
-#define BUFFERSIZE2  24
+#define BUFFERSIZE  84
+#define Speed  0
 #define MAJOR  0

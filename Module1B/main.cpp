@@ -1,11 +1,16 @@
 #pragma once
 
-#include "Config/ModuleBconf.h"
-#include "GlobalBuildConfig.h"   
+//#include "Config/ModuleBconf.h"
+//#include "GlobalBuildConfig.h"   
+#include <iostream>
+#include <ctime>  
 
 int main()
-{
+{ 
 
+ 
+	
+	/*
 	GlobalBuildConfig glob;
 	glob.Init();
 	glob.BUILD->SetValue(BuildEnum::DEBUG);
@@ -19,5 +24,5 @@ int main()
 	ModuleB.BUFFERSIZE->SetValue(p);
 
 	Config::PrintDefines(ModuleB);
-	return 1;
+	return 1;*/
 }

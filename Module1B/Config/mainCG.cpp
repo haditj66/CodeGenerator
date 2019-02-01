@@ -2,6 +2,9 @@
 
 #include "ModuleBconf.h"
 #include "GlobalBuildConfig.h"   
+#include <ctime> 
+#undef RAND_MAX
+#define RAND_MAX 100
 
 int mainCG()
 {  
@@ -13,9 +16,11 @@ int mainCG()
 
 
 	ModuleBConf0  ModuleB;
-	ModuleB.Init(); //dont forget to init() every library
-	int p = 35;
-	p += 80;
+	ModuleB.Init(); //dont forget to init() every library 
+	std::srand((unsigned)std::time(0));
+	int p; 
+	p = std::rand()%329;//random from 0 to 329
+
 	ModuleB.BUFFERSIZE->SetValue(p);
 
 	Config::PrintDefines(ModuleB);

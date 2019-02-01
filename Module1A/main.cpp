@@ -27,7 +27,7 @@ int main()
 	modaaConf1<ModeEnum::Fast> maa;
 	maa.Init();
 	modaConf0 m(&maa);
-	*/
+	
 	modaConf0 m;
 	m.Init();
 	m.FEATURE->SetValue(FeatureEnum::FEATURE3);
@@ -37,6 +37,6 @@ int main()
 	//m2.Init();
 
 	Config::PrintDefines(m); 
-	 
+	 */
 	 
 } 

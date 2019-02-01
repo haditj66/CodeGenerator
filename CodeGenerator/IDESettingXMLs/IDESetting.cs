@@ -1,6 +1,7 @@
 ﻿using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,12 +24,14 @@ namespace CodeGenerator.IDESettingXMLs
             ProjectExtension = projectExtension;
             Serializer = new XmlSerializer(typeOfRootSetting);
 
+            Debug.Assert(IsIDEProjectExistHere(PathWithoutFileNameOfXmlSetting), "There is no project setting here of extension "+ProjectExtension+". Make sure you create cgen project at same directory of your IDE project settings.");
+
             DirectoryInfo libraryDir = new DirectoryInfo(PathWithoutFileNameOfXmlSetting);
             string projFileFullPath = libraryDir.GetFiles()
                 .Where((FileInfo file) => { return file.Extension == projectExtension; }).First().FullName;
 
 
-            InitRootSetting(projFileFullPath, typeOfRootSetting); 
+            InitRootSetting(projFileFullPath, typeOfRootSetting);
 
         }
 
@@ -38,6 +41,31 @@ namespace CodeGenerator.IDESettingXMLs
             InitRootSetting(projFileFullPath, typeOfRootSetting);
 
         }
+
+        public bool IsIDEProjectExistHere(string PathWithoutFileNameOfXmlSetting)
+        {
+            var t = new DirectoryInfo(PathWithoutFileNameOfXmlSetting);
+
+            bool isfileExtensionThere = false;
+
+            foreach (var file in t.GetFiles())
+            {
+                if (file.Extension == ProjectExtension)
+                {
+                    isfileExtensionThere = true;
+                    break;
+                }
+            }
+
+            if (!isfileExtensionThere)
+            {
+                return false;
+            }
+
+
+            return true;
+        }
+
 
         private void InitRootSetting(string projFileFullPath, Type typeOfRootSetting)
         {
@@ -54,16 +82,16 @@ namespace CodeGenerator.IDESettingXMLs
             DirectoryInfo libraryDir = new DirectoryInfo(FullPathToPutGeneratedXMLFileWITHOUTFILENAME);
             string projFileFullPath = libraryDir.GetFiles()
                 .Where((FileInfo file) => { return file.Extension == ProjectExtension; }).First().FullName;
-            return projFileFullPath; 
+            return projFileFullPath;
         }
 
-        public virtual void GenerateXMLSetting(string FullPathToPutGeneratedXMLFileWITHOUTFILENAME) 
-        { 
+        public virtual void GenerateXMLSetting(string FullPathToPutGeneratedXMLFileWITHOUTFILENAME)
+        {
 
             using (StreamWriter sw = new StreamWriter(GetFullFilePathFromPathWithoutFile(FullPathToPutGeneratedXMLFileWITHOUTFILENAME)))
             {
                 Serializer.Serialize(sw, RootOfSetting);
-            } 
+            }
         }
     }
 }

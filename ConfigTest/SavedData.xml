@@ -15,14 +15,37 @@
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="ModuleBConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B\Config\ModuleBconf.h" ClassName="ModuleBConf0">
-            <EnumsDefinintions/>
+        <Config Prefix="modaaConf1" myInstanceNum="0" Major="1" ConfTypePrefix="MODE0" isTopLevel="false" FileNameString="c:\users\hadi\onedrive\documents\visualstudioprojects\projects\cSharp\codegenerator\codegenerator\module1aa\Config\modaaconf.h" ClassName="modaaConf1">
+            <EnumsDefinintions>
+                <EnumDefinition Name="MODE_Fast" Value="0"/>
+                <EnumDefinition Name="MODE_Slow" Value="1"/>
+            </EnumsDefinintions>
             <Defines>
-                <Define DefineName="BUFFERSIZE" Type="int" Value="115" MyPrivacy="public" PrefixName="ModuleBConf0" IsStatic="false"/>
-                <Define DefineName="BUFFERSIZE2" Type="int" Value="24" MyPrivacy="public" PrefixName="ModuleBConf0" IsStatic="false"/>
-                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="ModuleBConf0" IsStatic="true"/>
+                <Define DefineName="BUFFERSIZE" Type="int" Value="1800" MyPrivacy="public" PrefixName="modaaConf1" IsStatic="false"/>
+                <Define DefineName="MSG1" Type="string" Value="&quot;from ModA using ModAA&quot;" MyPrivacy="public" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="MSG2" Type="string" Value="&quot;ascavde&quot;" MyPrivacy="public" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="BUFFERSIZELOCAL" Type="int" Value="50" MyPrivacy="private" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="MAJOR" Type="int" Value="1" MyPrivacy="private" PrefixName="modaaConf1" IsStatic="true"/>
+                <Define DefineName="MODE" Type="enum ModeEnum" Value="0" MyPrivacy="template" PrefixName="modaaConf1" IsStatic="true"/>
             </Defines>
             <Depends/>
+        </Config>
+        <Config Prefix="modaConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A\Config\modaconf.h" ClassName="modaConf0">
+            <EnumsDefinintions>
+                <EnumDefinition Name="FEATURE_FEATURE1" Value="0"/>
+                <EnumDefinition Name="FEATURE_FEATURE2" Value="1"/>
+                <EnumDefinition Name="FEATURE_FEATURE3" Value="2"/>
+            </EnumsDefinintions>
+            <Defines>
+                <Define DefineName="BUFFERSIZE" Type="int" Value="2000" MyPrivacy="public" PrefixName="modaConf0" IsStatic="false"/>
+                <Define DefineName="MSG1" Type="string" Value="&quot;from modA&quot;" MyPrivacy="public" PrefixName="modaConf0" IsStatic="true"/>
+                <Define DefineName="FEATURE" Type="enum FeatureEnum" Value="1" MyPrivacy="public" PrefixName="modaConf0" IsStatic="true"/>
+                <Define DefineName="BUFFERSIZEL" Type="int" Value="80" MyPrivacy="private" PrefixName="modaConf0" IsStatic="true"/>
+                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="modaConf0" IsStatic="true"/>
+            </Defines>
+            <Depends>
+                <Depend NameOfDepend="modaaConf1" TypePrefOfDepend="MODE0" ModeOfDepend="1"/>
+            </Depends>
         </Config>
     </Configs>
 </Root>
