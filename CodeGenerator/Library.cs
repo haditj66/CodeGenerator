@@ -16,7 +16,7 @@ namespace CodeGenerator
         static public MyFilter LibraryDependencyFilter = new MyFilter("LibraryDependencies");
         public MyFilter LibraryBaseFilter { get; private set; }
         public  Config config { get; private set; } 
-        private MySettingsBase settings { get; set; }
+        public MySettingsBase settings { get; protected set; }
         public List<Library> LibrariesIDependOn { get; protected set; }
 
         public Library(Config config, MySettingsBase settings)
@@ -53,6 +53,7 @@ namespace CodeGenerator
 
 
         }
+
 
 
         public void SetLibrariesIDependOn(List<Library> FromTheseLibraries)
@@ -95,6 +96,15 @@ namespace CodeGenerator
             } 
         }
 
+        public string  GetFullPrefix()
+        {
+            return config.Prefix + config.Major + config.ConfTypePrefix ;
+        }
+
+        public string GetPathToProjectAsADependent()
+        {
+            return Path.Combine(config.Prefix, config.Major, config.ConfTypePrefix);
+        }
 
         public bool IsEqual(Library toThisLibrary)
         {

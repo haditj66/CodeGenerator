@@ -1,7 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
+using CodeGenerator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeGenerator.IDESettingXMLs;
 using CodeGenerator.FileTemplates;
+using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
+using CodeGenerator.ProjectBuilders;
 
 namespace CodeGeneratorTest
 {
@@ -63,10 +68,29 @@ namespace CodeGeneratorTest
         [TestMethod]
         public void MacroFileTest()
         {
-            FileTemplateMainCG maincgTemplate = new FileTemplateMainCG("","moda1");
+            FileTemplateMainCG maincgTemplate = new FileTemplateMainCG("", "moda1");
             maincgTemplate.CreateTemplate();
         }
 
+
+        [TestMethod]
+        public void TestConfigurationBuilder()
+        {
+            string DIRECTORYOFTHISCG = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGenerator\bin\Debug";
+            string CGSAVEFILESBASEDIRECTORY = "CGensaveFiles";
+            string CGCONFCOMPILATOINSBASEDIRECTORY = "ConfigCompilations";
+            string PATHTOCONFIGTEST = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest";
+
+
+            //get the project settings for the project configs I want to generate. for VS for NOW!
+            MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA");
+
+            //create the configuration file configurationCG.h 
+            ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting,
+                @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestConfigBuilder", DIRECTORYOFTHISCG, PATHTOCONFIGTEST);
+            configFileBuilder.CreateConfigurationToTempFolder();
+            configFileBuilder.WriteTempConfigurationToFinalFile();
+        }
 
     }
 }

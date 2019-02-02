@@ -5,9 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using CodeGenerator.IDESettingXMLs;
 using System.IO;
+using CodeGenerator.CMD_Handler;
 using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
 using ExtensionMethods;
 using CodeGenerator.FileTemplates;
+using CodeGenerator.GitHandlerForLibraries;
+using CodeGenerator.ProblemHandler;
+using CodeGenerator.ProjectBuilders.FileDependentImporters;
 
 namespace CodeGenerator.ProjectBuilders
 {
@@ -53,7 +57,7 @@ namespace CodeGenerator.ProjectBuilders
                 .ForEach((MyCLCompileFile inc) =>
                 {
                     //exclude files that are in the Config filter of that project or the LibraryDependencies. exclude main.cpp and as well
-                    if (ConditionForImportingDependencyCComp(inc))
+                    if (IsCCompDependencyAbleForImporting(inc))
                     {  
                         //change it so that the location of these files will be the same as the filters they are set in
                         inc.LocationOfFile = Path.GetDirectoryName(inc.FullFilterName);
@@ -73,7 +77,7 @@ namespace CodeGenerator.ProjectBuilders
                 .ForEach((MyCLIncludeFile inc) =>
                 {
                     //exclude files that are in the Config filter of that project or the LibraryDependencies
-                    if (ConditionForImportingDependencyCInc(inc))
+                    if (IsCIncDependencyAbleForImporting(inc))
                     {
                         //change it so that the location of these files will be the same as the filters they are set in
                         inc.LocationOfFile = Path.GetDirectoryName(inc.FullFilterName);
@@ -85,69 +89,31 @@ namespace CodeGenerator.ProjectBuilders
 
         }
 
-
-        /*
-        public override void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir)
-        {
-            //-------------config filter
-            //check if config filter exists
-            MyFilter configFilter;
-            if (!LibTop.GetAllFitlers().DoesFilterWithNameExist("Config"))
+        public override void CreateCCompCincDependencyFiles()
+        { 
+            var lowestLevelLibraries = LibTop.LibrariesIDependOn.Where((Library lib) =>
             {
-                configFilter = new MyFilter("Config");
-                LibTop.AddFilter(configFilter);
+                return lib.LibrariesIDependOn == null || lib.LibrariesIDependOn.Count == 0;
+            }).ToList();
+            //go through each of these and check out their tags. make a list of libraries already checked out.      
+            foreach (var lowestLevelLibrary in lowestLevelLibraries)
+            {
+                CheckoutLibraryToCorrectMajor(lowestLevelLibrary);
+
+                //grab all files that are qualified to be imported in and send them through the 
+                var CcompsToImport = lowestLevelLibrary.GetAllCCompile().Where((MyCLCompileFile ccom) => { return IsCCompDependencyAbleForImporting(ccom);}).ToList();
+                var CIncToImport = lowestLevelLibrary.GetAllCincludes().Where((MyCLIncludeFile cinc) => { return IsCIncDependencyAbleForImporting(cinc); }).ToList();
+                FileDepedentsImporter FileImporter = new FileDepedentsImporter(lowestLevelLibrary.GetFullPrefix(), CcompsToImport, CIncToImport);
+                FileImporter.ImportFilesToPath(Path.Combine(LibTop.settings.PATHOfProject + lowestLevelLibrary.GetPathToProjectAsADependent()));
+
+                //revert it back to its previous state
+                LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(lowestLevelLibrary);
             }
-            else
-            {
-                configFilter = LibTop.GetAllFitlers().GetFilterAtAddress("Config");
-            }
-
-
-            //-------------FolderCreation
-            //does config folder exist
-            string ConfDirPath = Path.Combine(BaseDirectoryForProject, "Config");// Path.Combine(Path.GetDirectoryName(LibTop.config.ConfigFileFullPath), "Config");
-            if (!Directory.Exists(ConfDirPath))
-            {
-                Directory.CreateDirectory(ConfDirPath);
-            }
-
-            //-------------mainCG.cpp NameOfCGenProjectConf.h Files  Configuration.h
-            //   settings should already check if it exists before adding it
-            MyCLCompileFile ccompMainCg = new MyCLCompileFile(configFilter, "mainCG", "Config");
-            LibTop.AddCCompileFile(ccompMainCg);
-            if (!File.Exists( Path.Combine(ConfDirPath, "mainCG.cpp")))
-            {
-                FileTemplateMainCG maincgTemplate = new FileTemplateMainCG(ConfDirPath, NameOfCGenProject);
-                maincgTemplate.CreateTemplate();
-                Console.WriteLine("mainCG.cpp" + "file created");
-            } 
-            MyCLIncludeFile ccincNameOfCGenProjectConf = new MyCLIncludeFile(configFilter, NameOfCGenProject + "Conf", "Config");
-            LibTop.AddCIncludeFile(ccincNameOfCGenProjectConf);
-            if (!File.Exists(Path.Combine(ConfDirPath, NameOfCGenProject+ "Conf.h")))
-            {
-                FileTemplateLibConf maincgTemplate = new FileTemplateLibConf(ConfDirPath, NameOfCGenProject);
-                maincgTemplate.CreateTemplate();
-                Console.WriteLine(NameOfCGenProject+"Conf.h" + "file created");
-            }
-            if (!File.Exists(Path.Combine(ConfDirPath, "Configuration.h")))
-            {
-                File.Create(Path.Combine(ConfDirPath, "Configuration.h"));
-                Console.WriteLine("Configuration.h " + "file created");
-            }
-
-
-
-
-            //add additionalinclude for configTest
-            LibTop.AddAdditionalIncludes(pathOfConfigTestDir);
-
-
-            //save the settings
-            LibTop.GenerateXMLSettings(BaseDirectoryForProject);
-             
-
         }
 
-        */
+
+
+
+         
     }
 }

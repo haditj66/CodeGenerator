@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,12 +20,14 @@ using System.Diagnostics;
 using CodeGenerator.CMD_Handler;
 using ExtensionMethods;
 using System.Reflection;
+using CodeGenerator.GitHandlerForLibraries;
+using CodeGenerator.ProblemHandler;
 
 namespace CodeGenerator
 {
 
 
-
+    
 
     public class Program
     {
@@ -298,89 +301,22 @@ namespace CodeGenerator
 
             //first make sure that a project exists here
             if (IsProjectExistsAtEnvironDirectory())
-            {
+            { 
+
                 //get the project settings for the project configs I want to generate. for VS for NOW!
                 MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(envIronDirectory);
-                VSsetting.Initiate();
 
-                //get all .cpp files that are in the top level library and are only in the Config Filter
-                var ccompiles = VSsetting.CLCompileFiles.GetCCompilesFromFilter("Config");//projectBuilderForVs.LibTop.GetAllCCompile().GetCCompilesFromFilter("Config");
-                CLCommandBuilderForConfigTest cl = new CLCommandBuilderForConfigTest("configGen", PATHTOCONFIGTEST, ccompiles.ToArray());
-                foreach (var include in VSsetting.StringIncludes)
-                {
-                    //just add all additional includes that show up in the top level library
-                    if (include != @"%(AdditionalIncludeDirectories)")
-                    {
-                        //check if it is a relative path
-                        if (!include.Contains(@":"))
-                        {
-                            cl.AdditionalIncludes.Add(Path.Combine(envIronDirectory, include));
-                        }
-                        else
-                        {
-                            cl.AdditionalIncludes.Add(include);
-                        }
-
-                    }
-                }
-                //add additoinal include for the baseProject as well as the baseproject/Config folder
-                cl.AdditionalIncludes.Add(envIronDirectory);
-                cl.AdditionalIncludes.Add(Path.Combine(envIronDirectory, "Config"));
-
-
-                //the output will be the same path as the where the mod_conf.h file is located
-                cl.OutputLocation = CGCONFCOMPILATOINSBASEDIRECTORY;//Path.Combine(projectBuilderForVs.BaseDirectoryForProject, "Config");
-
-                //Im here. I need to grab the mainCG.cpp, copy it into a temp file locally, change mainCG() { }  to main() { }
-                var maincg = ccompiles.Where((MyCLCompileFile ccom) => { return ccom.FullLocationName == "Config\\mainCG.cpp"; }).FirstOrDefault();
-                if (maincg == null)
-                {
-                    Console.WriteLine("CGEN ERROR: missing a mainCG.cpp file in your config filter");
-                }
-                cl.FilesCComp.Remove(maincg);
-
-                string mainCGstr = File.ReadAllText(Path.Combine(envIronDirectory, maincg.FullLocationName));
-                mainCGstr = Regex.Replace(mainCGstr, @"int mainCG", @"int main");
-                //write it all to a local temp mainCG.cpp
-                File.WriteAllText(Path.Combine(DIRECTORYOFTHISCG, "mainCG.cpp"), mainCGstr);
-                //add that ccompile instead now
-                MyCLCompileFile newMAinCG = new MyCLCompileFile(maincg.FilterIBelongTo, maincg.Name, "");
-                cl.FilesCComp.Add(newMAinCG);
-
-                string ss = cl.GetCompileCommand();
-
-
-                //use CMDHandler to compile and build the config for the top level library
-                CMDHandler cmdHandler = new CMDHandler(CMDTYPE.VS, DIRECTORYOFTHISCG);
-                cmdHandler.SetWorkingDirectory(DIRECTORYOFTHISCG);
-                cmdHandler.ExecuteCommand(ss);
-                //check if compilation was succesful
-                if (cmdHandler.Output.Contains(" : error"))
-                {
-                    Console.WriteLine("ERROR: there was a problem with compilation of your configuration");
-                }
-                else
-                {
-                    //if no problem than run that config.exe, run the 
-                    cmdHandler.SetWorkingDirectory(Path.Combine(DIRECTORYOFTHISCG, CGCONFCOMPILATOINSBASEDIRECTORY));
-                    cmdHandler.ExecuteCommand("CALL configGen.exe");
-
-                    //a Configuration.h file was created. grab the contents of that and put it in the proper projectbase/config/Configuration.h file
-                    string configuration_hStr = File.ReadAllText(Path.Combine(DIRECTORYOFTHISCG, CGCONFCOMPILATOINSBASEDIRECTORY, "Configuration.h"));
-                    string ToFile = Path.Combine(envIronDirectory, "Config", "ConfigurationCG.h");
-                    File.WriteAllText(ToFile, configuration_hStr);
-
-                    Console.WriteLine("ConfigurationCG.h File Created");
-                }
-
-
-
+                //create the configuration file configurationCG.h 
+                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY,DIRECTORYOFTHISCG, PATHTOCONFIGTEST);
+                configFileBuilder.CreateConfigurationToTempFolder(); 
+                configFileBuilder.WriteTempConfigurationToFinalFile();
+                  
+                 
 
                 //now that config was created for libtop. create the libtop's librarydepencies filter and folders
                 ProjectLibraryDependencyCreate();
 
-
-
+                 
             }
             else
             {
@@ -424,42 +360,41 @@ namespace CodeGenerator
 
         }
 
-        public static void ProjectLibraryDependencyCreate()
-        {
+         public static void ProjectLibraryDependencyCreate()
+         {
 
+             ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
 
-            //3. determine who is top level. use its filtersettingxml for that and create new 
-            //directories from that toplevel project directory as:
+            //3.  add filters and folders directories from that toplevel project directory as:
             //LibraryDependencies
             //  prefix(of libraries top level uses)
-            //      confTypePrefix(for libraries that are same but different template type.)  
-            //get the top level library
-            ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
-            List<Library> libraries = projectBuilderForVs.Libraries;
-            projectBuilderForVs.RecreateLibraryDependenciesFolders();
-            List<Library> allNotTopAndNotGlobal = libraries.Where((Library lib) => { return lib.IsTopLevel == false && lib.config.ClassName != "GlobalBuildConfig"; }).ToList();
-            Library libTop = libraries.Where((Library lib) => { return lib.IsTopLevel; }).First();
+            //      confTypePrefix(for libraries that are same but different template type.)    
+            projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters(); 
+
+            //4. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
+            //first grab all lowest level libraries that have no dependencies
+            projectBuilderForVs.CreateCCompCincDependencyFiles();
 
 
-            //4. add the filters from other libraries to toplevel library for this as well that matches the directories created from LibraryDependencies.
-            //these are already created in Library constructor as static LibraryDependencyFilter
-            libTop.AddFilter(Library.LibraryDependencyFilter);
-
-            4.5 im here I need to have the projectbuilder import the files from other dependncies to their correct locations while changeing file name and adding a namespace
-            projectBuilderForVs.ImportDependencyFiles();
+         //4.5 I need to have the projectbuilder import the files from other dependncies to their correct locations while changeing file name and adding a namespace
+            //projectBuilderForVs.ImportDependencyFiles();
 
 
             //5. I need to get all the cIncludes, cClompiles, additionalincludes from the other libraries and add to top level
             // to the top level library. 
             projectBuilderForVs.ImportDependentLibrariesCincAndCcompAndAdditional();
-             
+
 
             //6. Finally recreate the xml settings files. in this case there will be two .xproj and .filters
-            libTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
+            projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
 
 
 
         }
 
+         
+
     }
+      
+
 }

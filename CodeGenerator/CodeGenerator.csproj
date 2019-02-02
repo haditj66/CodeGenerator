@@ -75,11 +75,13 @@
     <Compile Include="CMD_Handler\CLCommandBuilder.cs" />
     <Compile Include="CMD_Handler\CLCommandBuilderForConfigTest.cs" />
     <Compile Include="CMD_Handler\CMDHandler.cs" />
+    <Compile Include="CMD_Handler\CMDHandlerVSDev.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FileTemplates\FileTemplateBase.cs" />
     <Compile Include="FileTemplates\FileTemplateLibConf.cs" />
     <Compile Include="FileTemplates\FileTemplateMainCG.cs" />
+    <Compile Include="GitHandlerForLibraries\GitHandlerForLibrary.cs" />
     <Compile Include="IDESettingXMLs\MyCLCompileFile.cs" />
     <Compile Include="IDESettingXMLs\MyCLIncludeFile.cs" />
     <Compile Include="IDESettingXMLs\MyFilter.cs" />
@@ -91,7 +93,12 @@
     <Compile Include="IDESettingXMLs\VisualStudioXMLs\IDESettingVSProj.cs" />
     <Compile Include="IDESettingXMLs\IDESetting.cs" />
     <Compile Include="Library.cs" />
+    <Compile Include="ProblemHandler\ICleanUp.cs" />
+    <Compile Include="ProblemHandler\LibrariesForCheckedOutGit.cs" />
+    <Compile Include="ProblemHandler\ProblemHandle.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProjectBuilders\ConfigurationFileBuilder.cs" />
+    <Compile Include="ProjectBuilders\FileDependentImporters\FileDepedentsImporter.cs" />
     <Compile Include="ProjectBuilders\ProjectBuilderBase.cs" />
     <Compile Include="ProjectBuilders\ProjectBuilderVS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
