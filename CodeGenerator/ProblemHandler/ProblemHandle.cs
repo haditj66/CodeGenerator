@@ -13,6 +13,7 @@ namespace CodeGenerator.ProblemHandler
 
         public ProblemHandle(params ICleanUp[] cleanups)
         {
+            Cleanups = new List<ICleanUp>();
             for (int i = 0; i < cleanups.Length; i++)
             {
                 AddCleanUp(ref cleanups[0]);

@@ -100,15 +100,32 @@ namespace CodeGenerator.ProjectBuilders
             {
                 CheckoutLibraryToCorrectMajor(lowestLevelLibrary);
 
+                //create Configuration.h in temporary folder but dont put it in project so to not change anything 
+                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(lowestLevelLibrary.settings, Program.CGCONFCOMPILATOINSBASEDIRECTORY, Program.DIRECTORYOFTHISCG, Program.PATHTOCONFIGTEST);
+                configFileBuilder.CreateConfigurationToTempFolder();
+
+                //create a configuration.h myinclude so to include that in the importing
+                var filtForConfiguration_h = lowestLevelLibrary.GetAllFitlers().Where((MyFilter filt) =>
+                {
+                    return filt.GetFullAddress() == "Config";
+                }).First(); 
+                MyCLIncludeFile clinc = new MyCLIncludeFile(filtForConfiguration_h,"ConfigurationCG.h",Path.Combine(lowestLevelLibrary.settings.PATHOfProject,"Config"));
+
                 //grab all files that are qualified to be imported in and send them through the 
                 var CcompsToImport = lowestLevelLibrary.GetAllCCompile().Where((MyCLCompileFile ccom) => { return IsCCompDependencyAbleForImporting(ccom);}).ToList();
                 var CIncToImport = lowestLevelLibrary.GetAllCincludes().Where((MyCLIncludeFile cinc) => { return IsCIncDependencyAbleForImporting(cinc); }).ToList();
-                FileDepedentsImporter FileImporter = new FileDepedentsImporter(lowestLevelLibrary.GetFullPrefix(), CcompsToImport, CIncToImport);
+                CIncToImport.Add(clinc);
+                FileDepedentsImporter FileImporter = new FileDepedentsImporter(lowestLevelLibrary.GetFullPrefix(), CcompsToImport, CIncToImport, lowestLevelLibrary.settings.PATHOfProject);
                 FileImporter.ImportFilesToPath(Path.Combine(LibTop.settings.PATHOfProject + lowestLevelLibrary.GetPathToProjectAsADependent()));
 
                 //revert it back to its previous state
                 LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(lowestLevelLibrary);
+
+                Console.WriteLine("Files have been imported for library " + lowestLevelLibrary.config.ClassName);
             }
+
+
+
         }
 
 

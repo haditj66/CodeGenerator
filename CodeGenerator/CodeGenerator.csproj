@@ -124,6 +124,14 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="CPP Parser\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CPPParserLibClang\CPPParserLibClang.csproj">
+      <Project>{b566ebbc-40a7-49a7-a0b6-05ef9360fbcc}</Project>
+      <Name>CPPParserLibClang</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

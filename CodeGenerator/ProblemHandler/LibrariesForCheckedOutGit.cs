@@ -11,7 +11,8 @@ namespace CodeGenerator.ProblemHandler
 
         public LibrariesForCheckedOutGit(CMDHandler cmd)
         {
-            Cmd = cmd;
+            LibrariesCheckedOutSoFar = new List<Library>();
+               Cmd = cmd;
         }
 
         public void AddLibraryCheckedOutSoFar(Library libraryCheckedout)

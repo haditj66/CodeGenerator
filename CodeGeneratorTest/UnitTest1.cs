@@ -7,6 +7,7 @@ using CodeGenerator.IDESettingXMLs;
 using CodeGenerator.FileTemplates;
 using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
 using CodeGenerator.ProjectBuilders;
+using CodeGenerator.ProjectBuilders.FileDependentImporters;
 
 namespace CodeGeneratorTest
 {
@@ -90,6 +91,19 @@ namespace CodeGeneratorTest
                 @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestConfigBuilder", DIRECTORYOFTHISCG, PATHTOCONFIGTEST);
             configFileBuilder.CreateConfigurationToTempFolder();
             configFileBuilder.WriteTempConfigurationToFinalFile();
+        }
+
+
+        [TestMethod]
+        public void TestFileDependentImporter()
+        { 
+            
+            MySettingsVS vsSettingmodAA = MySettingsVS.CreateMySettingsVS(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA");
+            vsSettingmodAA.Initiate(); 
+             
+
+            FileDepedentsImporter imprter = new FileDepedentsImporter("pref1o2",vsSettingmodAA.CLCompileFiles,vsSettingmodAA.CLIncludeFiles, vsSettingmodAA.PATHOfProject);
+            imprter.ImportFilesToPath(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestImporter");
         }
 
     }

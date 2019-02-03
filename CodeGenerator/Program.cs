@@ -22,6 +22,7 @@ using ExtensionMethods;
 using System.Reflection;
 using CodeGenerator.GitHandlerForLibraries;
 using CodeGenerator.ProblemHandler;
+using CPPParserLibClang;
 
 namespace CodeGenerator
 {
@@ -110,6 +111,8 @@ namespace CodeGenerator
 
         static void Main(string[] args)
         {
+
+            test t = new test();
 
             //string e = Environment.CurrentDirectory;
             //Console.WriteLine(e);
