@@ -26,6 +26,9 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,6 +39,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,6 +49,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommandLine, Version=2.3.0.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
@@ -71,7 +76,8 @@
     <Compile Include="cgenXMLSaves\cgenProjectsXMLClass.cs" />
     <Compile Include="cgenXMLSaves\SaveFileBase.cs" />
     <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenConfig.cs" />
-    <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenProject.cs" />
+    <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenProjectGlobal.cs" />
+    <Compile Include="cgenXMLSaves\SaveFiles\SaveFilecgenProjectLocal.cs" />
     <Compile Include="CMD_Handler\CLCommandBuilder.cs" />
     <Compile Include="CMD_Handler\CLCommandBuilderForConfigTest.cs" />
     <Compile Include="CMD_Handler\CMDHandler.cs" />
@@ -128,9 +134,9 @@
     <Folder Include="CPP Parser\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CPPParserLibClang\CPPParserLibClang.csproj">
-      <Project>{b566ebbc-40a7-49a7-a0b6-05ef9360fbcc}</Project>
-      <Name>CPPParserLibClang</Name>
+    <ProjectReference Include="ConsoleApp2\CPPParser.csproj">
+      <Project>{1f805e85-0449-4037-8fb7-082163ae14ff}</Project>
+      <Name>CPPParser</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

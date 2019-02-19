@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,9 +19,12 @@ namespace CodeGenerator.ProjectBuilders
         public string PathToOutPutCompilation { get; }
         protected string DIRECTORYOFTHISCG { get; }
         public string PATHTOCONFIGTEST { get; }
+        public bool IsTopLevelConfig { get; }
         public ProblemHandle ProblemHandler { get; private set; }
+        private static string ConfigInherittedValues;
 
-        public ConfigurationFileBuilder(MySettingsBase settingsOfProjectToBuildConfigfileFore, string PathToOutPutCompilation, string DIRECTORYOFTHISCG, string PATHTOCONFIGTEST,ProblemHandle problemHandler = null)
+
+        public ConfigurationFileBuilder(MySettingsBase settingsOfProjectToBuildConfigfileFore, string PathToOutPutCompilation, string DIRECTORYOFTHISCG, string PATHTOCONFIGTEST, ProblemHandle problemHandler = null, bool isTopLevelConfig = false)
         {
             if (problemHandler == null)
             {
@@ -35,6 +39,7 @@ namespace CodeGenerator.ProjectBuilders
             this.PathToOutPutCompilation = PathToOutPutCompilation;
             this.DIRECTORYOFTHISCG = DIRECTORYOFTHISCG;
             this.PATHTOCONFIGTEST = PATHTOCONFIGTEST;
+            IsTopLevelConfig = isTopLevelConfig;
         }
 
 
@@ -42,12 +47,12 @@ namespace CodeGenerator.ProjectBuilders
         {
 
             //get all .cpp files that are in the top level library and are only in the Config Filter
-            var ccompiles = VSsetting.CLCompileFiles.GetCCompilesFromFilter("Config");//projectBuilderForVs.LibTop.GetAllCCompile().GetCCompilesFromFilter("Config");
+            var ccompiles = VSsetting.CLCompileFiles.GetCCompilesFromLocationOfFile("Config");//projectBuilderForVs.LibTop.GetAllCCompile().GetCCompilesFromFilter("Config");
             CLCommandBuilderForConfigTest cl = new CLCommandBuilderForConfigTest("configGen", PATHTOCONFIGTEST, ccompiles.ToArray());
             foreach (var include in VSsetting.StringIncludes)
             {
                 //just add all additional includes that show up in the top level library
-                if (include != @"%(AdditionalIncludeDirectories)")
+                if (include != @"%(AdditionalIncludeDirectories)" && !include.Contains("LibraryDependencies"))
                 {
                     //check if it is a relative path
                     if (!include.Contains(@":"))
@@ -73,7 +78,7 @@ namespace CodeGenerator.ProjectBuilders
             var maincg = ccompiles.Where((MyCLCompileFile ccom) => { return ccom.FullLocationName == "Config\\mainCG.cpp"; }).FirstOrDefault();
             if (maincg == null)
             {
-                Console.WriteLine("CGEN ERROR: missing a mainCG.cpp file in your config filter");
+                ProblemHandler.ThereisAProblem("CGEN ERROR: missing a mainCG.cpp file in your config filter");
             }
             cl.FilesCComp.Remove(maincg);
 
@@ -89,34 +94,94 @@ namespace CodeGenerator.ProjectBuilders
 
 
             //use CMDHandler to compile and build the config for the top level library
-            CMDHandlerVSDev cmdHandler = new CMDHandlerVSDev( DIRECTORYOFTHISCG, DIRECTORYOFTHISCG);
+            CMDHandlerVSDev cmdHandler = new CMDHandlerVSDev(DIRECTORYOFTHISCG, DIRECTORYOFTHISCG);
             cmdHandler.SetWorkingDirectory(DIRECTORYOFTHISCG);
             cmdHandler.ExecuteCommand(ss);
             //check if compilation was succesful
-            if (cmdHandler.Output.Contains(" : error"))
+            if (cmdHandler.Output.Contains(": error") || cmdHandler.Output.Contains(": fatal"))
             {
-                ProblemHandler.ThereisAProblem("ERROR: there was a problem with compilation for the Configuration.h file of your library at location \n" + VSsetting.PATHOfProject + "\n make sure your configuration app builds for that library"); 
+                ProblemHandler.ThereisAProblem("ERROR: there was a problem with compilation for the Configuration.h file of your library at location \n" + VSsetting.PATHOfProject + "\n make sure your configuration app builds for that library");
             }
             else
             {
                 //if no problem than run that config.exe, run the 
                 cmdHandler.SetWorkingDirectory(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation));
                 cmdHandler.ExecuteCommand("CALL configGen.exe");
+
+                //check to see if there were any problems with generating the configurationfrom the conig.exe.
+                Match m = Regex.Match(cmdHandler.Output, @"PROBLEM::(.*)");
+                if (m.Success)
+                {
+                    ProblemHandler.ThereisAProblem("building the ConfigurationCG.h for library at path \n" + VSsetting.PATHOfProject+ "\n encountered a problem \n"+ m.Groups[1].Value);
+                }
+
+                if (IsTopLevelConfig)
+                {
+                    ConfigInherittedValues = cmdHandler.Output;
+                }
+
+
                 Console.WriteLine("TEMP ConfigurationCG.h File Created");
             }
         }
 
-        public void  WriteTempConfigurationToFinalFile()
+        public void WriteTempConfigurationToFinalFile(string ToNewFile = "")
         {
-            
-                //a Configuration.h file was created. grab the contents of that and put it in the proper projectbase/config/Configuration.h file
-          string configuration_hStr = File.ReadAllText(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation, "Configuration.h"));
-            string ToFile = Path.Combine(VSsetting.PATHOfProject, "Config", "ConfigurationCG.h");
-            File.WriteAllText(ToFile, configuration_hStr);
+
+            //a Configuration.h file was created. grab the contents of that and put it in the proper projectbase/config/Configuration.h file
+            string configuration_hStr = File.ReadAllText(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation, "Configuration.h"));
+
+
+            ToNewFile = string.IsNullOrEmpty(ToNewFile)
+              ? Path.Combine(VSsetting.PATHOfProject, "Config", "ConfigurationCG.h")
+              : ToNewFile;
+            File.WriteAllText(ToNewFile, configuration_hStr);
 
             Console.WriteLine("ConfigurationCG.h File Created");
         }
 
+        public void InheritFromTopConfig(Config ConfigOfLibraryOfTheOneInheriting)
+        {
 
+            if (!IsTopLevelConfig && !string.IsNullOrEmpty(ConfigInherittedValues))
+            {
+                string configuration_hStr = File.ReadAllText(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation, "Configuration.h"));
+                string[] configuration_hStrNew = configuration_hStr.Split('\n');//new string[configuration_hStr.Split('\n').Length];
+
+                //go through the ConfigInherittedValues line by line and change the value for the define
+                //that it matches in the configuration_hStr
+                foreach (var line in ConfigInherittedValues.Split('\n'))
+                {
+                    //go through each line in configuration_hStr and look for a #define line
+                    int index = 0;
+                    foreach (var lineconfStr in configuration_hStr.Split('\n'))
+                    {
+                        //first make sure that that line is a define
+                        Match m = Regex.Match(lineconfStr, @"#define (.*) (.*)");
+                        if (m.Success)
+                        {
+                            //check this define has form of the classname*conftypeprefix*definename
+                            string strPattern =@"#define "+ ConfigOfLibraryOfTheOneInheriting.ClassName + @"\*" + ConfigOfLibraryOfTheOneInheriting.ConfTypePrefix + @"\*" + m.Groups[1].Value+ @"\s*(.*)";
+                            Match m2 = Regex.Match(line, strPattern);//@"#define modaaConf1\*MODE0\*BUFFERSIZE\s*(.*)");
+                            if (m2.Success)
+                            {
+                                //there is a match that this define needs to be overriden. so change the value
+                                string newLine = lineconfStr.Substring(0, m.Groups[2].Index);//, lineconfStr.Length-1);
+                                newLine += m2.Groups[1];
+                                configuration_hStrNew[index] = newLine;
+                            }
+                        }
+
+                        
+                        index++;
+                    }
+                }
+
+
+                File.WriteAllText(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation, "Configuration.h"),  string.Join("\n",configuration_hStrNew));
+
+            }
+
+        }
     }
 }

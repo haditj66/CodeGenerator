@@ -80,5 +80,13 @@ namespace ExtensionMethods
                 return (ccomp.FilterIBelongTo.GetFullAddress()) == filterFullAddress;
             }).ToList();
         }
+
+        public static List<MyCLCompileFile> GetCCompilesFromLocationOfFile(this List<MyCLCompileFile> listCcomp, string Location)
+        {
+            return listCcomp.Where((MyCLCompileFile ccomp) =>
+            {
+                return (ccomp.LocationOfFile) == Location;
+            }).ToList();
+        }
     }
 }

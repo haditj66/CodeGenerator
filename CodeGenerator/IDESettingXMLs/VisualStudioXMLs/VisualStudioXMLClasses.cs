@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 
 namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 {
+    [Serializable]
     [XmlRoot(ElementName = "ProjectConfiguration", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class ProjectConfiguration
     {
@@ -18,6 +19,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public string Include { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "ItemGroup", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class ItemGroup
     {
@@ -31,6 +33,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public List<ClCompile> ClCompile { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "PropertyGroup", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class PropertyGroup
     {
@@ -64,6 +67,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public string SourcePath { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "Import", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class Import
     {
@@ -75,6 +79,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public string Label { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "ImportGroup", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class ImportGroup
     {
@@ -86,6 +91,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public string Condition { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "ClCompile", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class ClCompile
     {
@@ -105,17 +111,21 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public string Include { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "Link", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class Link
     {
         [XmlElement(ElementName = "AdditionalDependencies", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
         public string AdditionalDependencies { get; set; }
+        [XmlElement(ElementName = "AdditionalLibraryDirectories", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
+        public string AdditionalLibraryDirectories { get; set; }
         [XmlElement(ElementName = "EnableCOMDATFolding", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
         public string EnableCOMDATFolding { get; set; }
         [XmlElement(ElementName = "OptimizeReferences", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
         public string OptimizeReferences { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "ItemDefinitionGroup", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class ItemDefinitionGroup
     {
@@ -127,6 +137,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public string Condition { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "ClInclude", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class ClInclude
     {
@@ -134,6 +145,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         public string Include { get; set; }
     }
 
+    [Serializable]
     [XmlRoot(ElementName = "Project", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
     public class Project
     {

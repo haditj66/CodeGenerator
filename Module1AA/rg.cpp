@@ -1,12 +1,16 @@
 #include "rg.h"
 
+//namespace blaablaa {
 
+template<class T>
+	rg<T>::rg(int t)
+	{
+		this->blaa = t;
+	}
 
-rg::rg()
-{
-}
+	template<class T>
+	rg<T>::~rg()
+	{
+	}
 
-
-rg::~rg()
-{
-}
+//}

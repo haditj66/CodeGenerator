@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Projects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Projects NameOfProject="modaa" PathOfProject="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA\CGensaveFiles" UniqueIdentifier="418912368407420667" />
-</Projects>
+<Project xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Project NameOfProject="Mod" PathOfProject="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA\CGensaveFiles" UniqueIdentifier="138932710741353860" />
+</Project>

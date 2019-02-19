@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CodeGenerator.CMD_Handler;
 
 namespace CodeGenerator.ProblemHandler
@@ -7,7 +8,7 @@ namespace CodeGenerator.ProblemHandler
     {
         protected CMDHandler Cmd { get; set; }
 
-        protected List<Library> LibrariesCheckedOutSoFar { get; set; }
+        protected List<Library> LibrariesCheckedOutSoFar { get; set; } 
 
         public LibrariesForCheckedOutGit(CMDHandler cmd)
         {
@@ -17,14 +18,28 @@ namespace CodeGenerator.ProblemHandler
 
         public void AddLibraryCheckedOutSoFar(Library libraryCheckedout)
         {
-            LibrariesCheckedOutSoFar.Add(libraryCheckedout);
+            //dont add libraries that already have the same path of another library already added             
+            if (!LibrariesCheckedOutSoFar.Any(l => l.settings.PATHOfProject == libraryCheckedout.settings.PATHOfProject))
+            {
+                LibrariesCheckedOutSoFar.Add(libraryCheckedout);
+            } 
         }
 
 
         public void UncheckoutLibraryCheckedOutSoFar(Library libraryCheckedout)
         {
-            UncheckoutLibrary(libraryCheckedout); 
-            LibrariesCheckedOutSoFar.Remove(libraryCheckedout);
+            if (LibrariesCheckedOutSoFar.FirstOrDefault(l=> 
+                    l.IsTopLevel == libraryCheckedout.IsTopLevel &&
+                    l.settings.PATHOfProject == libraryCheckedout.settings.PATHOfProject &&
+                    l.config.ClassName == libraryCheckedout.config.ClassName &&
+                    l.config.ConfTypePrefix == libraryCheckedout.config.ConfTypePrefix &&
+                    l.config.Major == libraryCheckedout.config.Major 
+                    ) != null)
+            {
+                UncheckoutLibrary(libraryCheckedout);
+                LibrariesCheckedOutSoFar.Remove(libraryCheckedout);
+            } 
+            
         }
 
         private void UncheckoutLibrary(Library libraryToUncheckout)

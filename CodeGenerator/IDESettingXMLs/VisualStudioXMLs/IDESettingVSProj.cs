@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
- 
+ using Extensions;
 using CommandLine; 
 using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
 using CodeGenerator.IDESettingXMLs;
@@ -43,6 +44,13 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
              <ImportGroup Label="ExtensionTargets" />
             </Project>
             */
+
+
+            //creat a deep copy of root setting using a memory stream 
+            IDESettingXMLs.VisualStudioXMLs.Project RootOfSetting2 = restOfExtensions.DeepCopy<IDESettingXMLs.VisualStudioXMLs.Project>(RootOfSetting);
+  
+
+
             string FULLFILEPATH = GetFullFilePathFromPathWithoutFile(FullPathToPutGeneratedXMLFileWITHOUTFILENAME);
             List<IDESettingXMLs.VisualStudioXMLs.Project> projsJustForSer = new List<IDESettingXMLs.VisualStudioXMLs.Project>();
              
@@ -224,8 +232,8 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                 //<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
                 //</Project>  
                 string newstr = Regex.Replace(filestr, @"<\?xml version=""1.0"" encoding=""utf-8""\?>", "");
-                string newstr2 = Regex.Replace(newstr, @"<Project xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">", "");
-                string newstr3 = Regex.Replace(newstr2, @"<Project xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"" />", "");
+                string newstr3 = Regex.Replace(newstr, @"<Project \w*:?\w{3}="".*"" \w*:?\w{3}="".*"" \w*:?\w{3}="".*""\s*/?>", "");
+                //string newstr3 = Regex.Replace(newstr2, @"<Project xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"" />", "");
 
                 FileWithCorrectHeaders = Regex.Replace(newstr3, @"</Project>", "");
                 FileWithCorrectHeaders = @"<?xml version=""1.0"" encoding=""utf-8""?>" + "\n" + @"<Project DefaultTargets=""Build"" ToolsVersion=""15.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">" + FileWithCorrectHeaders;
@@ -237,6 +245,11 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
             //finally write the new file with appropriate headers
             File.WriteAllText(FULLFILEPATH, FileWithCorrectHeaders);
+
+
+            //set root setting back to what it was before all this
+              RootOfSetting = restOfExtensions.DeepCopy<IDESettingXMLs.VisualStudioXMLs.Project>(RootOfSetting2);
+
 
         }
     }

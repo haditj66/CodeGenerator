@@ -59,6 +59,10 @@
       <Project>{8ccce98b-937f-40d8-80bb-72c7f20dfee5}</Project>
       <Name>CodeGenerator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CodeGenerator\ConsoleApp2\CPPParser.csproj">
+      <Project>{1F805E85-0449-4037-8FB7-082163AE14FF}</Project>
+      <Name>CPPParser</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,8 +1,31 @@
 #pragma once
-class rg
+
+int r = 0;
+//namespace blaablaa {
+	template<class T>
+	class rg
+	{
+	public:
+		static int blaa;
+		T bloop() const;
+
+		rg(int t);
+		~rg();
+	};
+	//}
+
+template <class T>
+T rg<T>::bloop() const
 {
-public:
-	rg();
-	~rg();
-};
+}
+
+#define fef 3
+
+	//comment
+	//Annonymous
+	//Attributes
+	//
+
+template<class T>
+	int rg<T>::blaa = r;
 

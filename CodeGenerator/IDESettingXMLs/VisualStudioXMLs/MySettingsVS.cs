@@ -1,14 +1,17 @@
 ﻿using CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Filters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Extensions;
 using ExtensionMethods;
 using CodeGenerator.FileTemplates;
+using CodeGenerator.ProblemHandler;
 
 namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 {
@@ -16,8 +19,94 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
     {
 
         static Random rng = new Random();
-        public MySettingsVS(IDESetting xmlFilterSetting, IDESetting xmlProjectsetting) : base(xmlFilterSetting, xmlProjectsetting)//(Filters.Project xmlFilterClass, CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project XMLProjectClass) : base(xmlFilterClass, XMLProjectClass)
+
+        public MySettingsVS(IDESetting xmlFilterSetting, IDESetting xmlProjectsetting) :
+            base(xmlFilterSetting,
+                xmlProjectsetting) //(Filters.Project xmlFilterClass, CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project XMLProjectClass) : base(xmlFilterClass, XMLProjectClass)
         {
+            /*
+            IM HERE
+            THIS IS NOT WORKING BECAUSE IF I WANT TO REMOVE AN INCLUDE I WILL NEED TO SPOT THE DIFFERENCE
+            I NEED TO HAVE IT SO THAT ALL ADDITIONAL INCLUDES, ADDITIONAL LIBRARYDEPENDS AND LIBRARYLIBS ARE SET IN THE CONFIG FILE!!
+            THAT IS THE WHOLE POINT OF THE APP ANYWAYS!!! DONT WORRY ABOUT RELEASE AND THINGS LIKe THAT!! THATs NOT PART
+            OF THE WORKFLOW!!! IT DOESNT MATTER ABOUT OPTIMIZATIONS! IM ASSUMING YOU WILL ALWAYS BE IN DEBUG OR WILL CHANge CONFIGURATION OF
+            VS ON YOUR OWN*/
+
+            //INSTEAD IT WILL BE BETTER TO JUST GET ALL INCLUDES AND LIBRARIES FROM ALL PLATFORMS
+            //AND THEN PUT ALL NONDUPLICATES INTO ALL AVAILABLE PLAFORMS
+
+            //skip all this if I am doing the GlobalConfig.h library one.
+            if (this.PATHOfProject != Program.PATHTOCONFIGTEST)
+            {
+
+
+                #region getting all allIncludes and allLibraries from all platforms ********************************
+
+                List<ItemDefinitionGroup> itemDefinitionGroups =
+                    ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass)
+                    .ItemDefinitionGroup; //.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").ToList();
+
+                //includes
+                List<string> addincludesList = itemDefinitionGroups.Where((ItemDefinitionGroup tdg) =>
+                    {
+                        if (tdg.ClCompile == null)
+                        {
+                            return false;
+                        }
+                        return !string.IsNullOrEmpty(tdg.ClCompile.AdditionalIncludeDirectories);
+                    }).ToList()
+                    .Select(tdg => tdg.ClCompile.AdditionalIncludeDirectories).Distinct().ToList();
+                //remove duplicates and flatten to one string 
+                string allIncludes = string.Join(";", (string.Join(";",
+                    addincludesList.Select((string s) => { return s; }))).Split(';').Distinct()); //{ return s.Split(';'); }));
+
+                //library libs
+                List<string> addlibrariesList = itemDefinitionGroups.Where((ItemDefinitionGroup tdg) =>
+                {
+                    if (tdg.Link == null)
+                    {
+                        return false;
+                    }
+                    return !string.IsNullOrEmpty(tdg.Link.AdditionalDependencies);
+                }).ToList()
+
+                    .Select(tdg => tdg.Link.AdditionalDependencies).Distinct().ToList();
+                //remove duplicates and flatten to one string 
+                string allLibraries = string.Join(";", (string.Join(";",
+                    addlibrariesList.Select((string s) => { return s; }))).Split(';').Distinct()); //{ return s.Split(';'); }));
+
+                //library dirs
+                List<string> addlibrariesDirList = itemDefinitionGroups.Where((ItemDefinitionGroup tdg) =>
+                    {
+                        if (tdg.Link == null)
+                        {
+                            return false;
+                        }
+                        return !string.IsNullOrEmpty(tdg.Link.AdditionalLibraryDirectories);
+                    }
+                ).ToList()
+                    .Select(tdg => tdg.Link.AdditionalLibraryDirectories).Distinct().ToList();
+                string allLibrariesdir = string.Join(";", (string.Join(";",
+                    addlibrariesDirList.Select((string s) => { return s; }))).Split(';').Distinct());
+
+                #endregion
+
+
+
+                #region set all library and includes to ALL configurations  ********************************
+                //to make sure all configurations have the SAME additional library includes
+
+                foreach (var tdg in itemDefinitionGroups)
+                {
+                    tdg.Link.AdditionalDependencies = allLibraries; //string.Join("", allCurrentAdditionalsLibraryDirNoDuplicates);
+                    tdg.Link.AdditionalLibraryDirectories = allLibrariesdir;
+                    tdg.ClCompile.AdditionalIncludeDirectories = allIncludes;
+
+                }
+                #endregion
+
+
+            }
 
         }
 
@@ -32,8 +121,10 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             MySettingsVS vssetting = new MySettingsVS(settingFilter, settingProj);
             vssetting.Initiate();
             return vssetting;
-        } 
+        }
 
+
+        #region  additionalinclude stuff ********************************************************************
 
         protected override void AddSTRINGIncludeAsAdditionalIncludes(string additionalIncludeDir)
         {
@@ -43,20 +134,29 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                 additionalIncludeDir += ";";
             }
 
-            ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").First();
 
-            tdgs.ClCompile.AdditionalIncludeDirectories = additionalIncludeDir + tdgs.ClCompile.AdditionalIncludeDirectories;
+            //I NEED TO ADD THE INCLUDE TO ALL CONFIGURATIONS AS THE WHOLE POINT OF THIS APP IS THAT CONFIGURATIONS ARE HANDLED THROUGH THE
+            // CONFIGURATION FILE GENERATED!
+
+            List<ItemDefinitionGroup> itemDefinitionGroups = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup;//.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").ToList();
+
+            foreach (var idg in itemDefinitionGroups)
+            {
+                idg.ClCompile.AdditionalIncludeDirectories = additionalIncludeDir + idg.ClCompile.AdditionalIncludeDirectories;
+            }
+
+            //tdgs.ClCompile.AdditionalIncludeDirectories = additionalIncludeDir + tdgs.ClCompile.AdditionalIncludeDirectories;
         }
 
         protected override bool DoesAdditionalIncludesAlreadyExist(string additionalIncludeDir)
         {
-            ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").First();
-            if (tdgs.ClCompile.AdditionalIncludeDirectories == null)
+            ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").FirstOrDefault();
+            if (tdgs == null)
             {
                 return false;
-            } 
-
-            List<char> cc = new  List<char>();
+            }
+            /*
+            List<char> cc = new List<char>();
             //create regex pattern by putting escapes
             string pat = "";
             foreach (char c in additionalIncludeDir)
@@ -67,28 +167,188 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                     pat += "\\";
                 }
             }
-            pat += ";";
-            string sofar = tdgs.ClCompile.AdditionalIncludeDirectories;   
-            if(!Regex.IsMatch(sofar, pat))//(!tdgs.ClCompile.AdditionalIncludeDirectories.ToLiteral().Contains(additionalIncludeDir.ToLiteral())) //(Regex.IsMatch((string.Format(@tdgs.ClCompile.AdditionalIncludeDirectories)), (string.Format(@additionalIncludeDir))))  //!tdgs.ClCompile.AdditionalIncludeDirectories.Contains(additionalIncludeDir))
+            pat += ";";*/
+
+            List<string> sofar = tdgs.ClCompile.AdditionalIncludeDirectories.Split(';').ToList();
+            return sofar.Any(s => s == additionalIncludeDir);
+
+            /*if (!Regex.IsMatch(sofar, additionalIncludeDir))//(!tdgs.ClCompile.AdditionalIncludeDirectories.ToLiteral().Contains(additionalIncludeDir.ToLiteral())) //(Regex.IsMatch((string.Format(@tdgs.ClCompile.AdditionalIncludeDirectories)), (string.Format(@additionalIncludeDir))))  //!tdgs.ClCompile.AdditionalIncludeDirectories.Contains(additionalIncludeDir))
             {
                 return false;
-            }
+            }*/
             return true;
         }
 
+
+
         protected override List<string> ConvertAllCurrentAdditionalIncludesAsStrings()
         {
-            List<string> additionIncResult = new List<string>();
+            //List<string> additionIncResult = new List<string>();
 
 
-            ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").First();
-            if (tdgs.ClCompile.AdditionalIncludeDirectories != null)
+
+            List<ItemDefinitionGroup> tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.ToList();//.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").ToList();
+
+            var allCurrentAdditionals = tdgs.Select((ItemDefinitionGroup idg) =>
             {
-                additionIncResult = tdgs.ClCompile.AdditionalIncludeDirectories.Split(';').ToList();
+                return idg.ClCompile.AdditionalIncludeDirectories;
+            }).ToList();
+            allCurrentAdditionals = allCurrentAdditionals[0].Split(';').ToList();//string.Join(";", 
+            allCurrentAdditionals.RemoveAll(s => string.IsNullOrEmpty(s));
+
+            /*
+            //set all includes to ALL configurations to make sure all configurations have the SAME additional includes
+            foreach (var tdg in tdgs)
+            {
+                tdg.ClCompile.AdditionalIncludeDirectories = string.Join("", allCurrentAdditionalsNoDuplicates);
             }
-            return additionIncResult;
+             
+            //now get them as strings
+            if (tdgs[0].ClCompile.AdditionalIncludeDirectories != null)
+            {
+                additionIncResult = tdgs[0].ClCompile.AdditionalIncludeDirectories.Split(';').ToList();
+            }
+            */
+            return allCurrentAdditionals;
         }
 
+
+        protected override List<MyCLIncludeFile> ConvertAllCurrentCIncludesAsMyClIncludes()
+        {
+            List<MyCLIncludeFile> MyCLIncludeFileResult = new List<IDESettingXMLs.MyCLIncludeFile>();
+
+            var ItemGroupWithClIncludeFromfilter = ((Filters.Project)XmlFilterClass).ItemGroup
+                .Where((Filters.ItemGroup itmG) => { return itmG.ClInclude.Count != 0; })
+                .FirstOrDefault();
+
+            if (ItemGroupWithClIncludeFromfilter != null)
+            {
+
+                foreach (var clInclude in ItemGroupWithClIncludeFromfilter.ClInclude)
+                {
+                    //create new Myclinclude
+                    //the name will be the file at the end of the path minus the extension .h  
+                    //the filter will be the one that matches the path of the inlcude minus filename
+                    var filterTheCincBelongsTo = myFilters
+                        .Where((MyFilter fil) =>
+                        {
+
+                            return fil.GetFilterFromAddress(clInclude.Filter) != null;
+                        })
+                        .First();
+                    var MyClInc = new MyCLIncludeFile(filterTheCincBelongsTo, Path.GetFileName(clInclude.Include), Path.GetDirectoryName(clInclude.Include));
+
+                    MyCLIncludeFileResult.Add(MyClInc);
+                }
+            }
+
+            return MyCLIncludeFileResult;
+        }
+
+        #endregion
+
+
+
+        #region additionallibrarystuff  ************************************************************
+        protected override List<string> ConvertAllCurrentAdditionalLibrariesAsStrings()
+        {
+            //((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup[0].Link.
+            //List<ItemDefinitionGroup> itemDefinitionGroups = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup;//.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").ToList();
+
+            List<ItemDefinitionGroup> tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup.ToList();//.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").ToList();
+
+            List<string> allCurrentlibs = tdgs.Select((ItemDefinitionGroup idg) =>
+            {
+                return idg.Link.AdditionalDependencies;
+            }).ToList();
+            var allCurrentlibsstr = allCurrentlibs[0].Split(';').ToList();//string.Join(";",
+            allCurrentlibsstr.RemoveAll(s => string.IsNullOrEmpty(s));
+            allCurrentlibsstr.RemoveAll(s => s == "%(AdditionalDependencies)");
+
+
+            List<string> allCurrentlibsDirs = tdgs.Select((ItemDefinitionGroup idg) =>
+            {
+                return idg.Link.AdditionalLibraryDirectories;
+            }).ToList();
+            var allCurrentlibsDirsstr = allCurrentlibsDirs[0].Split(';').ToList();//string.Join(";",
+            allCurrentlibsDirsstr.RemoveAll(s => string.IsNullOrEmpty(s));
+            allCurrentlibsDirsstr.RemoveAll(s => s == "%(AdditionalDependencies)");
+
+            //this is a little more tricky as I do not know which libs belong to which directory(multiple libs could belong to multiipl directories)
+            //i need to go thrpough each directory and search
+            List<string> additionalLibDirs = new List<string>();
+            foreach (var allCurrentlibstr in allCurrentlibsstr)
+            {
+                foreach (var allCurrentlibsDir in allCurrentlibsDirsstr)
+                {
+                    if (File.Exists(Path.Combine(allCurrentlibsDir, allCurrentlibstr)))
+                    {
+                        additionalLibDirs.Add(Path.Combine(allCurrentlibsDir, allCurrentlibstr));
+                        break;
+                    }
+                }
+            }
+
+            if (additionalLibDirs.Count != allCurrentlibsstr.Count)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                var sf = st.GetFrame(0);
+                throw new Exception("one of the libs was not found in " + sf.GetFileName() + " at line " + sf.GetFileLineNumber());
+            }
+
+            return additionalLibDirs;
+        }
+
+
+        protected override void AddSTRINGLibraryAsAdditionalLibraries(string additionalLibraryDir)
+        {
+            //get libs and dirs seperately
+            string lib = Path.GetFileName(additionalLibraryDir);
+            string libdir = Path.GetDirectoryName(additionalLibraryDir);
+
+            if (!lib.Contains("%"))
+            {
+                lib += ";";
+            }
+            if (!libdir.Contains("%"))
+            {
+                libdir += ";";
+            }
+
+
+            //I NEED TO ADD THE libraries TO ALL CONFIGURATIONS  
+            List<ItemDefinitionGroup> itemDefinitionGroups = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup;//.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").ToList();
+
+            foreach (var idg in itemDefinitionGroups)
+            {
+                idg.Link.AdditionalDependencies = lib + idg.Link.AdditionalDependencies;
+                idg.Link.AdditionalLibraryDirectories = libdir + idg.Link.AdditionalLibraryDirectories;
+            }
+
+        }
+
+        protected override bool DoesAdditionalLibraryAlreadyExist(string additionalLibraryDir)
+        {
+            ItemDefinitionGroup tdgs = ((CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project)XmlProjectClass).ItemDefinitionGroup[0];//.Where((ItemDefinitionGroup tdg) => tdg.ClCompile.AdditionalIncludeDirectories != "").FirstOrDefault();
+            if (tdgs == null)
+            {
+                return false;
+            }
+
+            //grab all allCurrentlibsdirlist 
+            List<string> listAdditionalLibsFulDir = ConvertAllCurrentAdditionalLibrariesAsStrings();
+
+            bool existinSetting = listAdditionalLibsFulDir.Any(alib => alib == additionalLibraryDir);
+            //bool existInString = this.StringLibraries.Any(alib => alib == additionalLibraryDir);
+
+            return existinSetting;
+        }
+
+        #endregion
+
+
+
+        #region Filter stuff ********************************************************************
 
 
         protected override void AddMyFilterAsXMLFilter(MyFilter myfilters) // where t : IDESettingXMLs.VisualStudioXMLs.Filters.Filter
@@ -168,48 +428,21 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             return filtersResult;
         }
 
-        protected override List<MyCLIncludeFile> ConvertAllCurrentCIncludesAsMyClIncludes()
-        {
-            List<MyCLIncludeFile> MyCLIncludeFileResult = new List<IDESettingXMLs.MyCLIncludeFile>();
-
-            var ItemGroupWithClIncludeFromfilter = ((Filters.Project)XmlFilterClass).ItemGroup
-                .Where((Filters.ItemGroup itmG) => { return itmG.ClInclude.Count != 0; })
-                .First();
-
-            foreach (var clInclude in ItemGroupWithClIncludeFromfilter.ClInclude)
-            {
-                //create new Myclinclude
-                //the name will be the file at the end of the path minus the extension .h  
-                //the filter will be the one that matches the path of the inlcude minus filename
-                var filterTheCincBelongsTo = myFilters
-                    .Where((MyFilter fil) =>
-                    {
-
-                        return fil.GetFilterFromAddress(clInclude.Filter) != null;
-                    })
-                    .First();
-                var MyClInc = new MyCLIncludeFile(filterTheCincBelongsTo, Path.GetFileName(clInclude.Include), Path.GetDirectoryName(clInclude.Include));
-
-                MyCLIncludeFileResult.Add(MyClInc);
-            }
-
-            return MyCLIncludeFileResult;
-        }
 
         public override void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject)
         {
-            
+
             MyFilter configFilter;
             if (!myFilters.DoesFilterWithNameExist("Config"))
             {
-                configFilter = new MyFilter("Config"); 
+                configFilter = new MyFilter("Config");
                 AddFilter(configFilter);
             }
             else
             {
                 configFilter = myFilters.GetFilterAtAddress("Config");
             }
-            
+
 
             //-------------FolderCreation
             //does config folder exist
@@ -222,7 +455,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             //-------------mainCG.cpp NameOfCGenProjectConf.h Files  Configuration.h
             //   settings should already check if it exists before adding it
             MyCLCompileFile ccompMainCg = new MyCLCompileFile(configFilter, "mainCG", "Config");
-            AddCLCompileFile(ccompMainCg); 
+            AddCLCompileFile(ccompMainCg);
             if (!File.Exists(Path.Combine(ConfDirPath, "mainCG.cpp")))
             {
                 FileTemplateMainCG maincgTemplate = new FileTemplateMainCG(ConfDirPath, NameOfCGenProject);
@@ -248,13 +481,36 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
             //add additionalinclude for configTest
             AddAdditionalInclude(Program.PATHTOCONFIGTEST);
-            
+
 
             //save the settings 
-            GenerateXMLSettings(Program.envIronDirectory);
+            Save(Program.envIronDirectory);
 
 
         }
+
+        protected override void RemoveAllMentionsOfLibraryDependencyFilters()
+        {
+            //filters only show up in the filter settings
+            var filtersOfLibDep = ((Filters.Project)XmlSettings[0].RootOfSetting)
+                .ItemGroup
+                .Where((Filters.ItemGroup itg) => { return itg.Filter.Count != 0; })
+                .ToList()
+                .FirstOrDefault();
+            if (filtersOfLibDep != null)
+            {
+                filtersOfLibDep.Filter
+                    .RemoveAll((Filters.Filter filt) => { return filt.Include.Contains("LibraryDependencies"); });
+            }
+
+
+        }
+
+        #endregion
+
+
+
+        #region CLInclude stuff **********************************************************************
 
         protected override void AddMyClIncludesAsCIncludes(MyCLIncludeFile CLIncludeFile)
         {
@@ -264,6 +520,13 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             //make sure both are created and added  
             var ItemGroupWithCincludesPROJ = ((Project)XmlProjectClass).ItemGroup.Where((ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).First();
             var ItemGroupWithCCompilesFILT = ((Filters.Project)XmlFilterClass).ItemGroup.Where((Filters.ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).First();
+
+            if (ItemGroupWithCincludesPROJ == null || ItemGroupWithCCompilesFILT == null)
+            {
+                ProblemHandle p = new ProblemHandle();
+                p.ThereisAProblem("you need to have at least one .h file in your project to initialize. \n If you do and you still get this message, try reloading the project.");
+            }
+
 
             // create it 
             ClInclude theClIncToCreate = new ClInclude();
@@ -281,7 +544,13 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
         protected override bool DoesClIncludeExist(MyCLIncludeFile CLIncludeFile)
         {
-            var ItemGroupWithCincludesPROJ = ((Project)XmlProjectClass).ItemGroup.Where((ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).First();
+            var ItemGroupWithCincludesPROJ = ((Project)XmlProjectClass).ItemGroup
+                .Where((ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).FirstOrDefault();
+
+            if (ItemGroupWithCincludesPROJ == null)
+            {
+                return false;
+            }
 
             foreach (var CLInclude in ItemGroupWithCincludesPROJ.ClInclude)
             {
@@ -295,6 +564,34 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             return false;
         }
 
+        protected override void RemoveAllMentionsOfLibraryDependencyCLIncludes()
+        {
+            //clincludes shows up in filter settings and project settings
+            var inclibdep1 = ((Filters.Project)XmlSettings[0].RootOfSetting).ItemGroup
+                .Where((Filters.ItemGroup itg) => { return itg.ClInclude.Count != 0; })
+                .ToList().FirstOrDefault();
+            if (inclibdep1 != null)
+            {
+                inclibdep1.ClInclude
+                    .RemoveAll((Filters.ClInclude cl) => { return cl.Filter.Contains("LibraryDependencies"); });
+            }
+
+            //for proj settings
+            var inclibdep2 = ((Project)XmlSettings[1].RootOfSetting).ItemGroup
+                .Where((ItemGroup itg) => { return itg.ClInclude.Count != 0; })
+                .ToList().FirstOrDefault();
+            if (inclibdep2 != null)
+            {
+                inclibdep2.ClInclude
+                    .RemoveAll((ClInclude cl) => { return cl.Include.Contains("LibraryDependencies"); });
+            }
+
+        }
+
+        #endregion
+
+
+        #region CLCompile stuff **********************************************************************
 
         protected override List<MyCLCompileFile> ConvertAllCurrentCCompilessAsMyClCompiles()
         {
@@ -304,20 +601,25 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
             var ItemGroupWithClCompFromFilter = ((Filters.Project)XmlFilterClass).ItemGroup
                 .Where((Filters.ItemGroup itmG) => { return itmG.ClCompile.Count != 0; })
-                .First();
+                .FirstOrDefault();
 
-            foreach (var cCompile in ItemGroupWithClCompFromFilter.ClCompile)
+            if (ItemGroupWithClCompFromFilter != null)
             {
-                //create new Myclinclude
-                //the name will be the file at the end of the path minus the extension .h  
-                //the filter will be the one that matches the path of the inlcude minus filename
-                var filterTheCcompBelongsTo = myFilters
-                    .Where((MyFilter fil) => { return fil.GetFilterFromAddress(cCompile.Filter) != null; })
-                    .First();
 
-                var MyCComp = new MyCLCompileFile(filterTheCcompBelongsTo, Path.GetFileName(cCompile.Include), Path.GetDirectoryName(cCompile.Include));
+                foreach (var cCompile in ItemGroupWithClCompFromFilter.ClCompile)
+                {
+                    //create new Myclinclude
+                    //the name will be the file at the end of the path minus the extension .h  
+                    //the filter will be the one that matches the path of the inlcude minus filename
+                    var filterTheCcompBelongsTo = myFilters
+                        .Where((MyFilter fil) => { return fil.GetFilterFromAddress(cCompile.Filter) != null; })
+                        .First();
 
-                MyCLCompileFileResult.Add(MyCComp);
+                    var MyCComp = new MyCLCompileFile(filterTheCcompBelongsTo, Path.GetFileName(cCompile.Include), Path.GetDirectoryName(cCompile.Include));
+
+                    MyCLCompileFileResult.Add(MyCComp);
+                }
+
             }
 
             return MyCLCompileFileResult;
@@ -330,8 +632,15 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             //xmlProject Itemgroup CLCompile
             //make sure both are created and added 
 
-            var ItemGroupWithCCompilesPROJ = ((Project)XmlProjectClass).ItemGroup.Where((ItemGroup itmG) => { return itmG.ClCompile.Count > 0; }).First();
-            var ItemGroupWithCCompilesFILT = ((Filters.Project)XmlFilterClass).ItemGroup.Where((Filters.ItemGroup itmG) => { return itmG.ClCompile.Count > 0; }).First();
+            var ItemGroupWithCCompilesPROJ = ((Project)XmlProjectClass).ItemGroup.Where((ItemGroup itmG) => { return itmG.ClCompile.Count > 0; }).FirstOrDefault();
+            var ItemGroupWithCCompilesFILT = ((Filters.Project)XmlFilterClass).ItemGroup.Where((Filters.ItemGroup itmG) => { return itmG.ClCompile.Count > 0; }).FirstOrDefault();
+
+            if (ItemGroupWithCCompilesPROJ == null || ItemGroupWithCCompilesFILT == null)
+            {
+                ProblemHandle p = new ProblemHandle();
+                p.ThereisAProblem("you need to have at least one .cpp file in your project to initialize. \n If you do and you still get this message, try reloading the project.");
+            }
+
 
             // create it  
             ClCompile theClCompToCreate = new ClCompile();
@@ -347,7 +656,14 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
         protected override bool DoesCCompileExist(MyCLCompileFile clCompileToCheck)
         {
-            var ItemGroupWithCincludesPROJ = ((Project)XmlProjectClass).ItemGroup.Where((ItemGroup itmG) => { return itmG.ClCompile.Count > 0; }).First();
+            var ItemGroupWithCincludesPROJ = ((Project)XmlProjectClass).ItemGroup
+                .Where((ItemGroup itmG) => { return itmG.ClCompile.Count > 0; }).FirstOrDefault();
+
+
+            if (ItemGroupWithCincludesPROJ == null)
+            {
+                return false;
+            }
 
             foreach (var CLCompil in ItemGroupWithCincludesPROJ.ClCompile)
             {
@@ -362,47 +678,35 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         }
 
 
-        protected override void RemoveAllMentionsOfLibraryDependencyFilters()
-        {
-            //filters only show up in the filter settings
-            ((Filters.Project)XmlSettings[0].RootOfSetting).ItemGroup
-                .Where((Filters.ItemGroup itg) => { return itg.Filter.Count != 0; })
-                .ToList().First().Filter
-                .RemoveAll((Filters.Filter filt) => { return filt.Include.Contains("LibraryDependencies"); });
-
-        }
-
-        protected override void RemoveAllMentionsOfLibraryDependencyCLIncludes()
-        {
-            //clincludes shows up in filter settings and project settings
-            ((Filters.Project)XmlSettings[0].RootOfSetting).ItemGroup
-                .Where((Filters.ItemGroup itg) => { return itg.ClInclude.Count != 0; })
-                .ToList().First().ClInclude
-                .RemoveAll((Filters.ClInclude cl) => { return cl.Filter.Contains("LibraryDependencies"); });
-
-
-            //for proj settings
-            ((Project)XmlSettings[1].RootOfSetting).ItemGroup
-                .Where((ItemGroup itg) => { return itg.ClInclude.Count != 0; })
-                .ToList().First().ClInclude
-                .RemoveAll((ClInclude cl) => { return cl.Include.Contains("LibraryDependencies"); });
-        }
-
         protected override void RemoveAllMentionsOfLibraryDependencyCLCompiles()
         {
             //clincludes shows up in filter settings and project settings
-            ((Filters.Project)XmlSettings[0].RootOfSetting).ItemGroup
+            var complibdep1 = ((Filters.Project)XmlSettings[0].RootOfSetting).ItemGroup
                 .Where((Filters.ItemGroup itg) => { return itg.ClCompile.Count != 0; })
-                .ToList().First().ClCompile
-                .RemoveAll((Filters.ClCompile cl) => { return cl.Filter.Contains("LibraryDependencies"); });
-
+                .ToList().FirstOrDefault();
+            if (complibdep1 != null)
+            {
+                complibdep1.ClCompile
+                    .RemoveAll((Filters.ClCompile cl) => { return cl.Filter.Contains("LibraryDependencies"); });
+            }
 
             //for proj settings
-            ((Project)XmlSettings[1].RootOfSetting).ItemGroup
+            var complibdep2 = ((Project)XmlSettings[1].RootOfSetting).ItemGroup
                 .Where((ItemGroup itg) => { return itg.ClCompile.Count != 0; })
-                .ToList().First().ClCompile
-                .RemoveAll((ClCompile cl) => { return cl.Include.Contains("LibraryDependencies"); });
+                .ToList().FirstOrDefault();
+            if (complibdep2 != null)
+            {
+                complibdep2.ClCompile
+                    .RemoveAll((ClCompile cl) => { return cl.Include.Contains("LibraryDependencies"); });
+            }
+
         }
-         
+        #endregion
+
+
+
+
+
+
     }
 }

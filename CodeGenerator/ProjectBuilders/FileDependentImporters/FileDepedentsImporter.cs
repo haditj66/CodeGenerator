@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CodeGenerator.IDESettingXMLs;
+using ConsoleApp2.CPPRefactoring;
 
 namespace CodeGenerator.ProjectBuilders.FileDependentImporters
 {
@@ -35,37 +36,41 @@ namespace CodeGenerator.ProjectBuilders.FileDependentImporters
                 Directory.Delete(PathToTempfolder,true);
             } 
             Directory.CreateDirectory(PathToTempfolder);
-              
-            foreach (var clcomp in ClCompFilesToImport)
+
+            //I need to get all files, change their names with the prefix, put a copy of all files in the temp folder,
+            //and change all mentions of their //header #include "name" to that name
+            List<string> allFilePaths = new List<string>();// = ClCompFilesToImport.Select((MyCLCompileFile comp) => comp.FullLocationName).ToList();
+            //allFilePaths.AddRange(ClIncFilesToImport.Select((MyCLIncludeFile comp) => comp.FullLocationName).ToList());
+            //create copy temp files 
+            foreach (var clComp in ClCompFilesToImport)
             {
-                //read all contents of the ccomp
-                List<string> contents = File.ReadAllLines(Path.Combine(BaseLocationOfFiles,clcomp.FullLocationName)).ToList();
-
-
-                //put the namespace in there. since this is a .cpp file. it wont have #pragma once or a header gaurd. 
-                //so look through and put the namespace after the last mention of a #include 
-                contents = SetNameSPaceForCPPContents(contents);
+                string toFullPathName = Path.Combine(PathToOutput, clComp.Name);
+                allFilePaths.Add(toFullPathName);
+                
+                File.Copy(Path.Combine(BaseLocationOfFiles,clComp.FullLocationName) , toFullPathName);
 
             }
+            foreach (var CLinc in ClIncFilesToImport)
+            {
+                string toFullPathName = Path.Combine(PathToOutput, CLinc.Name);
+                allFilePaths.Add(toFullPathName);
+                File.Copy(Path.Combine(BaseLocationOfFiles, CLinc.FullLocationName), toFullPathName);
+            }
+
+
+
+            //allFilePaths.ForEach((string pathstr) => { pathstr = PrefixToAdd+pathstr; });
+
+
+
+
+            //change namespace for all files with the 
+
+            //put the namespace in there. since this is a .cpp file. it wont have #pragma once or a header gaurd. 
+
 
         }
 
-        private static List<string> SetNameSPaceForCPPContents(List<string> contents)
-        {
-            int index = 0;
-            bool previousLineWasInclude = true;
-            foreach (var content in contents)
-            {
-                //ignore comment lines and #include lines
-                if (content.Contains("#include") || Regex.IsMatch(content, @"^\s*//"))
-                {
-                    
-                } 
-                index++;
-            }
 
-            return null;
-        }
-         
     }
 }

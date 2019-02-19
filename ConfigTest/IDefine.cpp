@@ -13,42 +13,42 @@ std::string IDefine::GetBaseName()
 
 std::string IDefine::GetFullName()
 {
-
+	std::string delimiter = "*";
 
 	//prefixName_ConfTypePrefix_defineName_suffixMajor_instanceOfconfig
 	std::string strDefToPrint;
 	  
 
-	auto KeepPrefixName = [this, &strDefToPrint](void) ->void
+	auto KeepPrefixName = [this, &strDefToPrint, delimiter](void) ->void
 	{
 		strDefToPrint.append(PrefixName);
-		strDefToPrint.append("_");
+		strDefToPrint.append(delimiter);
 	}; 
-	auto KeepconftypePrefix = [this, &strDefToPrint](void) ->void
+	auto KeepconftypePrefix = [this, &strDefToPrint, delimiter](void) ->void
 	{
 		//make sure conftypePrefix is not empty
 		if (!ConfTypePrefix.empty())
 		{
 			strDefToPrint.append(ConfTypePrefix);
-			strDefToPrint.append("_");
+			strDefToPrint.append(delimiter);
 		}
 	}; 
-	auto KeepDefineName = [this, &strDefToPrint](void) ->void
+	auto KeepDefineName = [this, &strDefToPrint, delimiter](void) ->void
 	{
 		strDefToPrint.append(DefineName);
 		
 	}; 
-	auto KeepMajor = [this, &strDefToPrint](void) ->void
+	auto KeepMajor = [this, &strDefToPrint, delimiter](void) ->void
 	{
-		strDefToPrint.append("_");
+		strDefToPrint.append(delimiter);
 		strDefToPrint.append(std::to_string(Major));
 	};
-	auto KeepInstanceOfconfig = [this, &strDefToPrint](void) ->void
+	auto KeepInstanceOfconfig = [this, &strDefToPrint, delimiter](void) ->void
 	{ 
 		//the first instance does not need to be put 
 		if (InstanceOfConfig != 0)
 		{
-			strDefToPrint.append("_");
+			strDefToPrint.append(delimiter);
 			strDefToPrint.append(std::to_string(InstanceOfConfig));
 		}
 	};

@@ -33,23 +33,27 @@ namespace CodeGenerator.cgenXMLSaves
 
         protected abstract string FileNameDefault { get; }
         protected string _FileLocation;
-        protected string FileLocation { get { return _FileLocation != null ? _FileLocation : FileNameDefault; } }
+        //protected string FileLocation { get { return _FileLocation != null ? _FileLocation : FileNameDefault; } }
+        protected string FileLocation { get { return _FileLocation ; } }
         private dynamic _XMLClassToSave;
         public dynamic XMLClassToSave { get { return _XMLClassToSave; } protected set { _XMLClassToSave = value; } }
                      
 
         public SaveFileBase(string fileLocation) 
         {
-            _FileLocation = fileLocation +"\\"+ "cgenProjs.cgx"; 
-            init();
+            _FileLocation = fileLocation +"\\"+ "cgenProjs.cgx";
+            Init();
+            Load();
         }
 
         public SaveFileBase()
         {
-            init();
+            _FileLocation = FileNameDefault;
+            Init();
+            Load();
         }
 
-        private void init()
+        private void Init()
         {
             serializerCreated = false;
 
@@ -58,7 +62,11 @@ namespace CodeGenerator.cgenXMLSaves
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(FileLocation));
             }
+        }
 
+        public void Load()
+        {
+             
             //first make sure that the file exists.  .
             if (File.Exists(FileLocation))
             { 
@@ -73,6 +81,7 @@ namespace CodeGenerator.cgenXMLSaves
                 catch (Exception)
                 {
                     //if there was a problem than get default instead
+                    Console.WriteLine("there was a problem loading file "+ _FileLocation);
                     XMLClassToSave = GetDefaultXMLClass();
                     //Save();
                 }

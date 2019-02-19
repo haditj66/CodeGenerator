@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,13 +19,19 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+
+
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{3C234ED6-AC10-467A-A769-8CC476FAE1D6}</ProjectGuid>
     <RootNamespace>Module1AA</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
+
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -51,9 +58,17 @@
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
+
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+
   <ImportGroup Label="ExtensionSettings" />
+
+
   <ImportGroup Label="Shared" />
+
+
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -66,20 +81,27 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+
+
+
   <PropertyGroup Label="UserMacros" />
+
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+
+
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>LibraryDependencies;LibraryDependencies\ModAAConf1\MODE1;C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LibraryDependencies;LibraryDependencies\ModAAConf1\MODE1;C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest;%(AdditionalIncludeDirectories)C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ConfigTest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ConfigTest.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -87,17 +109,23 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>LibraryDependencies;LibraryDependencies\ModAAConf1\MODE1;C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest;%(AdditionalIncludeDirectories)C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>ConfigTest.lib;%(AdditionalDependencies);</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>LibraryDependencies;LibraryDependencies\ModAAConf1\MODE1;C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest;%(AdditionalIncludeDirectories)C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
+      <AdditionalDependencies>ConfigTest.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -107,14 +135,18 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>LibraryDependencies;LibraryDependencies\ModAAConf1\MODE1;C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest;%(AdditionalIncludeDirectories)C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
+      <AdditionalDependencies>ConfigTest.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+
+
   <ItemGroup>
     <ClCompile Include="ClassToInterfaceWith.cpp" />
     <ClCompile Include="main.cpp" />
@@ -122,12 +154,21 @@
     <ClCompile Include="SomaLibraryClassM1AA.cpp" />
     <ClCompile Include="Config\mainCG.cpp" />
   </ItemGroup>
+
+
   <ItemGroup>
     <ClInclude Include="ClassToInterfaceWith.h" />
     <ClInclude Include="Config\modaaConf.h" />
     <ClInclude Include="rg.h" />
     <ClInclude Include="SomaLibraryClassM1AA.h" />
+    <ClInclude Include="Config\ConfigurationCG.h" />
+    <ClInclude Include="Config\ModConf.h" />
   </ItemGroup>
+
+
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+
   <ImportGroup Label="ExtensionTargets" />
 </Project>

@@ -25,7 +25,7 @@ namespace CodeGenerator
             LibrariesIDependOn = new List<Library>();
             if (config.IsTopLevel == "true")
             {
-                TopLevelDir = Path.GetDirectoryName(config.ConfigFileFullPath);
+                TopLevelDir = Directory.GetParent(Path.GetDirectoryName(config.ConfigFileFullPath)).FullName;
                 TopLevelDir = Path.Combine(TopLevelDir, "LibraryDependencies"); 
                 IsTopLevel = true;
                 settings.Initiate(); 
@@ -103,7 +103,8 @@ namespace CodeGenerator
 
         public string GetPathToProjectAsADependent()
         {
-            return Path.Combine(config.Prefix, config.Major, config.ConfTypePrefix);
+            return Path.Combine(config.Prefix,config.ConfTypePrefix);
+            //return Path.Combine(config.Prefix, config.Major, config.ConfTypePrefix);
         }
 
         public bool IsEqual(Library toThisLibrary)
@@ -137,12 +138,29 @@ namespace CodeGenerator
                 settings.AddAdditionalInclude(include);
             }
 
-        } 
+        }
+
+        public void AddAdditionalLibraries(params string[] Libraries)
+        {
+            //add the additional incldue directories to the top level library
+            foreach (var lib in Libraries)
+            {
+                settings.AddAdditionalLibrary(lib);
+            }
+
+        }
+
+        public List<string> GetAllAdditionalLibraries()
+        {
+            return settings.StringLibraries;
+        }
+
 
         public List<string> GetAllAdditionalIncludes()
         {
             return settings.StringIncludes;
         }
+
 
         public List<MyFilter> GetAllFitlers()
         {
@@ -177,7 +195,7 @@ namespace CodeGenerator
 
         public void GenerateXMLSettings(string baseDirectoryForProject)
         {
-            settings.GenerateXMLSettings(baseDirectoryForProject); 
+            settings.Save(baseDirectoryForProject); 
 
             /*
             if (settings.XmlFilterClass != null)
@@ -191,7 +209,17 @@ namespace CodeGenerator
             }*/
 
         }
-          
+
+        public void SetPrefixToCLCompileFiles(string prefixToAddToAllFilesNames)
+        {
+            settings.SetPrefixToCLCompileFiles(prefixToAddToAllFilesNames);
+        }
+
+        public void SetPrefixToCLIncFiles(string prefixToAddToAllFilesNames)
+        {
+            settings.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames);
+        }
+
 
     }
 

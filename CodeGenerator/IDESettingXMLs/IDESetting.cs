@@ -17,28 +17,33 @@ namespace CodeGenerator.IDESettingXMLs
         public string PathWithoutFileNameOfXmlSetting { get; }
         public string ProjectExtension { get; }
         public XmlSerializer Serializer { get; }
+        public string SettingFileFullPath { get; private set; }
+        public Type TypeOfRootSetting { get; private set; }
+
 
         public IDESetting(string PathWithoutFileNameOfXmlSetting, string projectExtension, Type typeOfRootSetting)
         {
             this.PathWithoutFileNameOfXmlSetting = PathWithoutFileNameOfXmlSetting;
             ProjectExtension = projectExtension;
-            Serializer = new XmlSerializer(typeOfRootSetting);
+            TypeOfRootSetting = typeOfRootSetting;
+            Serializer = new XmlSerializer(TypeOfRootSetting);
 
             Debug.Assert(IsIDEProjectExistHere(PathWithoutFileNameOfXmlSetting), "There is no project setting here of extension "+ProjectExtension+". Make sure you create cgen project at same directory of your IDE project settings.");
 
             DirectoryInfo libraryDir = new DirectoryInfo(PathWithoutFileNameOfXmlSetting);
-            string projFileFullPath = libraryDir.GetFiles()
+            SettingFileFullPath = libraryDir.GetFiles()
                 .Where((FileInfo file) => { return file.Extension == projectExtension; }).First().FullName;
 
 
-            InitRootSetting(projFileFullPath, typeOfRootSetting);
+            LoadSettings( );
 
         }
+         
 
 
         public IDESetting(string projFileFullPath, Type typeOfRootSetting)
         {
-            InitRootSetting(projFileFullPath, typeOfRootSetting);
+            LoadSettings( );
 
         }
 
@@ -67,12 +72,12 @@ namespace CodeGenerator.IDESettingXMLs
         }
 
 
-        private void InitRootSetting(string projFileFullPath, Type typeOfRootSetting)
+        public void LoadSettings()
         {
             //get library project xml path  
-            using (StreamReader reader = new StreamReader(projFileFullPath))
+            using (StreamReader reader = new StreamReader(SettingFileFullPath))
             {
-                RootOfSetting = Convert.ChangeType(Serializer.Deserialize(reader), typeOfRootSetting);
+                RootOfSetting = Convert.ChangeType(Serializer.Deserialize(reader), TypeOfRootSetting);
             }
         }
 

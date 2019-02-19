@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B566EBBC-40A7-49A7-A0B6-05EF9360FBCC}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>CPPParserLibClang</RootNamespace>
     <AssemblyName>CPPParserLibClang</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -56,7 +56,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ClangSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClangSharp.3.8.0\lib\net40\ClangSharp.dll</HintPath>
+      <HintPath>..\packages\clang.sharp.3.6.2\lib\net40\ClangSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CppSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CppSharp.0.8.23\lib\CppSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CppSharp.AST, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CppSharp.0.8.23\lib\CppSharp.AST.dll</HintPath>
+    </Reference>
+    <Reference Include="CppSharp.Generator, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CppSharp.0.8.23\lib\CppSharp.Generator.dll</HintPath>
+    </Reference>
+    <Reference Include="CppSharp.Parser, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CppSharp.0.8.23\lib\CppSharp.Parser.dll</HintPath>
+    </Reference>
+    <Reference Include="CppSharp.Parser.CLI, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\CppSharp.0.8.23\lib\CppSharp.Parser.CLI.dll</HintPath>
+    </Reference>
+    <Reference Include="CppSharp.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CppSharp.0.8.23\lib\CppSharp.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,6 +86,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CPPRefactoring\CPPNode.cs" />
+    <Compile Include="CPPRefactoring\CppRefactorer.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Location.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="test.cs" />
@@ -84,15 +106,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="x64\libclang.dll" />
-    <Content Include="x86\libclang.dll" />
+    <Content Include="libclang.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\ClangSharp.3.8.0\build\ClangSharp.targets" Condition="Exists('..\packages\ClangSharp.3.8.0\build\ClangSharp.targets')" />
+  <Import Project="..\packages\clang.sharp.3.6.2\build\net40\clang.sharp.targets" Condition="Exists('..\packages\clang.sharp.3.6.2\build\net40\clang.sharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\ClangSharp.3.8.0\build\ClangSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ClangSharp.3.8.0\build\ClangSharp.targets'))" />
+    <Error Condition="!Exists('..\packages\clang.sharp.3.6.2\build\net40\clang.sharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\clang.sharp.3.6.2\build\net40\clang.sharp.targets'))" />
+    <Error Condition="!Exists('..\packages\Baseclass.Contrib.Nuget.Output.2.4.3\build\Baseclass.Contrib.Nuget.Output.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Baseclass.Contrib.Nuget.Output.2.4.3\build\Baseclass.Contrib.Nuget.Output.targets'))" />
   </Target>
+  <Import Project="..\packages\Baseclass.Contrib.Nuget.Output.2.4.3\build\Baseclass.Contrib.Nuget.Output.targets" Condition="Exists('..\packages\Baseclass.Contrib.Nuget.Output.2.4.3\build\Baseclass.Contrib.Nuget.Output.targets')" />
 </Project>

@@ -120,7 +120,13 @@ void Config::PrintDefines(Config& TopLevelConfig)
 			strDefToPrint.append("  ");
 
 			//assert that ValueAsString is not empty
-			assert(!var->ValueAsString.empty());
+			if(	var->ValueAsString.empty())
+			{ 
+				config->Problem(var->GetBaseName().append(" for library ")
+					.append(config->ClassName)
+					.append(" has not been defined. either define it or add a default define in its library ")
+					.append(config->ClassName));
+			}
 			strDefToPrint.append(var->ValueAsString);
 
 			strDefToPrint.append("\n");
@@ -464,6 +470,15 @@ bool Config::IsEqual(const Config& configToCompare) const
 	}
 
 	return false;
+}
+
+void Config::Problem(std::string msg)
+{
+	std::string p = "PROBLEM:: ";
+	std::cout << std::endl;
+	std::cout << p.append(msg) << std::endl;
+	std::cout << std::endl;
+
 }
 
 void Config::AddConfigSoFar(Config* configToAdd)

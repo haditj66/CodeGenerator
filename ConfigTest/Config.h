@@ -120,7 +120,7 @@ public:
 	//Config() { ConfTypePrefix = ""; }
 	void Init(); 
 	bool IsEqual(const Config& configToCompare ) const;
-
+	void Problem(std::string);
 
 	template<class T> 
 	void SetPublicDefineValue(std::string name, T valueToChangeTo);

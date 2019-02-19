@@ -1,19 +1,19 @@
 #pragma once
 
 
-#include "GlobalBuildConfig.h"
-#include "Config.h"
-#include "Defines.h"
-#include "IDefine.h"
+//#include "GlobalBuildConfig.h"
+//#include "Config.h"
+//#include "Defines.h"
+//#include "IDefine.h"
 #include <iostream> 
 #include <string>
 #include <algorithm>
-#include "Config/modaaConf.h" 
+//#include "Config/modaaConf.h" 
 #include <sstream>
 #include <string>
 #include <fstream>
 //#include "Pre_ClassToInterfaceWith.h"
-//#include "SomaLibraryClassM1AA.h"
+#include "SomaLibraryClassM1AA.h"
 /*
 #define PRINTER(var) printer(#var, ((int)var))
  
@@ -51,7 +51,7 @@ int main()
 	PRE::SomaLibraryClassM1AA d(2);
 	*/
 
-	
+	/*
 	GlobalBuildConfig glob;
 	glob.Init();
 	glob.BUILD->SetValue(BuildEnum::DEBUG);
@@ -61,7 +61,7 @@ int main()
 	m.Init(); 
 	m.SetPublicDefineValue<int>("BUFFERSIZE",4);// change back to vector and just iterate through to find name
 	m.BUFFERSIZE->SetValue(500);
-	m.MSG2->SetValue("hello bla"); 
+	m.MSG2->SetValue("hello bla"); */ 
 	 /*
 	ModAAConf1<ModeEnum::Fast> m11;
 	m11.Init();
@@ -72,9 +72,9 @@ int main()
 	m2.BUFFERSIZE->SetValue(1000);
 	m2.MSG2->SetValue("wf bla");
 	*/
-	Config::PrintDefines(m);
+	//Config::PrintDefines(m);
  
- 
+
 
 
 

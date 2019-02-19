@@ -12,54 +12,80 @@ namespace CodeGenerator.IDESettingXMLs
 {
     public abstract class MySettingsBase
     {
+        private readonly IDESetting _xmlFilterSetting;
+        private readonly IDESetting _xmlProjectsetting;
         public List<IDESetting> XmlSettings { get; }
-        public object XmlFilterClass { get; }
-        public object XmlProjectClass { get; }
+        public object XmlFilterClass { get => _xmlFilterSetting.RootOfSetting; }
+        public object XmlProjectClass { get => _xmlProjectsetting.RootOfSetting; }
         public List<MyFilter> myFilters { get; private set; }
         public List<string> StringIncludes { get; private set; }
+        public List<string> StringLibraries { get; private set; }
         public List<MyCLCompileFile> CLCompileFiles { get; private set; }
         public List<MyCLIncludeFile> CLIncludeFiles { get; private set; }
         public string PATHOfProject { get; private set; }
 
-        
+
 
 
         public MySettingsBase(IDESetting xmlFilterSetting, IDESetting xmlProjectsetting)
         {
+            _xmlFilterSetting = xmlFilterSetting;
+            _xmlProjectsetting = xmlProjectsetting;
             PATHOfProject = xmlProjectsetting.PathWithoutFileNameOfXmlSetting;
 
             XmlSettings = new List<IDESetting>();
             XmlSettings.Add(xmlFilterSetting);
             XmlSettings.Add(xmlProjectsetting);
-            XmlFilterClass = xmlFilterSetting.RootOfSetting;
-            XmlProjectClass = xmlProjectsetting.RootOfSetting;
+            //XmlFilterClass = xmlFilterSetting.RootOfSetting;
+            //XmlProjectClass = xmlProjectsetting.RootOfSetting;
 
-             
 
-        } 
-        
+
+        }
+
+        public void LoadAllSettingsWithoutLibDepends()
+        {
+            XmlSettings.ForEach(s => s.LoadSettings());
+
+            IsAlreadyInitiated = false;
+            Initiate();
+        }
+
+
 
         private bool IsAlreadyInitiated = false;
         public void Initiate()
         {
-            if (!IsAlreadyInitiated)
-            { 
-                RemoveAllMentionsOfLibraryDependencyFilters();
-                RemoveAllMentionsOfLibraryDependencyCLCompiles();
-                RemoveAllMentionsOfLibraryDependencyCLIncludes();
+            //skip this one if you are doing the globalbuild library one 
+            if (this.PATHOfProject != Program.PATHTOCONFIGTEST)
+            {
+                if (!IsAlreadyInitiated)
+                {
+                    RemoveAllMentionsOfLibraryDependencyFilters();
+                    RemoveAllMentionsOfLibraryDependencyCLCompiles();
+                    RemoveAllMentionsOfLibraryDependencyCLIncludes();
 
-                myFilters = ConvertAllCurrentXMLFiltersAsMyFilters();
-                StringIncludes = ConvertAllCurrentAdditionalIncludesAsStrings();
-                CLCompileFiles = ConvertAllCurrentCCompilessAsMyClCompiles();
-                CLIncludeFiles = ConvertAllCurrentCIncludesAsMyClIncludes();
+                    myFilters = ConvertAllCurrentXMLFiltersAsMyFilters();
+                    StringIncludes = ConvertAllCurrentAdditionalIncludesAsStrings();
+                    StringLibraries = ConvertAllCurrentAdditionalLibrariesAsStrings();
+                    CLCompileFiles = ConvertAllCurrentCCompilessAsMyClCompiles();
+                    CLIncludeFiles = ConvertAllCurrentCIncludesAsMyClIncludes();
 
 
-                //take out all ccompile, cincludes, and myfilters that have mention of LibraryDependency
-                CLCompileFiles.RemoveAll((MyCLCompileFile cc) => { return cc.FullFilterName.Contains("LibraryDependencies"); });
-                CLIncludeFiles.RemoveAll((MyCLIncludeFile cc) => { return cc.FullFilterName.Contains("LibraryDependencies"); });
-                myFilters.RemoveAll((MyFilter cc) => { return cc.GetFullAddress().Contains("LibraryDependencies"); });
+                    //take out all ccompile, cincludes, and myfilters that have mention of LibraryDependency
+                    CLCompileFiles.RemoveAll((MyCLCompileFile cc) =>
+                    {
+                        return cc.FullFilterName.Contains("LibraryDependencies");
+                    });
+                    CLIncludeFiles.RemoveAll((MyCLIncludeFile cc) =>
+                    {
+                        return cc.FullFilterName.Contains("LibraryDependencies");
+                    });
+                    myFilters.RemoveAll(
+                        (MyFilter cc) => { return cc.GetFullAddress().Contains("LibraryDependencies"); });
 
-                IsAlreadyInitiated = true;
+                    IsAlreadyInitiated = true;
+                }
             }
         }
 
@@ -70,6 +96,10 @@ namespace CodeGenerator.IDESettingXMLs
         protected abstract List<string> ConvertAllCurrentAdditionalIncludesAsStrings();
         protected abstract void AddSTRINGIncludeAsAdditionalIncludes(string additionalIncludeDir);
         protected abstract bool DoesAdditionalIncludesAlreadyExist(string additionalIncludeDir);
+
+        protected abstract List<string> ConvertAllCurrentAdditionalLibrariesAsStrings();
+        protected abstract void AddSTRINGLibraryAsAdditionalLibraries(string additionalIncludeDir);
+        protected abstract bool DoesAdditionalLibraryAlreadyExist(string additionalIncludeDir);
 
         protected abstract void RemoveAllMentionsOfLibraryDependencyCLIncludes();
         protected abstract List<MyCLIncludeFile> ConvertAllCurrentCIncludesAsMyClIncludes();
@@ -106,6 +136,16 @@ namespace CodeGenerator.IDESettingXMLs
             }
         }
 
+        public void AddAdditionalLibrary(string AdditionalLibrary)
+        {
+            if (!DoesAdditionalLibraryAlreadyExist(AdditionalLibrary))
+            {
+                StringLibraries.Add(AdditionalLibrary);
+
+                AddSTRINGLibraryAsAdditionalLibraries(AdditionalLibrary);
+            }
+        }
+
         public void AddCLIncludeFile(MyCLIncludeFile CLIncludeFile)
         {
             if (!DoesClIncludeExist(CLIncludeFile))
@@ -127,13 +167,25 @@ namespace CodeGenerator.IDESettingXMLs
 
         }
 
-        public void GenerateXMLSettings(string baseDirectoryForProject)
+        public void SetPrefixToCLCompileFiles(string prefixToAddToAllFilesNames)
+        {
+            CLCompileFiles.ForEach(cinc => cinc.Name = prefixToAddToAllFilesNames + cinc.Name);
+        }
+
+        public void SetPrefixToCLIncFiles(string prefixToAddToAllFilesNames)
+        {
+            CLIncludeFiles.ForEach(cinc => cinc.Name = prefixToAddToAllFilesNames + cinc.Name); 
+        }
+
+        public void Save(string baseDirectoryForProject)
         {
             foreach (var setting in XmlSettings)
             {
 
                 setting.GenerateXMLSetting(baseDirectoryForProject);//(Path.GetDirectoryName(config.ConfigFileFullPath));
             }
+
+
         }
     }
 }

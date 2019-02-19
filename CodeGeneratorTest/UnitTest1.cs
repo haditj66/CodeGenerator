@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using ClangSharp;
 using CodeGenerator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeGenerator.IDESettingXMLs;
@@ -8,6 +12,10 @@ using CodeGenerator.FileTemplates;
 using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
 using CodeGenerator.ProjectBuilders;
 using CodeGenerator.ProjectBuilders.FileDependentImporters;
+using ConsoleApp2.CPPRefactoring;
+using ConsoleApp2.MyClangWrapperClasses.CXCursors.MyCursorKinds;
+using ConsoleApp2.Parsing;
+using CPPParser;
 
 namespace CodeGeneratorTest
 {
@@ -105,6 +113,74 @@ namespace CodeGeneratorTest
             FileDepedentsImporter imprter = new FileDepedentsImporter("pref1o2",vsSettingmodAA.CLCompileFiles,vsSettingmodAA.CLIncludeFiles, vsSettingmodAA.PATHOfProject);
             imprter.ImportFilesToPath(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestImporter");
         }
+
+        [TestMethod]
+        public void TestisStartsWithHashtagInclude()
+        {
+             string line1 = @"#include blabla";
+             string line2 = @"// somethign sdds #include blabla";
+             string line3 = @"  #include blabla";
+             string line4 = @"int e = 4 #include blabla";
+
+            Assert.IsTrue(line1.isStartsWithHashtagInclude());
+            Assert.IsTrue(!line2.isStartsWithHashtagInclude());
+            Assert.IsTrue(line3.isStartsWithHashtagInclude());
+            Assert.IsTrue(!line4.isStartsWithHashtagInclude());
+
+        }
+
+        [TestMethod]
+        public void ChangeFileName()
+        {
+            CppRefactorer refact = new CppRefactorer(new DirectoryInfo(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\FileNameChange"));
+
+            refact.ChangeNameOfFile(@"rg.h","pre_rg.h"); 
+        }
+
+        [TestMethod]
+        public void InsertNAmespaceIntoFile()
+        {
+            //set the test files-------------------------------------
+            if (Directory.Exists(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\FileNameChangeTemp"))
+            {
+                Directory.Delete(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\FileNameChangeTemp",true);
+            } 
+            Directory.CreateDirectory(   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\FileNameChangeTemp");
+            string[] files = Directory.GetFiles(
+                @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\DontChangeAnythingHere");
+            foreach (var file in files)
+            {
+                File.Copy(file, Path.Combine(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\FileNameChangeTemp", Path.GetFileName(file)));
+            }
+            //-------------------------------------------------------
+
+
+            CppRefactorer refact = new CppRefactorer(new DirectoryInfo(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\FileNameChangeTemp"));
+
+            refact.InsertNamespaceIntoAllFiles("bla"); 
+        }
+
+
+        [TestMethod]
+        public void VisitorOfKind()
+        {
+            //thesting for enumDeclaration
+
+            CppParser parser = new CppParser(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\GlobalBuildConfig.h");
+            List<MyCursorOfKindEnumDecl> enumcursors =  parser.GetAllCursorsOfKind<MyCursorOfKindEnumDecl>();
+
+
+            Assert.IsTrue(enumcursors.Count == 2);
+
+            MyCursorOfKindEnumDecl platformenum = enumcursors.Where((MyCursorOfKindEnumDecl myc) =>
+            {
+                return myc.getCursorSpelling() == "PlatformEnum";
+            }).First();
+            var children = platformenum.GetChildrenOfKind_EnumConstantDecl();
+            
+            //var z = enumcursors[0].getEnumConstantDeclValue();
+        }
+
 
     }
 }

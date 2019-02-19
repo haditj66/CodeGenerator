@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CodeGenerator.IDESettingXMLs;
 using System.IO;
+using CodeGenerator.cgenXMLSaves.SaveFiles;
 using CodeGenerator.CMD_Handler;
 using CodeGenerator.GitHandlerForLibraries;
 using CodeGenerator.ProblemHandler;
@@ -23,7 +24,7 @@ namespace CodeGenerator.ProjectBuilders
         protected GitHandlerForLibrary GitHandlerforLib { get; private set; }
         protected LibrariesForCheckedOutGit LibGitCleanUp { get; private set; }
 
-        protected ProblemHandle ProblemHandle { get;  set; }
+        public ProblemHandle ProblemHandle { get; protected set; }
 
         public ProjectBuilderBase(IDESetting configSettings)
         {
@@ -67,7 +68,7 @@ namespace CodeGenerator.ProjectBuilders
         }
 
 
-        public static bool IsCCompDependencyAbleForImporting(MyCLCompileFile CComp)
+        public static bool IsCCompDependencyAbleForImporting(MyCLCompileFile CComp, params string[] possiblePrefixs)
         {
             if ((CComp.LocationOfFile == "Config"))
             {
@@ -79,9 +80,17 @@ namespace CodeGenerator.ProjectBuilders
                 return false;
             }
 
-            if ((CComp.Name == "main.cpp"))
+            if ((CComp.Name == "main.cpp")   )
             {
                 return false;
+            }
+
+            foreach (string possibleprefix in possiblePrefixs)
+            {
+                if ((CComp.Name == possibleprefix + "main.cpp"))
+                {
+                    return false;
+                } 
             }
 
             return true;
@@ -89,6 +98,12 @@ namespace CodeGenerator.ProjectBuilders
 
         public static bool IsCIncDependencyAbleForImporting(MyCLIncludeFile Cinc)
         {
+
+
+            if (Cinc.Name.Contains("_ConfigurationCG"))
+            {
+                return true;
+            }
             if ((Cinc.LocationOfFile == "Config"))
             {
                 return false;
@@ -146,16 +161,22 @@ namespace CodeGenerator.ProjectBuilders
             else
             {
                 //since it has the needed tag. stash everything, checkout to that tag 
-                GitHandlerforLib.StashAndCheckoutTag(libraryToCheckout, tagToCheckoutTo);
+                GitHandlerforLib.StashAndCheckoutTag(libraryToCheckout, tagToCheckoutTo, ProblemHandle);
                 LibGitCleanUp.AddLibraryCheckedOutSoFar(libraryToCheckout);
             }
         }
 
         protected abstract MySettingsBase GetSettingsOVERRIDE(string pathToProjectSettings);
 
-        public abstract void ImportDependentLibrariesCincAndCcompAndAdditional();
+        /// <summary>
+        /// this imports settings from dependent libraries into the settings of your project program
+        /// </summary>
+        public abstract void ImportDependentSettingsLibrariesCincAndCcompAndAdditional(SaveFilecgenProjectGlobal saveProjGlob);
 
-        public abstract void CreateCCompCincDependencyFiles();
+        /// <summary>
+        /// this will import all physical files from libraries your top library depends on.
+        /// </summary>
+        public abstract void ImportDependentFilesLibrariesCincAndCcomp();
         //public abstract void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir);
 
 

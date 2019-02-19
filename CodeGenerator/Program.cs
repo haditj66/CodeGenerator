@@ -20,21 +20,30 @@ using System.Diagnostics;
 using CodeGenerator.CMD_Handler;
 using ExtensionMethods;
 using System.Reflection;
+using ClangSharp;
 using CodeGenerator.GitHandlerForLibraries;
 using CodeGenerator.ProblemHandler;
-using CPPParserLibClang;
+using CommandLine.Text;
+using ConsoleApp2;
+using ConsoleApp2.CPPRefactoring;
+using ConsoleApp2.MyClangWrapperClasses;
+using ConsoleApp2.MyClangWrapperClasses.CXCursors;
+using ConsoleApp2.MyClangWrapperClasses.CXCursors.MyCursorKinds;
+using ConsoleApp2.Parsing;
+using Extensions;
+using Project = CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project;
 
 namespace CodeGenerator
 {
 
 
-    
+
 
     public class Program
     {
 
-
-
+        #region Options classes  ***************************************************************************
+        //*************************************************************************************************** 
         //Verbs help delineate and separate options and values for multiple commands within a single app
         [Verb("generate", HelpText = "generate the code")]
         public class GenerateOptions
@@ -79,15 +88,49 @@ namespace CodeGenerator
 
         }
 
-        [Verb("config", HelpText = "Configure Code Generator")]
+        [Verb("config", HelpText = "Configure Code Generator. add and remove targets. configurations are Debug or Release")]
         public class ConfigOptions
         {
             //[CommandLine.Value(1), help]
             [Option(HelpText = "Directory of the Config")]
             public string directoryofconfig { get; set; }
 
+            [Option('r', HelpText = "remove a platform")]
+            public string PlatformToRemove { get; set; }
+
+            [Option('a', HelpText = "create a new platform")]
+            public string PlatformToAdd { get; set; }
 
         }
+
+
+        [Verb("configproj", HelpText = "manage the project's possible configurations. add and remove additional includes and library paths. configurations are Debug or Release")]
+        public class ProjConfigOptions
+        {
+            [Value(0, HelpText = "platform you want to add or remove includes or library directories")]
+            public string platform { get; set; }
+
+            [Option(HelpText = "include you want to add")]
+            public string addinclude { get; set; }
+
+            [Option(HelpText = "include you want to remove")]
+            public string removeinclude { get; set; }
+
+            [Option(HelpText = "library you want to add")]
+            public string addlibrary { get; set; }
+
+            [Option(HelpText = "library you want to remove")]
+            public string removelibrary { get; set; }
+
+            [Option('r', HelpText = "remove a platform from this project's scope")]
+            public string PlatformToRemove { get; set; }
+
+            [Option('a', HelpText = "add a new platform to this project's scope")]
+            public string PlatformToAdd { get; set; }
+
+        }
+        #endregion
+
 
         public static string DIRECTORYOFTHISCG = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string CGSAVEFILESBASEDIRECTORY = "CGensaveFiles";
@@ -96,23 +139,48 @@ namespace CodeGenerator
 
 #if TESTING
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
-        public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
+        //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";//
+        //public static string envIronDirectory =  @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
+
+        //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
+        //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
+        //static string[] command  = "init moda".Split(' ');
+        //static string[] command  = ("config --directoryofconfig " +  @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest").Split(' ');
+        //static string[] command  = "config".Split(' ');
+        //static string[] command  = "config -a stm32f5".Split(' ');
+        //static string[] command  = "config -r stm32f4".Split(' ');
+        //static string[] command  = "config -r IAR".Split(' ');
+        //static string[] command = "configproj".Split(' ');
+        //static string[] command = "configproj -a VS".Split(' ');
+        //static string[] command = "configproj -r VS".Split(' ');
+        //static string[] command = @"configproj VS --addinclude C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator".Split(' ');
+        //static string[] command = @"configproj VS --removeinclude C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator".Split(' ');
+        //static string[] command = @"configproj VS --addlibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
+        //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
+        //static string[] command  = "".Split(' ');
+        static string[] command  = "generate".Split(' ');
+        //static string[] command  = "init Mod".Split(' ');
+        //static string[] command = "init ModAA".Split(' ');
+        //static string[] command = "init ModA".Split(' ');
+
+
 #else
+        static string[] command;
         public static string envIronDirectory = Environment.CurrentDirectory;
 #endif
 
-        public static SaveFilecgenProject savefileProjLocal = new SaveFilecgenProject();
-        public static SaveFilecgenConfig saveFilecgenConfigLocal = new SaveFilecgenConfig();
+        public static SaveFilecgenProjectGlobal savefileProjGlobal = new SaveFilecgenProjectGlobal();
+        public static SaveFilecgenConfig saveFilecgenConfigGlobal = new SaveFilecgenConfig();
+        public static SaveFilecgenProjectLocal SaveFilecgenProjectLocal = new SaveFilecgenProjectLocal();
         //public static ProjectBuilderVS projectBuilderForVs;
 
-        static string[] command;
 
 
         static void Main(string[] args)
         {
-
-            test t = new test();
 
             //string e = Environment.CurrentDirectory;
             //Console.WriteLine(e);
@@ -121,11 +189,12 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, ConfigOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, ConfigOptions, ProjConfigOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<InitOptions>(opts => Init(opts))
-.WithParsed<ConfigOptions>(opts => Config(opts));
+.WithParsed<ConfigOptions>(opts => Config(opts))
+.WithParsed<ProjConfigOptions>(opts => ProjConfig(opts));
             };
 
 #if !TESTING
@@ -133,14 +202,6 @@ namespace CodeGenerator
 
             if (command.Count() != 0)
 #else
-
-            //command = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
-            //command = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
-            //command = "init moda".Split(' ');
-            //command = ("config --directoryofconfig " +  @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest").Split(' ');
-            //command = "".Split(' ');
-            command = "generate".Split(' ');
-            //command = "init ModuleB".Split(' ');
 
             if (command != null && command.Count() > 0)
 #endif 
@@ -154,9 +215,10 @@ namespace CodeGenerator
                 if (IsProjectExistsAtEnvironDirectory())
                 {
                     //get the SaveFilecgenProject for this directory
-                    SaveFilecgenProject savefileAtDir = new SaveFilecgenProject(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
+                    SaveFilecgenProjectLocal savefileLocal = new SaveFilecgenProjectLocal(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
 
-                    var projHere = savefileProjLocal.CgenProjects.Projects.Where((cgenProject cgenproj) => cgenproj.UniqueIdentifier == savefileAtDir.CgenProjects.Projects.FirstOrDefault().UniqueIdentifier).First();
+                    var projHere = savefileProjGlobal.CgenProjects.Projects
+                        .First((cgenProjectGlobal cgenproj) => cgenproj.UniqueIdentifier == savefileLocal.CgenProjects.Project.UniqueIdentifier);
                     if (projHere != null)
                     {
                         Console.WriteLine(projHere.NameOfProject + " project exists in this directory");
@@ -177,29 +239,12 @@ namespace CodeGenerator
 
 
 
-        static bool IsProjectExistsAtEnvironDirectory()
-        {
-            if (Directory.Exists(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY))
-            {
-                return true;
-            }
-            return false;
-        }
 
-        static SaveFilecgenProject GetSaveFilecgenProjectAtEnvironDirectory()
-        {
-            if (!IsProjectExistsAtEnvironDirectory())
-            {
-                throw new Exception("there is no such project here yet");
-            }
-
-            return (new SaveFilecgenProject(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY));
-
-        }
-
-
+        #region Config command ***************************************************************************
+        //***************************************************************************************************  
         static ParserResult<object> Config(ConfigOptions opts)
         {
+
             //if there is no cgenXMLSaves directory than this must be the first config run. build all the
             //config files needed here.
             if (!Directory.Exists(CGSAVEFILESBASEDIRECTORY))
@@ -207,18 +252,421 @@ namespace CodeGenerator
                 Directory.CreateDirectory(CGSAVEFILESBASEDIRECTORY);
             }
 
-            if (opts.directoryofconfig != null || opts.directoryofconfig != "")
+            //dealing with option directoryofconfig  ***************************************************************************
+            if (!string.IsNullOrEmpty(opts.directoryofconfig))
             {
-                saveFilecgenConfigLocal.CgenConfig.DirectoryOfConfig = opts.directoryofconfig;
-                saveFilecgenConfigLocal.Save();
+                saveFilecgenConfigGlobal.CgenConfig.DirectoryOfConfig = opts.directoryofconfig;
+                saveFilecgenConfigGlobal.Save();
+                Console.WriteLine("directory " + opts.directoryofconfig + " \n has been set as directoryofconfig");
+                return null;
             }
+
+            //get all current targets (platforms) that are available to the user to use for projects
+            saveFilecgenConfigGlobal.Load();
+            string pathToGlobalBuildConfig_h = Path.Combine(saveFilecgenConfigGlobal.CgenConfig.DirectoryOfConfig,
+                "GlobalBuildConfig.h");
+            CppParser cppParser = new CppParser(pathToGlobalBuildConfig_h);
+            var enumsCursors = cppParser.GetAllCursorsOfKind<MyCursorOfKindEnumDecl>();
+            //get that platforenum
+            MyCursorOfKindEnumDecl platformenum = enumsCursors.Where((MyCursorOfKindEnumDecl myc) => { return myc.getCursorSpelling() == "PlatformEnum"; }).First();
+            //get values of enum as string
+            List<MyCursorOfKindEnumConstantDecl> platformsAvailableCursor = platformenum.GetChildrenOfKind_EnumConstantDecl();
+            List<string> platformsAvailable = platformsAvailableCursor.Select((MyCursorOfKindEnumConstantDecl enumval) => { return enumval.getCursorSpelling(); }).ToList();
+            saveFilecgenConfigGlobal.Load();
+            saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.Clear();
+            platformsAvailable.ForEach((p) => saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.Add(p));
+            saveFilecgenConfigGlobal.Save();
+
+
+            #region dealing with option -a  ***************************************************************************
+            //***************************************************************************************************
+            //get a refactorer and a cgenxmlConfigFile
+
+            CppRefactorer cpprefactorer = new CppRefactorer(pathToGlobalBuildConfig_h);
+            saveFilecgenConfigGlobal.Load();
+            if (!string.IsNullOrEmpty(opts.PlatformToAdd))
+            {
+                //make sure that platform does not already exist
+                if (!platformsAvailable.Any((string platformAvailable) => { return platformAvailable == opts.PlatformToAdd; }))
+                {
+                    //insert the new platform into the enum
+                    cpprefactorer.AddEnumConstantDecl("GlobalBuildConfig.h", "PlatformEnum", opts.PlatformToAdd);
+                    saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.Add(opts.PlatformToAdd);
+                    saveFilecgenConfigGlobal.Save();
+                    Console.WriteLine("target " + opts.PlatformToAdd + " has been added");
+                    return null;
+                }
+                else
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem(opts.PlatformToAdd + " target already exists");
+                    return null;
+                }
+
+            }
+            #endregion
+
+
+            #region dealing with option -r  ***************************************************************************              
+            //***************************************************************************************************
+            if (!string.IsNullOrEmpty(opts.PlatformToRemove))
+            {
+                //make sure that platform DOES already exist
+                if (platformsAvailable.Any((string platformAvailable) => { return platformAvailable == opts.PlatformToRemove; }))
+                {
+                    cpprefactorer.RemoveEnumConstantDecl("GlobalBuildConfig.h", "PlatformEnum", opts.PlatformToRemove);
+                    saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.Remove(saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.First(plat => plat == opts.PlatformToRemove));
+                    saveFilecgenConfigGlobal.Save();
+                    Console.WriteLine("target " + opts.PlatformToRemove + " has been Removed");
+                    return null;
+                }
+                else
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem(opts.PlatformToAdd + " Target does not exist. Check your spelling?");
+                    return null;
+                }
+
+            }
+            #endregion
+
+
+            Console.WriteLine("Current platforms available are: ");
+            foreach (var platformAva in platformsAvailable)
+            {
+                Console.WriteLine(platformAva);
+            }
+            Console.WriteLine("\ncurrent configurations available are: \nDEBUG \nRELEASE \n");
+            Console.WriteLine("To create another Platform: cgen config -a <PLATFORMNAME>.\nto remove: cgen config -r <PLATFORMNAME>");
+
+
+            return null;
+        }
+        #endregion
+
+
+        #region ProjConfig command***************************************************************************
+        //***************************************************************************************************   
+        static ParserResult<object> ProjConfig(ProjConfigOptions opts)
+        {
+            cgenProjectGlobal projGlob = savefileProjGlobal.CgenProjects.Projects.First(p =>
+                p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject);
+
+
+
+            #region add a include to a platform --addinclude ***************************************************************************
+            //*************************************************************************************************** 
+            if ((!string.IsNullOrEmpty(opts.addinclude) && !string.IsNullOrEmpty(opts.platform)))
+            {
+
+                if (!isPlatformExistAsACreatedPlatform(opts.platform))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " you are trying to put into scope was not created yet");
+                }
+
+                if (!isPlatformInProjectScope(opts.platform, projGlob))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen -a <platform> to set project in scope");
+                } 
+
+                //make sure it is of proper path format. it needs to not have an extension and directory needs to exist 
+                if (Path.HasExtension(opts.addinclude))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The include \n" + opts.addinclude + "\n should be a path to directory, not a file.");
+                } 
+                if (!Directory.Exists(opts.addinclude))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The include \n" + opts.addinclude + "\n does not exist");
+                }
+                 
+                if (isIncludeExistForPlatform(opts.platform, opts.addinclude))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The include \n" + opts.addinclude + "\n has already been added");
+                }
+
+                //add the include to that platform 
+                savefileProjGlobal.CgenProjects.Projects
+                    .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+                    .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == opts.platform)
+                    .AdditionalIncludes.AdditionalInclude.Add(opts.addinclude);
+                savefileProjGlobal.Save();
+
+
+                Console.WriteLine(opts.addinclude + "\nhas been added from platform " + opts.platform); 
+                return null;
+            }
+            #endregion
+
+            #region remove a include to a platform --removeinclude ***************************************************************************
+            //***************************************************************************************************  
+            if ((!string.IsNullOrEmpty(opts.removeinclude) && !string.IsNullOrEmpty(opts.platform)))
+            {
+
+                if (!isPlatformExistAsACreatedPlatform(opts.platform))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " you are trying to put into scope was not created yet.");
+                }
+
+                if (!isPlatformInProjectScope(opts.platform, projGlob))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen -a <platform> to set project in scope");
+                }
+
+                //make sure it is of proper path format. it needs to not have an extension and directory needs to exist 
+                if (Path.HasExtension(opts.removeinclude))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The include \n" + opts.removeinclude + "\n should be a path to directory, not a file.");
+                }
+                if (!Directory.Exists(opts.removeinclude))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The include \n" + opts.removeinclude + "\n does not exist");
+                }
+
+                if (!isIncludeExistForPlatform(opts.platform, opts.removeinclude))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The include \n" + opts.removeinclude + "\n already is not in scope for that platform");
+                }
+
+
+                //remove the include from the platform 
+                savefileProjGlobal.CgenProjects.Projects
+                    .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+                    .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == opts.platform)
+                    .AdditionalIncludes.AdditionalInclude.Remove(opts.removeinclude);
+                savefileProjGlobal.Save();
+
+                Console.WriteLine(opts.removeinclude+"\nhas been removed from platform "+ opts.platform);
+                return null;
+            }
+
+
+            #endregion
+
+            #region add a library to a platform --addlibrary ***************************************************************************
+            //***************************************************************************************************  
+            if ((!string.IsNullOrEmpty(opts.addlibrary) && !string.IsNullOrEmpty(opts.platform)))
+            {
+
+                if (!isPlatformExistAsACreatedPlatform(opts.platform))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " you are trying to put into scope was not created yet");
+                }
+
+                if (!isPlatformInProjectScope(opts.platform, projGlob))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen -a <platform> to set project in scope");
+                } 
+
+                if (!(Path.GetExtension(opts.addlibrary) == ".lib"))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The library \n" + opts.addlibrary + "\n should point to a file with a .lib extension.");
+                }
+                if (!File.Exists(opts.addlibrary))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The library \n" + opts.addlibrary + "\n does not exist");
+                }
+
+                if (isLibraryExistForPlatform(opts.platform, opts.addlibrary))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The library \n" + opts.addlibrary + "\n has already been added");
+                }
+
+                //add the include to that platform 
+                savefileProjGlobal.CgenProjects.Projects
+                    .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+                    .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == opts.platform)
+                    .AdditionalLibraries.AdditionalLibrary.Add(opts.addlibrary);
+                savefileProjGlobal.Save();
+
+
+                Console.WriteLine(opts.addlibrary + "\nhas been added to platform " + opts.platform);
+                return null;
+            }
+            #endregion
+
+            #region remove a library to a platform --removelibrary***************************************************************************
+            //***************************************************************************************************  
+            if ((!string.IsNullOrEmpty(opts.removelibrary) && !string.IsNullOrEmpty(opts.platform)))
+            {
+
+                if (!isPlatformExistAsACreatedPlatform(opts.platform))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " you are trying to put into scope was not created yet");
+                }
+
+                if (!isPlatformInProjectScope(opts.platform, projGlob))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen -a <platform> to set project in scope");
+                }
+
+                if (!(Path.GetExtension(opts.removelibrary) == ".lib"))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The library \n" + opts.removelibrary + "\n should point to a file with a .lib extension.");
+                }
+                if (!File.Exists(opts.removelibrary))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The library \n" + opts.removelibrary + "\n does not exist");
+                }
+
+                if (!isLibraryExistForPlatform(opts.platform, opts.removelibrary))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The library \n" + opts.removelibrary + "\n already does not exist for that platform");
+                }
+
+                //add the include to that platform 
+                savefileProjGlobal.CgenProjects.Projects
+                    .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+                    .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == opts.platform)
+                    .AdditionalLibraries.AdditionalLibrary.Remove(opts.removelibrary);
+                savefileProjGlobal.Save();
+
+
+                Console.WriteLine(opts.removelibrary + "\nhas been removed from platform " + opts.platform);
+                return null;
+            }
+            #endregion
+
+            #region add a platform to the project  -a ***************************************************************************
+            //***************************************************************************************************   
+            if (!string.IsNullOrEmpty(opts.PlatformToAdd))
+            {
+                savefileProjGlobal.Load();
+                saveFilecgenConfigGlobal.Load();
+
+
+                if (!isPlatformExistAsACreatedPlatform(opts.PlatformToAdd))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.PlatformToAdd + " you are trying to put into scope was not created yet");
+                }
+
+                if (isPlatformInProjectScope(opts.PlatformToAdd, projGlob))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.PlatformToAdd + " is already a project in scope");
+                }
+
+                //add that platform to proj scope then 
+                PlatForm newplatformInScope = new PlatForm()
+                {
+                    AdditionalIncludes = new AdditionalIncludes(),
+                    AdditionalLibraries = new AdditionalLibraries(),
+                    PlatFormName = opts.PlatformToAdd
+                };
+                savefileProjGlobal.CgenProjects.Projects.First(p =>
+                    p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject).
+                    PlatFormsInScope.PlatForms.Add(newplatformInScope);
+
+                savefileProjGlobal.Save();
+
+
+                Console.WriteLine(opts.PlatformToAdd + "platform has been added");
+                return null;
+            }
+
+            #endregion
+
+
+            #region remove a platform to the project -r ***************************************************************************
+            //***************************************************************************************************   
+            if (!string.IsNullOrEmpty(opts.PlatformToRemove))
+            {
+                savefileProjGlobal.Load();
+                saveFilecgenConfigGlobal.Load();
+
+                if (!isPlatformExistAsACreatedPlatform(opts.PlatformToRemove))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.PlatformToRemove + " you are trying to put into scope");
+                }
+
+                if (!isPlatformInProjectScope(opts.PlatformToRemove, projGlob))
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The platform " + opts.PlatformToRemove + " is not in scope already.");
+                }
+                //you cant remove ALLPLATFORMS
+                if (opts.platform == "ALLPLATFORMS")
+                {
+                    ProblemHandle p = new ProblemHandle();
+                    p.ThereisAProblem("The include \n" + opts.removeinclude + "\n already is not in scope for that platform");
+                }
+
+                //remove that platform to proj scope then  
+                PlatForm platToRemove = savefileProjGlobal.CgenProjects.Projects.First(p =>
+                        p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject).
+                    PlatFormsInScope.PlatForms
+                    .First(pl => pl.PlatFormName == opts.PlatformToRemove);
+                savefileProjGlobal.CgenProjects.Projects.First(p =>
+                        p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject).PlatFormsInScope
+                    .PlatForms.Remove(platToRemove);
+
+                savefileProjGlobal.Save();
+
+                Console.WriteLine(opts.PlatformToRemove + "platform has been removed");
+
+                return null;
+            }
+
+            #endregion
+
+
+            #region no options given. just empty command ***************************************************************************
+            //*************************************************************************************************** 
+            //Over here, start filling this out. I need to load the savefileProjGlobal where the name matches the local.
+            //get the project and then the platformsinscope and list them along with the additional includes and libraries
+            savefileProjGlobal.Load();
+            SaveFilecgenProjectLocal projLocal = new SaveFilecgenProjectLocal();
+            Console.WriteLine("Platforms in scope for the project " + SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject + " are ");
+            foreach (var platform in projGlob.PlatFormsInScope.PlatForms)
+            {
+                Console.WriteLine("\t" + platform.PlatFormName);
+                Console.WriteLine("additional includes are: ");
+                foreach (var include in platform.AdditionalIncludes.AdditionalInclude)
+                {
+                    Console.WriteLine("\t\t" + include);
+                }
+                Console.WriteLine("additional libraries are: ");
+                foreach (var library in platform.AdditionalLibraries.AdditionalLibrary)
+                {
+                    Console.WriteLine("\t\t" + library);
+                }
+
+                Console.WriteLine();
+            }
+
+            #endregion
 
 
             return null;
         }
 
+        #endregion
 
+         
 
+        #region Init command ***************************************************************************
+        //***************************************************************************************************  
         static ParserResult<object> Init(InitOptions opts)
         {
 
@@ -226,19 +674,25 @@ namespace CodeGenerator
             //get the project builder for Visual Studio, as VS is right now the only supporting starting project build
             //IDESetting settingConfig = new IDESetting(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest", ".xml", typeof(Root));
             //ProjectBuilderBase projectBuilderForVs = new ProjectBuilderVS(settingConfig);
-
+            
+            //if that name already exists
+            if (savefileProjGlobal.CgenProjects.Projects.Any(p => p.NameOfProject == opts.name))
+            {
+                ProblemHandle p = new ProblemHandle();
+                p.ThereisAProblem("The name "+ opts.name+ "already exists");
+            }
 
             //check that there isnt already a project here.  
             if (IsProjectExistsAtEnvironDirectory())
             {
                 //get project settings for this.
                 MySettingsVS settings = MySettingsVS.CreateMySettingsVS(envIronDirectory);
-                settings.RecreateConfigurationFilterFolderIncludes(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Projects.First().NameOfProject);
+                settings.RecreateConfigurationFilterFolderIncludes(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Project.NameOfProject);
                 //projectBuilderForVs.RecreateConfigurationFilterFolderIncludes(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Projects.First().NameOfProject, saveFilecgenConfigLocal.CgenConfig.DirectoryOfConfig);
-                Console.WriteLine(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Projects.First().NameOfProject + " already exists as a project here");
+                Console.WriteLine(GetSaveFilecgenProjectAtEnvironDirectory().CgenProjects.Project.NameOfProject + " already exists as a project here");
                 return null;
             }
-            else if (opts.name == null || opts.name == "")
+            else if (string.IsNullOrEmpty(opts.name))
             {
                 Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   ");
             }
@@ -248,7 +702,7 @@ namespace CodeGenerator
                 MySettingsVS settings = MySettingsVS.CreateMySettingsVS(envIronDirectory);
 
 
-                
+
                 if (Regex.IsMatch(opts.name, @"\d"))
                 {
                     Console.WriteLine("you cant have a number in the name of the project");
@@ -262,19 +716,44 @@ namespace CodeGenerator
                     Directory.CreateDirectory(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
                     //CREATE ALL THE FILES THAT ARE NEEDED FOR PROJECT INITIATION!
                     // creation of the SaveFilecgenProject file
-                    SaveFilecgenProject saveFilecgenProject = new SaveFilecgenProject(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
-                    cgenProjects projs = saveFilecgenProject.CgenProjects;
-                    cgenProject projToAdd = new cgenProject();
+                    //SaveFilecgenProjectLocal saveFilecgenProject = new SaveFilecgenProjectLocal(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
+                    //cgenProjectLocal projlocal = saveFilecgenProject.CgenProjects;
+                    cgenProjectLocal projToAdd = new cgenProjectLocal();
                     projToAdd.NameOfProject = opts.name;
-                    projToAdd.PathOfProject = envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY;
+                    projToAdd.PathOfProject = envIronDirectory;// + "\\" + CGSAVEFILESBASEDIRECTORY;
                     projToAdd.UniqueIdentifier = cgenXMLMemeberCreationHelper.UniqueIdentifierCreator();
-                    //also add the project to the localProjSettings
-                    savefileProjLocal.CgenProjects.Projects.Add(projToAdd);
-                    projs.Projects.Add(projToAdd);
+                    //also add the project to the GlobalProjSettings  
+                    savefileProjGlobal.AddNewProject((cgenProjectGlobal)projToAdd);
+                    SaveFilecgenProjectLocal.CgenProjects.Project = projToAdd;
+                    SaveFilecgenProjectLocal.Save();
+                    savefileProjGlobal.Save();
+
+                    #region add platform in scope "ALLPLATFORMS", configtest.lib, and additional include Program.PATHTOCONFIGTEST
+
+                    //over here. tests that this works by init mod again 
+                    savefileProjGlobal.Load();
+                    SaveFilecgenProjectLocal.Load();
+
+                    PlatForm newplatformInScope = new PlatForm()
+                    {
+                        AdditionalIncludes = new AdditionalIncludes(),
+                        AdditionalLibraries = new AdditionalLibraries(),
+                        PlatFormName = "ALLPLATFORMS"
+                    };
+                    savefileProjGlobal.AddNewPlatformInScope(opts.name, newplatformInScope);
+                    savefileProjGlobal.AddNewInclude(opts.name, "ALLPLATFORMS", PATHTOCONFIGTEST);
+                    savefileProjGlobal.AddNewLibrary(opts.name, "ALLPLATFORMS", Path.Combine(PATHTOCONFIGTEST, "ConfigTest.lib"));
+                    
+
+                    settings.AddAdditionalInclude(PATHTOCONFIGTEST);
+                    settings.AddAdditionalLibrary(Path.Combine(PATHTOCONFIGTEST, "ConfigTest.lib"));
+                    settings.Save(envIronDirectory);
+
+                    #endregion
 
                     //save created files
-                    saveFilecgenProject.Save();
-                    savefileProjLocal.Save();
+                    SaveFilecgenProjectLocal.Save();
+                    savefileProjGlobal.Save();
                     settings.RecreateConfigurationFilterFolderIncludes(opts.name);
                     //projectBuilderForVs.RecreateConfigurationFilterFolderIncludes(opts.name, saveFilecgenConfigLocal.CgenConfig.DirectoryOfConfig);
 
@@ -283,6 +762,8 @@ namespace CodeGenerator
                 }
                 catch (Exception e)
                 {
+                    //todo. I should clean up and use a problem handle to save the settings
+                    //todo file in a simple string and replace the .vcxproj and .filters and delete the locat CGenSaveFiles directory
                     Console.WriteLine("There was a problem with project creation");
                     Console.WriteLine(e);
                 }
@@ -294,32 +775,62 @@ namespace CodeGenerator
 
             return null;
         }
+        #endregion
 
 
 
-
+        #region Generate command ***************************************************************************
+        //***************************************************************************************************  
 
         static ParserResult<object> Generate(GenerateOptions opts)
         {
 
             //first make sure that a project exists here
             if (IsProjectExistsAtEnvironDirectory())
-            { 
+            {
 
                 //get the project settings for the project configs I want to generate. for VS for NOW!
                 MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(envIronDirectory);
 
-                //create the configuration file configurationCG.h 
-                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY,DIRECTORYOFTHISCG, PATHTOCONFIGTEST);
+                // I need to create the configuration file for the top level library just so that I can have all
+                // the libraries configs information that it depends on. in the saveddata.xml file.
+                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY, DIRECTORYOFTHISCG, PATHTOCONFIGTEST,null,true);
                 configFileBuilder.CreateConfigurationToTempFolder(); 
+                 
+                //create project builder. and check if all libraries support the platform Im on
+                ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
+                string libraryNameNotSupportingPlat = projectBuilderForVs.GetLibraryThatDoesNOTSupportPlatform(savefileProjGlobal);
+                if (libraryNameNotSupportingPlat != null)
+                {
+                    ProblemHandle p =new ProblemHandle();
+                    p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen projconfig -a <nameofScope> \n to add platform to that project scope.");
+                }
                 configFileBuilder.WriteTempConfigurationToFinalFile();
-                  
-                 
 
-                //now that config was created for libtop. create the libtop's librarydepencies filter and folders
-                ProjectLibraryDependencyCreate();
 
-                 
+                //3.  add filters and folders directories from that toplevel project directory as:
+                //LibraryDependencies
+                //  prefix(of libraries top level uses)
+                //      confTypePrefix(for libraries that are same but different template type.)    
+                projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
+
+                //4. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
+                //first grab all lowest level libraries that have no dependencies
+                projectBuilderForVs.ImportDependentFilesLibrariesCincAndCcomp();
+
+
+
+                //5. For the settings(.vcxproj .filters) of the top level I need to get all the cIncludes,
+                //cClompiles, additionalincludes additional libraries from the other libraries and add to top level
+                // to the top level library. 
+                projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
+
+
+                //6. Finally recreate the xml settings files. 
+                projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
+
+
+
             }
             else
             {
@@ -331,6 +842,12 @@ namespace CodeGenerator
             return null;
         }
 
+        #endregion
+
+
+
+        #region Degenerate command ***************************************************************************
+        //***************************************************************************************************  
         static ParserResult<object> Degenerate(DegenerateOptions opts)
         {
 
@@ -347,7 +864,100 @@ namespace CodeGenerator
             return null;
         }
 
-         public static ProjectBuilderVS  CreateProjectBuilderVS()
+        #endregion
+
+
+
+        #region helper static functions  ***************************************************************************
+        //***************************************************************************************************  
+
+
+
+        static bool isIncludeExistForPlatform(string forPlatform, string forInclude)
+        {
+            var additionals = savefileProjGlobal.CgenProjects.Projects
+                .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+                .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == forPlatform)
+                .AdditionalIncludes.AdditionalInclude;
+            if (additionals.Count == 0)
+            {
+                return false;
+            }
+            return additionals.Any(ad => ad == forInclude);
+        }
+
+        static bool isLibraryExistForPlatform(string forPlatform, string forLibrary)
+        {
+            var libraries=  savefileProjGlobal.CgenProjects.Projects
+                .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+                .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == forPlatform)
+                .AdditionalLibraries.AdditionalLibrary;
+            if (libraries.Count == 0)
+            {
+                return false;
+            }
+            return libraries.Any(ad => ad == forLibrary);
+        }
+
+        /// <summary>
+        /// check that the platform exists as a created platform
+        /// </summary>
+        /// <param name="PlatformName"></param>
+        /// <returns></returns>
+        static bool isPlatformExistAsACreatedPlatform(string PlatformName)
+        {
+            //check that the platform exists as a created platform
+            if (saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.Any(pl => pl == PlatformName))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// is the local project has platform in scope
+        /// </summary>
+        /// <param name="PlatformName"></param>
+        /// <returns></returns>
+        static bool isPlatformInProjectScope(string PlatformName, cgenProjectGlobal projGlob)
+        {
+            //is the local project has platform in scope
+            if (projGlob.PlatFormsInScope.PlatForms.Any(pl => pl.PlatFormName == PlatformName))
+            {
+                return true;
+            }
+            return false;
+        }
+
+
+        static bool IsProjectExistsAtEnvironDirectory()
+        {
+            string fullpath = Path.Combine(envIronDirectory, CGSAVEFILESBASEDIRECTORY, "cgenProjs.cgx");
+            if (Directory.Exists(Path.GetDirectoryName(fullpath)))
+            {
+                if (File.Exists(fullpath))
+                {
+                    return true;
+                } 
+            }
+            return false;
+        }
+
+        static SaveFilecgenProjectLocal GetSaveFilecgenProjectAtEnvironDirectory()
+        {
+            if (!IsProjectExistsAtEnvironDirectory())
+            {
+                throw new Exception("there is no such project here yet");
+            }
+
+            return (new SaveFilecgenProjectLocal(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY));
+
+        }
+
+
+        public static ProjectBuilderVS CreateProjectBuilderVS()
         {
 
             //DONT WORRY ABOUT LIBRARIES THAT DEPEND ON LIBRARIES FOR NOW JUST GET THIS MUCH TO WORK.
@@ -363,41 +973,38 @@ namespace CodeGenerator
 
         }
 
-         public static void ProjectLibraryDependencyCreate()
-         {
+        public static void ProjectLibraryDependencyCreate()
+        {
 
-             ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
+            ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
 
             //3.  add filters and folders directories from that toplevel project directory as:
             //LibraryDependencies
             //  prefix(of libraries top level uses)
             //      confTypePrefix(for libraries that are same but different template type.)    
-            projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters(); 
-
+            projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
+            
             //4. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
             //first grab all lowest level libraries that have no dependencies
-            projectBuilderForVs.CreateCCompCincDependencyFiles();
+            projectBuilderForVs.ImportDependentFilesLibrariesCincAndCcomp();
 
-
-         //4.5 I need to have the projectbuilder import the files from other dependncies to their correct locations while changeing file name and adding a namespace
-            //projectBuilderForVs.ImportDependencyFiles();
 
 
             //5. I need to get all the cIncludes, cClompiles, additionalincludes from the other libraries and add to top level
             // to the top level library. 
-            projectBuilderForVs.ImportDependentLibrariesCincAndCcompAndAdditional();
+            projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
 
 
             //6. Finally recreate the xml settings files. in this case there will be two .xproj and .filters
             projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
 
-
-
         }
 
-         
+        #endregion 
+
+
 
     }
-      
+
 
 }

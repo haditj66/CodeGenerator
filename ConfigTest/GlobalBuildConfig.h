@@ -6,9 +6,12 @@
 
 enum PlatformEnum
 {
+	ALLPLATFORMS,
 	QP,
-	IAR,
-	VS
+	IAR, 
+	VS,	
+	stm32f4,
+	stm32f5
 };
 
 enum BuildEnum
@@ -29,20 +32,20 @@ public:
 	GlobalBuildConfig DEPENDS_ON0()
 		END
 
-	
+
 
 		PUBLIC_DEF_DECLARE(PLATFORM, PlatformEnum)
 		PUBLIC_DEF_DECLARE(BUILD, BuildEnum)
-		
+
 
 		PUBLIC_DEF_START
 		PUBLIC_DEF_CREATION1(PLATFORM, PlatformEnum, PlatformEnum::VS, true)
-		PUBLIC_DEF_CREATION1(BUILD, BuildEnum, BuildEnum::DEBUG, true) 
+		PUBLIC_DEF_CREATION1(BUILD, BuildEnum, BuildEnum::DEBUG, true)
 		END
 
 
 		PRIVATE_DEF_START
-		
+
 		END
 
 

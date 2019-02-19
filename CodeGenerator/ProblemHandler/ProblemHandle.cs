@@ -27,10 +27,6 @@ namespace CodeGenerator.ProblemHandler
 
         public void ThereisAProblem(string MsgOfProblem)
         {
-            //first display problem
-            Console.WriteLine("-------------------------------------PROBLEM-----------------------------");
-            Console.WriteLine(MsgOfProblem);
-            Console.WriteLine("-------------------------------------------------------------------------");
 
             //now cleanup
             foreach (var cleanup in Cleanups)
@@ -38,6 +34,10 @@ namespace CodeGenerator.ProblemHandler
                 cleanup.CleanUp();
             }
 
+            //first display problem
+            Console.WriteLine("-------------------------------------PROBLEM-----------------------------");
+            Console.WriteLine(MsgOfProblem);
+            Console.WriteLine("-------------------------------------------------------------------------");
 
             //exit program
             Environment.Exit(0);
