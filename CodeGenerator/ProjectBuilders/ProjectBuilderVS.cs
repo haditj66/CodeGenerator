@@ -156,12 +156,6 @@ namespace CodeGenerator.ProjectBuilders
             }).ToList();
 
 
-            //go through lowest level libraries first to import in      
-            foreach (var  Library in LibTop.LibrariesIDependOn)
-            { 
-                //1. check out git tags for ALL dependent libraries
-                //CheckoutLibraryToCorrectMajor(Library);
-            }
 
 
             //go through lowest level libraries first to import in      
@@ -239,14 +233,7 @@ namespace CodeGenerator.ProjectBuilders
                 Console.WriteLine("Files have been imported for library " + lowestLevelLibrary.config.ClassName);
             }
 
-                 
-            //only when everything is all said and done should I revert all libraries back 
-            foreach (var Library in LibTop.LibrariesIDependOn)
-            {
-                //5. --------------------- 
-                //revert it back to its previous state
-                //LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(Library);
-            }
+
 
         }
 

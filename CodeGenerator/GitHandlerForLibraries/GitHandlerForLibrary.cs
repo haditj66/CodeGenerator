@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using CodeGenerator.CMD_Handler;
 using CodeGenerator.ProblemHandler;
@@ -20,14 +21,29 @@ namespace CodeGenerator.GitHandlerForLibraries
         }
 
 
-        public bool DoesLibraryContainsGitRepoAndTagForMajor(Library Library, out string tag)
+        public bool IsPathHaveGit(string path)
         {
-
-            Cmd.SetWorkingDirectory(Library.settings.PATHOfProject);
+            Cmd.SetWorkingDirectory(path);
             Cmd.ExecuteCommand("git rev-parse --git-dir"); //this will check if .git exists here. if so, it should read ".git" exactly
             Cmd.Output = Cmd.Output.Replace("\n", "");
             Cmd.Output = Cmd.Output.Trim();
             if (Cmd.Output != ".git")
+            {
+                if (Directory.Exists(Path.Combine(path,".git")))
+                {
+                    throw new Exception("Im not sure anymore");
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+
+        public bool DoesLibraryContainsGitRepoAndTagForMajor(Library Library, out string tag)
+        {
+
+            if (!IsPathHaveGit(Library.settings.PATHOfProject))
             {
                 tag = "";
                 return false;
@@ -50,7 +66,7 @@ namespace CodeGenerator.GitHandlerForLibraries
                         return true;
                     }
                 }
-            } 
+            }
 
             tag = "";
             return false;
@@ -70,6 +86,27 @@ namespace CodeGenerator.GitHandlerForLibraries
             //checkout that tag
             Cmd.ExecuteCommand("git checkout " + tagToCheckoutTo);
 
+        }
+
+        public void InitGitHere(string envIronDirectory)
+        {
+            Cmd.SetWorkingDirectory(envIronDirectory);
+            Cmd.ExecuteCommand("git init");
+        }
+
+        public void CommitAll(string envIronDirectory)
+        {
+            Cmd.SetWorkingDirectory(envIronDirectory);
+            Cmd.ExecuteCommand("git add --all");
+            Cmd.ExecuteCommand(@"git commit -m ""added all files""");
+
+        }
+
+        public void AddVersionTag(string envIronDirectory, int major, int minor, int patch, string msg = "")
+        {
+            Cmd.SetWorkingDirectory(envIronDirectory);
+
+            Cmd.ExecuteCommand(@"git tag v" + major.ToString() + @"." + minor.ToString() + @"." + patch.ToString() + @" -m """ + msg + @""" ");
         }
     }
 }

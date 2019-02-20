@@ -31,15 +31,14 @@ namespace MyLibClangVisitors.ConsoleApp2
             MyCXCursor mycursor = new MyCXCursor(cursor);
             AllCursorsVisited.Add(mycursor); 
              
-            Console.WriteLine(mycursor.getCursorSpelling() + " of kind " + 
-                              mycursor.getCursorKindSpelling());
+            //Console.WriteLine(mycursor.getCursorSpelling() + " of kind " +   mycursor.getCursorKindSpelling());
 
 
             //--------------------get source location
             MyCXSourceLocation sloc = new MyCXSourceLocation(cursor);  
-            Console.WriteLine("at file: " + sloc.MyCxFilefileStart.FileName);
-            Console.WriteLine("at line: " + sloc.lineStart);
-            Console.WriteLine("at column: " + sloc.columnStart);
+            //Console.WriteLine("at file: " + sloc.MyCxFilefileStart.FileName);
+           // Console.WriteLine("at line: " + sloc.lineStart);
+           // Console.WriteLine("at column: " + sloc.columnStart);
  
              return CXChildVisitResult.CXChildVisit_Recurse;
             //https://clang.llvm.org/doxygen/group__CINDEX__CURSOR__TRAVERSAL.html

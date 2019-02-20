@@ -21,6 +21,8 @@ using CodeGenerator.CMD_Handler;
 using ExtensionMethods;
 using System.Reflection;
 using ClangSharp;
+using CodeGenerator.FileTemplates;
+using CodeGenerator.FileTemplatesMacros;
 using CodeGenerator.GitHandlerForLibraries;
 using CodeGenerator.ProblemHandler;
 using CommandLine.Text;
@@ -143,7 +145,8 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";//
         //public static string envIronDirectory =  @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
@@ -669,12 +672,11 @@ namespace CodeGenerator
         //***************************************************************************************************  
         static ParserResult<object> Init(InitOptions opts)
         {
-
-
+             
             //get the project builder for Visual Studio, as VS is right now the only supporting starting project build
             //IDESetting settingConfig = new IDESetting(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest", ".xml", typeof(Root));
             //ProjectBuilderBase projectBuilderForVs = new ProjectBuilderVS(settingConfig);
-            
+
             //if that name already exists
             if (savefileProjGlobal.CgenProjects.Projects.Any(p => p.NameOfProject == opts.name))
             {
@@ -713,11 +715,11 @@ namespace CodeGenerator
                 //then I need to create a new project as none exist and user wants to create one 
                 try
                 {
+
+
                     Directory.CreateDirectory(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
                     //CREATE ALL THE FILES THAT ARE NEEDED FOR PROJECT INITIATION!
-                    // creation of the SaveFilecgenProject file
-                    //SaveFilecgenProjectLocal saveFilecgenProject = new SaveFilecgenProjectLocal(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY);
-                    //cgenProjectLocal projlocal = saveFilecgenProject.CgenProjects;
+
                     cgenProjectLocal projToAdd = new cgenProjectLocal();
                     projToAdd.NameOfProject = opts.name;
                     projToAdd.PathOfProject = envIronDirectory;// + "\\" + CGSAVEFILESBASEDIRECTORY;
@@ -759,6 +761,38 @@ namespace CodeGenerator
 
                     Console.WriteLine("Project successfully created");
 
+
+
+                    //4. check if a git exists, if not, create one and put a gitignore in. 
+                    CMDHandler cmd = new CMDHandler(envIronDirectory);
+                    GitHandlerForLibrary gitHandler = new GitHandlerForLibrary(cmd);
+                    //check that git exists
+                    if (!gitHandler.IsPathHaveGit(envIronDirectory))
+                    {
+                        gitHandler.InitGitHere(envIronDirectory);
+                        if (!File.Exists(Path.Combine(envIronDirectory, ".gitignore")))
+                        {
+                            File.Copy(".gitignore",Path.Combine(envIronDirectory, ".gitignore")); 
+                        }
+                        if (!File.Exists(Path.Combine(envIronDirectory, ".gitattributes")))
+                        {
+                            File.Copy(".gitattributes", Path.Combine(envIronDirectory, ".gitattributes"));
+                        }
+
+                        gitHandler.CommitAll(envIronDirectory);
+                        gitHandler.AddVersionTag(envIronDirectory,0,0,1);
+                        Console.WriteLine("git initialized here"); 
+                    }
+
+
+
+                    //5. update CGKeywords.h and alllibraryincludes.h here 
+                    FileTemplateAllLibraryInlcudes faAllLibraryInlcudes = new FileTemplateAllLibraryInlcudes(PATHTOCONFIGTEST, savefileProjGlobal);
+                    FileTemplateCGKeywordDefine fileTemplateCgKeyword = new FileTemplateCGKeywordDefine(PATHTOCONFIGTEST, savefileProjGlobal);
+                    faAllLibraryInlcudes.CreateTemplate();
+                    fileTemplateCgKeyword.CreateTemplate();
+                    Console.WriteLine("LibraryIncludes updated");
+
                 }
                 catch (Exception e)
                 {
@@ -792,7 +826,7 @@ namespace CodeGenerator
                 //get the project settings for the project configs I want to generate. for VS for NOW!
                 MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(envIronDirectory);
 
-                // I need to create the configuration file for the top level library just so that I can have all
+                //1. I need to create the configuration file for the top level library just so that I can have all
                 // the libraries configs information that it depends on. in the saveddata.xml file.
                 ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY, DIRECTORYOFTHISCG, PATHTOCONFIGTEST,null,true);
                 configFileBuilder.CreateConfigurationToTempFolder(); 
@@ -808,25 +842,25 @@ namespace CodeGenerator
                 configFileBuilder.WriteTempConfigurationToFinalFile();
 
 
-                //3.  add filters and folders directories from that toplevel project directory as:
+                //2.  add filters and folders directories from that toplevel project directory as:
                 //LibraryDependencies
                 //  prefix(of libraries top level uses)
                 //      confTypePrefix(for libraries that are same but different template type.)    
                 projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
 
-                //4. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
+                //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
                 //first grab all lowest level libraries that have no dependencies
                 projectBuilderForVs.ImportDependentFilesLibrariesCincAndCcomp();
 
 
 
-                //5. For the settings(.vcxproj .filters) of the top level I need to get all the cIncludes,
+                //4. For the settings(.vcxproj .filters) of the top level I need to get all the cIncludes,
                 //cClompiles, additionalincludes additional libraries from the other libraries and add to top level
                 // to the top level library. 
                 projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
 
 
-                //6. Finally recreate the xml settings files. 
+                //5. Finally recreate the xml settings files. 
                 projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
 
 
@@ -972,33 +1006,7 @@ namespace CodeGenerator
             return new ProjectBuilderVS(settingConfig);
 
         }
-
-        public static void ProjectLibraryDependencyCreate()
-        {
-
-            ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
-
-            //3.  add filters and folders directories from that toplevel project directory as:
-            //LibraryDependencies
-            //  prefix(of libraries top level uses)
-            //      confTypePrefix(for libraries that are same but different template type.)    
-            projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
-            
-            //4. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
-            //first grab all lowest level libraries that have no dependencies
-            projectBuilderForVs.ImportDependentFilesLibrariesCincAndCcomp();
-
-
-
-            //5. I need to get all the cIncludes, cClompiles, additionalincludes from the other libraries and add to top level
-            // to the top level library. 
-            projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
-
-
-            //6. Finally recreate the xml settings files. in this case there will be two .xproj and .filters
-            projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
-
-        }
+         
 
         #endregion 
 

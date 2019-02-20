@@ -12,7 +12,7 @@ namespace CodeGenerator.cgenXMLSaves
     public abstract class SaveFileBase
     {
 
-        public string BaseDirectoryForProjectSaveFiles = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) +"\\"+  @"CGensaveFiles\";
+        public string BaseDirectoryForProjectSaveFiles;// = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) +"\\"+  @"CGensaveFiles\";
         private bool serializerCreated;
         private XmlSerializer _serializer;
         public XmlSerializer Serializer
@@ -48,6 +48,7 @@ namespace CodeGenerator.cgenXMLSaves
 
         public SaveFileBase()
         {
+            BaseDirectoryForProjectSaveFiles = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\" + @"CGensaveFiles\";
             _FileLocation = FileNameDefault;
             Init();
             Load();

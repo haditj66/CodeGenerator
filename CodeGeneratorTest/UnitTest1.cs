@@ -6,9 +6,11 @@ using System.Linq;
 using System.Reflection;
 using ClangSharp;
 using CodeGenerator;
+using CodeGenerator.cgenXMLSaves.SaveFiles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeGenerator.IDESettingXMLs;
 using CodeGenerator.FileTemplates;
+using CodeGenerator.FileTemplatesMacros;
 using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
 using CodeGenerator.ProjectBuilders;
 using CodeGenerator.ProjectBuilders.FileDependentImporters;
@@ -79,6 +81,16 @@ namespace CodeGeneratorTest
         {
             FileTemplateMainCG maincgTemplate = new FileTemplateMainCG("", "moda1");
             maincgTemplate.CreateTemplate();
+        }
+
+        [TestMethod]
+        public void MacroLoopSectionTest()
+        {
+            SaveFilecgenProjectGlobal saveFilecgenProjectGlobal = new SaveFilecgenProjectGlobal(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGenerator\bin\Debug\CGensaveFiles");
+            FileTemplateAllLibraryInlcudes faAllLibraryInlcudes = new FileTemplateAllLibraryInlcudes("", saveFilecgenProjectGlobal);
+            FileTemplateCGKeywordDefine fileTemplateCgKeyword = new FileTemplateCGKeywordDefine("", saveFilecgenProjectGlobal);
+            faAllLibraryInlcudes.CreateTemplate();
+            fileTemplateCgKeyword.CreateTemplate();
         }
 
 
