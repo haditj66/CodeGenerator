@@ -176,7 +176,7 @@ namespace CodeGenerator.ProjectBuilders
         /// <summary>
         /// this will import all physical files from libraries your top library depends on.
         /// </summary>
-        public abstract void ImportDependentFilesLibrariesCincAndCcomp();
+        public abstract void ImportDependentLibrariesFiles();
         //public abstract void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir);
 
 

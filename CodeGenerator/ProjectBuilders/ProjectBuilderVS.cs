@@ -139,7 +139,7 @@ namespace CodeGenerator.ProjectBuilders
             return plaformOfSetup;
         }
 
-        public override void ImportDependentFilesLibrariesCincAndCcomp()
+        public override void ImportDependentLibrariesFiles()
         { 
             //steps 
             //1. check out git tags for ALL dependent libraries
@@ -152,85 +152,133 @@ namespace CodeGenerator.ProjectBuilders
 
             var lowestLevelLibraries = LibTop.LibrariesIDependOn.Where((Library lib) =>
             {
-                return lib.LibrariesIDependOn == null || lib.LibrariesIDependOn.Count == 0;
+                return true;// lib.LibrariesIDependOn == null || lib.LibrariesIDependOn.Count == 0;
             }).ToList();
 
 
 
 
             //go through lowest level libraries first to import in      
-                foreach (var lowestLevelLibrary in lowestLevelLibraries)
+                foreach (var libraryToImp in lowestLevelLibraries)
             {
 
                 //1. check out git tags for ALL dependent libraries
-                CheckoutLibraryToCorrectMajor(lowestLevelLibrary);
+                CheckoutLibraryToCorrectMajor(libraryToImp);
 
                 //2. ---------------------
                 //create Configuration.h in temporary folder but dont put it in project so to not change anything 
-                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(lowestLevelLibrary.settings, Program.CGCONFCOMPILATOINSBASEDIRECTORY, Program.DIRECTORYOFTHISCG, Program.PATHTOCONFIGTEST, ProblemHandle);
+                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(libraryToImp.settings, Program.CGCONFCOMPILATOINSBASEDIRECTORY, Program.DIRECTORYOFTHISCG, Program.PATHTOCONFIGTEST, ProblemHandle);
                 configFileBuilder.CreateConfigurationToTempFolder();
 
 
                 //create a configuration.h myinclude for the dependent library so to include that in the importing
-                var filtForConfiguration_h = lowestLevelLibrary.GetAllFitlers().Where((MyFilter filt) =>
+                var filtForConfiguration_h = libraryToImp.GetAllFitlers().Where((MyFilter filt) =>
                 {
                     return filt.GetFullAddress() == "Config";//Path.Combine("LibraryDependencies", lowestLevelLibrary.GetPathToProjectAsADependent());
                 }).First();
                 //todo the path here should be to the temp folder?
-                string e = lowestLevelLibrary.GetPathToProjectAsADependent();
-                MyCLIncludeFile clinc = new MyCLIncludeFile(filtForConfiguration_h,"ConfigurationCG.h", Path.Combine("LibraryDependencies", lowestLevelLibrary.GetPathToProjectAsADependent()));
+                string e = libraryToImp.GetPathToProjectAsADependent();
+                MyCLIncludeFile clinc = new MyCLIncludeFile(filtForConfiguration_h,"ConfigurationCG.h", Path.Combine("LibraryDependencies", libraryToImp.GetPathToProjectAsADependent()));
 
 
                 //2.5 send that configurationCG.h file to final librarydependencies/xx/xx folder. but first inherit values
-                configFileBuilder.InheritFromTopConfig(lowestLevelLibrary.config);
+                configFileBuilder.InheritFromTopConfig(libraryToImp.config);
                 configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject ,clinc.LocationOfFile,clinc.Name));
 
                 //3. --------------------- 
                 //grab all files that are qualified to be imported in and send them through  (NOT main.cpp, ModuleConfig.h etc)
-                var CcompsToImport = lowestLevelLibrary.GetAllCCompile().Where((MyCLCompileFile ccom) => { return IsCCompDependencyAbleForImporting(ccom);}).ToList();
-                var CIncToImport = lowestLevelLibrary.GetAllCincludes().Where((MyCLIncludeFile cinc) => { return IsCIncDependencyAbleForImporting(cinc); }).ToList();
+                var CcompsToImport = libraryToImp.GetAllCCompile().Where((MyCLCompileFile ccom) => { return IsCCompDependencyAbleForImporting(ccom);}).ToList();
+                var CIncToImport = libraryToImp.GetAllCincludes().Where((MyCLIncludeFile cinc) => { return IsCIncDependencyAbleForImporting(cinc); }).ToList();
                 //CIncToImport.Add(clinc); dont do this yet as you only want to refactor this, not import it.
 
 
 
                 //4. ---------------------import those files from dependent library to main library.
-                FileDepedentsImporter FileImporter = new FileDepedentsImporter(lowestLevelLibrary.GetFullPrefix(), CcompsToImport, CIncToImport, lowestLevelLibrary.settings.PATHOfProject);
-                string pathToOutput = Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", lowestLevelLibrary.GetPathToProjectAsADependent());
+                FileDepedentsImporter FileImporter = new FileDepedentsImporter(libraryToImp.GetFullPrefix(), CcompsToImport, CIncToImport, libraryToImp.settings.PATHOfProject);
+                string pathToOutput = Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent());
                 FileImporter.ImportFilesToPath(pathToOutput);
                  
                 CIncToImport.Add(clinc);//the configuration that was written in needs to be added now
-                lowestLevelLibrary.AddCIncludeFile(clinc);
+                libraryToImp.AddCIncludeFile(clinc);
                 List<string> allFilePaths = new List<string>();
                 allFilePaths.AddRange(CcompsToImport.Select(cinc => Path.Combine(pathToOutput, cinc.Name)));
                 allFilePaths.AddRange(CIncToImport.Select(cinc => Path.Combine(pathToOutput, cinc.Name)));
 
-                //change names of all imported files 
+                //refactor files
                 CppRefactorer refactorer = new CppRefactorer(allFilePaths);
                 List<string> filesInScopeToRefactorCopy = new List<string>(refactorer.FilesInScopeToRefactor);
-                string prefixToAddToAllFilesNames = string.IsNullOrEmpty(lowestLevelLibrary.config.ConfTypePrefix) 
-                        ?  lowestLevelLibrary.config.Prefix + "_" 
-                        : lowestLevelLibrary.config.Prefix + "_" + lowestLevelLibrary.config.ConfTypePrefix + "_";
+                string prefixToAddToAllFilesNames = string.IsNullOrEmpty(libraryToImp.config.ConfTypePrefix) 
+                        ?  libraryToImp.config.Prefix + "_" 
+                        : libraryToImp.config.Prefix + "_" + libraryToImp.config.ConfTypePrefix + "_";
+               
+                //replace the files defines from the configuration folder values. otherwise the define names will conflict with the main program configuration defines.
+                foreach (var file in filesInScopeToRefactorCopy)
+                {
+                    string configContents = File.ReadAllText(Path.Combine(LibTop.settings.PATHOfProject, clinc.LocationOfFile, clinc.Name));
+                    refactorer.ReplaceDefinesWithDefineValueFile(file, configContents);
+                }
+                refactorer.ReloadRefactorer();
+                //change names of all imported files 
                 foreach (var File in filesInScopeToRefactorCopy)
                 {
                     refactorer.ChangeNameOfFile(Path.GetFileName(File), Path.Combine(pathToOutput , prefixToAddToAllFilesNames + Path.GetFileName(File)),false);
 
                 }
+
+
                 refactorer.ReloadRefactorer();
+
+                
 
                 //add the prefix as a namespace to all files as well.
                 refactorer.InsertNamespaceIntoAllFiles(prefixToAddToAllFilesNames);
                 refactorer.ReloadRefactorer();
 
 
+                //change #include mentions of librarydependencies to have just the file name
+                foreach (var file in refactorer.FilesInScopeToRefactor)
+                {
+                    string fullPath =  refactorer.GetFullFilePathFromFileNameInScope(file);
+                    string[] contents = File.ReadAllLines(fullPath);
+                    string[] contentsNew = File.ReadAllLines(fullPath);
+                    int index = 0;
+                    foreach (var line in contents)
+                    {
+                        if (Regex.IsMatch(line, @"#include.*LibraryDependencies"))
+                        {
+                            //get the include and replace it with just the file name
+                            Match m = Regex.Match(line, @"#include\s*""(.*)""");
+                            contentsNew[index] =contentsNew[index].Remove(m.Groups[1].Index, m.Groups[1].Length);
+                            contentsNew[index] = contentsNew[index].Insert(m.Groups[1].Index,Path.GetFileName(m.Groups[1].Value));
+                        }
+
+                        index++;
+                    }
+
+                    File.WriteAllLines(fullPath, contentsNew);
+                }
+
+                //remove contents of configuration
+                foreach (var file in refactorer.FilesInScopeToRefactor)
+                {
+                    if (file.Contains("_ConfigurationCG.h"))
+                    {
+                        string fullPath = refactorer.GetFullFilePathFromFileNameInScope(file); 
+
+                        File.WriteAllText(fullPath, "");
+                    } 
+                }
+
+
                 //finally change the names of all the myincludes and myccompiles
-                lowestLevelLibrary.SetPrefixToCLCompileFiles(prefixToAddToAllFilesNames);
-                lowestLevelLibrary.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames);
+                libraryToImp.SetPrefixToCLCompileFiles(prefixToAddToAllFilesNames);
+                libraryToImp.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames);
 
 
                 //5. --------------------- 
                 //revert it back to its previous state
-                LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(lowestLevelLibrary);
-                Console.WriteLine("Files have been imported for library " + lowestLevelLibrary.config.ClassName);
+                LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(libraryToImp);
+                Console.WriteLine("Files have been imported for library " + libraryToImp.config.ClassName);
             }
 
 

@@ -39,7 +39,14 @@ namespace CodeGenerator
                     
                     //any libraries that depend on other libraries will not be with that library's filter but rather have its own
                     MyFilter prefixFilter = LibraryDependencyFilter.AddChildFilter(config.Prefix);
-                    LibraryBaseFilter = prefixFilter.AddChildFilter(config.ConfTypePrefix);
+                    if (!string.IsNullOrEmpty(config.ConfTypePrefix))
+                    {
+                        LibraryBaseFilter = prefixFilter.AddChildFilter(config.ConfTypePrefix); 
+                    }
+                    else
+                    {
+                        LibraryBaseFilter = prefixFilter;
+                    }
 
                     settings.Initiate();
 
@@ -63,7 +70,7 @@ namespace CodeGenerator
             {
                 foreach (var lib in FromTheseLibraries)
                 {
-                    if (lib.IsTopLevel == false && lib.config.Depends.Depend.Count == 0 && lib.config.ClassName != "GlobalBuildConfig")
+                    if (lib.IsTopLevel == false && lib.config.ClassName != "GlobalBuildConfig")
                     {
                         //then add this library as a depend to the top level library
                         this.LibrariesIDependOn.Add(lib);
@@ -71,28 +78,28 @@ namespace CodeGenerator
                 }
             }
             //if it is not top level than ignore top level library and set depends for all in its config depends that matches
-            else
+            else if ( this.IsTopLevel == false && this.config.Depends.Depend.Count != 0 && this.config.ClassName != "GlobalBuildConfig") 
             {
-                var LibrarysThatStillNeedInitializing = FromTheseLibraries.Where((Library lib) => { return lib.IsTopLevel == false && lib.config.Depends.Depend.Count != 0 && lib.config.ClassName != "GlobalBuildConfig"; });
+                //var LibrarysThatStillNeedInitializing = FromTheseLibraries.Where((Library lib) => { return lib.IsTopLevel == false && lib.config.Depends.Depend.Count != 0 && lib.config.ClassName != "GlobalBuildConfig"; });
 
                  
 
-                foreach (var libstill in LibrarysThatStillNeedInitializing)
-                {
+                //foreach (var libstill in LibrarysThatStillNeedInitializing)
+                //{
 
                     //get its depends
-                    foreach (var d in libstill.config.Depends.Depend)
+                    foreach (var d in this.config.Depends.Depend)
                     { 
                         //now iterate through the LibrarysThatStillNeedInitializing again and add any that match that depend
-                        foreach (var libToCheck in LibrarysThatStillNeedInitializing)
+                        foreach (var libToCheck in FromTheseLibraries)
                         {
                             if (d.ModeOfDepend == libToCheck.config.Major && d.NameOfDepend == libToCheck.config.ClassName && d.TypePrefOfDepend == libToCheck.config.ConfTypePrefix)
                             {
-                                libstill.LibrariesIDependOn.Add(libToCheck);
+                                this.LibrariesIDependOn.Add(libToCheck);
                             }  
                         } 
                     }  
-                } 
+                //} 
             } 
         }
 

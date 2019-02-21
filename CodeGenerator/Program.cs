@@ -142,8 +142,7 @@ namespace CodeGenerator
 #if TESTING
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
-        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";//
-        //public static string envIronDirectory =  @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";// 
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
         public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
@@ -163,7 +162,7 @@ namespace CodeGenerator
         //static string[] command = @"configproj VS --removeinclude C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator".Split(' ');
         //static string[] command = @"configproj VS --addlibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
         //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
-        //static string[] command  = "".Split(' ');
+        //static string[] command  = "".Split(' '); 
         static string[] command  = "generate".Split(' ');
         //static string[] command  = "init Mod".Split(' ');
         //static string[] command = "init ModAA".Split(' ');
@@ -819,6 +818,8 @@ namespace CodeGenerator
         static ParserResult<object> Generate(GenerateOptions opts)
         {
 
+
+
             //first make sure that a project exists here
             if (IsProjectExistsAtEnvironDirectory())
             {
@@ -850,7 +851,7 @@ namespace CodeGenerator
 
                 //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
                 //first grab all lowest level libraries that have no dependencies
-                projectBuilderForVs.ImportDependentFilesLibrariesCincAndCcomp();
+                projectBuilderForVs.ImportDependentLibrariesFiles();
 
 
 

@@ -157,11 +157,13 @@ namespace CodeGenerator.ProjectBuilders
                     foreach (var lineconfStr in configuration_hStr.Split('\n'))
                     {
                         //first make sure that that line is a define
-                        Match m = Regex.Match(lineconfStr, @"#define (.*) (.*)");
+                        Match m = Regex.Match(lineconfStr, @"#define(\b.+?\b)\s+(.+)$",RegexOptions.Multiline);
                         if (m.Success)
                         {
-                            //check this define has form of the classname*conftypeprefix*definename
-                            string strPattern =@"#define "+ ConfigOfLibraryOfTheOneInheriting.ClassName + @"\*" + ConfigOfLibraryOfTheOneInheriting.ConfTypePrefix + @"\*" + m.Groups[1].Value+ @"\s*(.*)";
+                            //check this define has form of the classname*conftypeprefix*definename 
+                            string strPattern = !string.IsNullOrEmpty(ConfigOfLibraryOfTheOneInheriting.ConfTypePrefix) 
+                                ? @"#define " + ConfigOfLibraryOfTheOneInheriting.ClassName + @"\*" + ConfigOfLibraryOfTheOneInheriting.ConfTypePrefix + @"\*" + m.Groups[1].Value.Trim() + @"\s+(.*)"
+                                : @"#define " + ConfigOfLibraryOfTheOneInheriting.ClassName + @"\*"+ m.Groups[1].Value.Trim() + @"\s+(.*)";
                             Match m2 = Regex.Match(line, strPattern);//@"#define modaaConf1\*MODE0\*BUFFERSIZE\s*(.*)");
                             if (m2.Success)
                             {

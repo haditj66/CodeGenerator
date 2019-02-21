@@ -30,7 +30,7 @@ namespace ConsoleApp2.CPPRefactoring
         }
 
         public CppRefactorer(List<string> filesInScopeToRefactor)
-        {  
+        {
             //List<CXTranslationUnit> cxTranslationUnits = filesInScopeToRefactor.GetTranslationUnitsFromAllFiles();
             //TranslationUnits = cxTranslationUnits.Select((CXTranslationUnit tu) => { return new MyCXTranslationUnit(tu); }).ToList();
 
@@ -53,7 +53,7 @@ namespace ConsoleApp2.CPPRefactoring
                 Parsers.Add(cppParser);
                 TranslationUnits.Add(cppParser.MyCxTranslationUnit);
             }
-             
+
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ConsoleApp2.CPPRefactoring
 
         }
 
-        protected string GetFullFilePathFromFileNameInScope(string ofThisFileInScope)
+        public string GetFullFilePathFromFileNameInScope(string ofThisFileInScope)
         {
             //make sure file is just of the filename
             ofThisFileInScope = Path.GetFileName(ofThisFileInScope);
@@ -159,7 +159,7 @@ namespace ConsoleApp2.CPPRefactoring
                                 //newcontents[lineIndex] = Regex.Replace(line, ofThisFileInScope, toThisNewName);
                                 var m = Regex.Match(line, @"#include\s*""(.*)""");
                                 string pat = string.Format(@"{0}", m.Groups[1].Value.SetEscapesOnString());
-                                newcontents[lineIndex] = Regex.Replace(line, pat, toThisNewName); 
+                                newcontents[lineIndex] = Regex.Replace(line, pat, toThisNewName);
                                 fileChanged = true;
                             }
                         }
@@ -180,7 +180,7 @@ namespace ConsoleApp2.CPPRefactoring
             {
                 ReloadRefactorer();
             }
-            
+
         }
 
 
@@ -218,8 +218,46 @@ namespace ConsoleApp2.CPPRefactoring
                 }
             }
 
+        }
+
+        public void ReplaceDefinesWithDefineValueFile(string file, string configContents)
+        {
+            string fullPAthOffile = GetFullFilePathFromFileNameInScope(file);
+            string fileContents = File.ReadAllText(fullPAthOffile);
+            string[] fileToReturn = fileContents.Split('\n');
+
+
+
+            //go through each line and look for the define name
+            int index = 0;
+            foreach (var line in fileContents.Split('\n'))
+            { 
+                //go through each line in configContents and look for a #define line
+                foreach (var lineconfStr in configContents.Split('\n'))
+                {
+                    //first make sure that that line is a define
+                    //get the name and value of the defines in the configContents
+                    Match m = Regex.Match(lineconfStr, @"#define(\b.+?\b)\s+(.+)$", RegexOptions.Multiline);
+                    if (m.Success)
+                    { 
+                        string pattern = @"\b" + m.Groups[1].Value.Trim() + @"\b";
+                        Match mm = Regex.Match(line, pattern);
+                        if (mm.Success)
+                        {
+                            fileToReturn[index] = Regex.Replace(fileToReturn[index], pattern, m.Groups[2].Value.Trim());
+                        }
+                        
+
+                    }
+                }
+                index++;
+            }
+
+            File.WriteAllLines(fullPAthOffile, fileToReturn);
 
         }
+
+
 
 
         // dealing with code insertion of a  file ************************************************
@@ -297,7 +335,7 @@ namespace ConsoleApp2.CPPRefactoring
 
 
             RemoveStringFromLineColumnToLineColumn(sourceLocation.MyCxFilefileStart.FileFullName, Fromline, Fromcolumn, Toline, Tocolumn);
-             
+
         }
 
         private void RemoveStringFromENDofCXsourceToENDofCXsource(MyCXSourceLocation FromEndOfsourceLocation, MyCXSourceLocation ToEndOfsourceLocation)
@@ -309,7 +347,7 @@ namespace ConsoleApp2.CPPRefactoring
             int Tocolumn = (int)ToEndOfsourceLocation.columnEnd - 1;
 
             RemoveStringFromLineColumnToLineColumn(FromEndOfsourceLocation.MyCxFilefileStart.FileFullName, Fromline, Fromcolumn, Toline, Tocolumn);
-             
+
         }
 
         private void RemoveStringFromBEGGININGofCXsourceToBEGGININGofCXsource(MyCXSourceLocation FromBEGGININGOfsourceLocation, MyCXSourceLocation ToBEGGININGOfsourceLocation)
@@ -361,21 +399,21 @@ namespace ConsoleApp2.CPPRefactoring
 
             //get the substring contents After the source
             List<string> contents = File.ReadAllLines(fromcxSource.MyCxFilefileStart.FileFullName).ToList();
-            List<string> contentsCopy = new List<string>(contents); 
+            List<string> contentsCopy = new List<string>(contents);
             contentsCopy.RemoveRange(0, Toline);
             contentsCopy[0] = contentsCopy[0].Remove(0, Tocolumn);
             string contentAfterTheSource = string.Join("\n", contentsCopy);
-             
+
             //remove first occurence of that char adn replace it with " "
             int index = contentAfterTheSource.IndexOf(charToRemove);
-            contentAfterTheSource =  contentAfterTheSource.Remove(index, charToRemove.Length);
+            contentAfterTheSource = contentAfterTheSource.Remove(index, charToRemove.Length);
             StringBuilder b = new StringBuilder(contentAfterTheSource);
             b.Insert(index, " ", charToRemove.Length);
             contentAfterTheSource = b.ToString();
-             
-            contents.RemoveRange(Toline+1, contents.Count - Toline-1);
-            contents[contents.Count-1] = contents.Last().Remove(Tocolumn, contents.Last().Length-Tocolumn);
-            string contentBeforeEndOfSource =  string.Join("\n", (contents));
+
+            contents.RemoveRange(Toline + 1, contents.Count - Toline - 1);
+            contents[contents.Count - 1] = contents.Last().Remove(Tocolumn, contents.Last().Length - Tocolumn);
+            string contentBeforeEndOfSource = string.Join("\n", (contents));
             string newContents = contentBeforeEndOfSource + contentAfterTheSource;
 
             File.WriteAllText(fromcxSource.MyCxFilefileStart.FileFullName, newContents);
@@ -418,7 +456,7 @@ namespace ConsoleApp2.CPPRefactoring
             //dont forget to reload the parser after EVERY write! 
             cppParser.ReloadParser();
             return true;
- 
+
         }
 
 
@@ -431,21 +469,21 @@ namespace ConsoleApp2.CPPRefactoring
             if (toEnumCursor == null) { return false; }
 
             var enumValueCursors = toEnumCursor.GetChildrenOfKind_EnumConstantDecl();
-             var enumValueCursor= enumValueCursors.FirstOrDefault(enumconst => enumconst.getCursorSpelling() == enumvaluename);
-             int indexofEnumIWant = enumValueCursors.FindIndex(en => clang.equalCursors(enumValueCursor.CXCursor, en.CXCursor)==1);
-             if (enumValueCursor == null) { return false; }
+            var enumValueCursor = enumValueCursors.FirstOrDefault(enumconst => enumconst.getCursorSpelling() == enumvaluename);
+            int indexofEnumIWant = enumValueCursors.FindIndex(en => clang.equalCursors(enumValueCursor.CXCursor, en.CXCursor) == 1);
+            if (enumValueCursor == null) { return false; }
 
             if (enumValueCursors.Count == 0)
-            { 
+            {
                 RemoveStringOfCXsourceLocation(enumValueCursor.MyCxSourceLocation);
-                
+
             }
             else if (indexofEnumIWant == 0)
             {//if the enum I want is the first one, I need to account for the comma that comes after it. 
                 DeleteFirstOccurenceOfStrAfterSource(enumValueCursor.MyCxSourceLocation, ",");
                 RemoveStringOfCXsourceLocation(enumValueCursor.MyCxSourceLocation);
                 //RemoveStringFromBEGGININGofCXsourceToBEGGININGofCXsource (enumValueCursors[indexofEnumIWant].MyCxSourceLocation, enumValueCursors[1].MyCxSourceLocation);
-                 
+
             }
             else
             {
@@ -453,7 +491,7 @@ namespace ConsoleApp2.CPPRefactoring
                 DeleteFirstOccurenceOfStrAfterSource(enumValueCursors[indexofEnumIWant - 1].MyCxSourceLocation, ",");
                 RemoveStringOfCXsourceLocation(enumValueCursors[indexofEnumIWant].MyCxSourceLocation);
                 //RemoveStringFromENDofCXsourceToENDofCXsource(enumValueCursors[indexofEnumIWant-1].MyCxSourceLocation, enumValueCursors[indexofEnumIWant].MyCxSourceLocation);
-                 
+
             }
 
 
@@ -461,5 +499,7 @@ namespace ConsoleApp2.CPPRefactoring
             return true;
 
         }
+
+
     }
 }

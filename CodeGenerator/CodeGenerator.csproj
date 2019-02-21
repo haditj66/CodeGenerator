@@ -134,9 +134,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CPP Parser\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="ConsoleApp2\CPPParser.csproj">
       <Project>{1f805e85-0449-4037-8fb7-082163ae14ff}</Project>
