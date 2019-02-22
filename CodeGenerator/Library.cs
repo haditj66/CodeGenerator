@@ -65,6 +65,25 @@ namespace CodeGenerator
 
         public void SetLibrariesIDependOn(List<Library> FromTheseLibraries)
         {
+            /*
+            var sameInstances = FromTheseLibraries.Where(l => l.IsEqual(this));
+            int numOfInstances = sameInstances.Count();
+            if (numOfInstances>1)
+            {
+                //then set the myinstance to +1 the highest instance
+                int highestInt = Convert.ToInt32(sameInstances.OrderBy(si => Convert.ToInt32(si.config.MyInstanceNum)).Last().config.MyInstanceNum);
+                this.config.MyInstanceNum = highestInt.ToString();
+            }
+            */
+            /*
+            List<Library> libsToRemove = new List<Library>();
+            foreach (var fromTheseLibrary in FromTheseLibraries)
+            {
+                libsToRemove.AddRange(FromTheseLibraries.Where(l => l.IsEqual(fromTheseLibrary) && (Convert.ToInt32(l.config.MyInstanceNum) < Convert.ToInt32(fromTheseLibrary.config.MyInstanceNum)) ));
+            } 
+            libsToRemove.ForEach(lr => FromTheseLibraries.Remove(lr));
+            */
+
             //if this library is top level, look for all non top level libraries that dont have depends in their configs.
             if (this.IsTopLevel == true)
             {
@@ -103,8 +122,11 @@ namespace CodeGenerator
             } 
         }
 
+
         public string  GetFullPrefix()
         {
+
+
             return config.Prefix + config.Major + config.ConfTypePrefix ;
         }
 

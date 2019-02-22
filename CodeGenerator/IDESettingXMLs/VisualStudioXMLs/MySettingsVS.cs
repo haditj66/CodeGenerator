@@ -213,38 +213,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         }
 
 
-        protected override List<MyCLIncludeFile> ConvertAllCurrentCIncludesAsMyClIncludes()
-        {
-            List<MyCLIncludeFile> MyCLIncludeFileResult = new List<IDESettingXMLs.MyCLIncludeFile>();
-
-            var ItemGroupWithClIncludeFromfilter = ((Filters.Project)XmlFilterClass).ItemGroup
-                .Where((Filters.ItemGroup itmG) => { return itmG.ClInclude.Count != 0; })
-                .FirstOrDefault();
-
-            if (ItemGroupWithClIncludeFromfilter != null)
-            {
-
-                foreach (var clInclude in ItemGroupWithClIncludeFromfilter.ClInclude)
-                {
-                    //create new Myclinclude
-                    //the name will be the file at the end of the path minus the extension .h  
-                    //the filter will be the one that matches the path of the inlcude minus filename
-                    var filterTheCincBelongsTo = myFilters
-                        .Where((MyFilter fil) =>
-                        {
-
-                            return fil.GetFilterFromAddress(clInclude.Filter) != null;
-                        })
-                        .First();
-                    var MyClInc = new MyCLIncludeFile(filterTheCincBelongsTo, Path.GetFileName(clInclude.Include), Path.GetDirectoryName(clInclude.Include));
-
-                    MyCLIncludeFileResult.Add(MyClInc);
-                }
-            }
-
-            return MyCLIncludeFileResult;
-        }
-
+ 
         #endregion
 
 
@@ -512,6 +481,41 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
         #region CLInclude stuff **********************************************************************
 
+        protected override List<MyCLIncludeFile> ConvertAllCurrentCIncludesAsMyClIncludes()
+        {
+            List<MyCLCompileFile> MyCLCompileFileResult = new List<IDESettingXMLs.MyCLCompileFile>();
+
+            var itgs = ((Filters.Project)XmlFilterClass).ItemGroup
+                .Where((Filters.ItemGroup itmG) => { return itmG.ClInclude.Count != 0; });
+            //.Select(idgs => idgs.ClCompile.).ToList();
+            List<Filters.ClInclude> CCincs = itgs.SelectMany(i => i.ClInclude).ToList();
+             
+            List<MyCLIncludeFile> MyCLIncludeFileResult = new List<IDESettingXMLs.MyCLIncludeFile>();
+              
+            if (CCincs != null)
+            {
+
+                foreach (var clInclude in CCincs)
+                {
+                    //create new Myclinclude
+                    //the name will be the file at the end of the path minus the extension .h  
+                    //the filter will be the one that matches the path of the inlcude minus filename
+                    var filterTheCincBelongsTo = myFilters
+                        .Where((MyFilter fil) =>
+                        {
+
+                            return fil.GetFilterFromAddress(clInclude.Filter) != null;
+                        })
+                        .First();
+                    var MyClInc = new MyCLIncludeFile(filterTheCincBelongsTo, Path.GetFileName(clInclude.Include), Path.GetDirectoryName(clInclude.Include));
+
+                    MyCLIncludeFileResult.Add(MyClInc);
+                }
+            }
+
+            return MyCLIncludeFileResult;
+        }
+
         protected override void AddMyClIncludesAsCIncludes(MyCLIncludeFile CLIncludeFile)
         {
             //CCinclude affects TWO xml classes   
@@ -599,14 +603,15 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
             List<MyCLCompileFile> MyCLCompileFileResult = new List<IDESettingXMLs.MyCLCompileFile>();
 
-            var ItemGroupWithClCompFromFilter = ((Filters.Project)XmlFilterClass).ItemGroup
-                .Where((Filters.ItemGroup itmG) => { return itmG.ClCompile.Count != 0; })
-                .FirstOrDefault();
-
-            if (ItemGroupWithClCompFromFilter != null)
+            var itgs = ((Filters.Project) XmlFilterClass).ItemGroup
+                .Where((Filters.ItemGroup itmG) => { return itmG.ClCompile.Count != 0; });
+            //.Select(idgs => idgs.ClCompile.).ToList();
+            List<Filters.ClCompile> CComps = itgs.SelectMany(i => i.ClCompile).ToList(); 
+             
+            if (CComps != null)
             {
 
-                foreach (var cCompile in ItemGroupWithClCompFromFilter.ClCompile)
+                foreach (var cCompile in CComps)
                 {
                     //create new Myclinclude
                     //the name will be the file at the end of the path minus the extension .h  

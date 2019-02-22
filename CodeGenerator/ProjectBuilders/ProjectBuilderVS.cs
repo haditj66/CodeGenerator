@@ -178,12 +178,12 @@ namespace CodeGenerator.ProjectBuilders
                 }).First();
                 //todo the path here should be to the temp folder?
                 string e = libraryToImp.GetPathToProjectAsADependent();
-                MyCLIncludeFile clinc = new MyCLIncludeFile(filtForConfiguration_h,"ConfigurationCG.h", Path.Combine("LibraryDependencies", libraryToImp.GetPathToProjectAsADependent()));
+                MyCLIncludeFile clincConfig = new MyCLIncludeFile(filtForConfiguration_h,"ConfigurationCG.h", Path.Combine("LibraryDependencies", libraryToImp.GetPathToProjectAsADependent()));
 
 
                 //2.5 send that configurationCG.h file to final librarydependencies/xx/xx folder. but first inherit values
                 configFileBuilder.InheritFromTopConfig(libraryToImp.config);
-                configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject ,clinc.LocationOfFile,clinc.Name));
+                configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject ,clincConfig.LocationOfFile,clincConfig.Name));
 
                 //3. --------------------- 
                 //grab all files that are qualified to be imported in and send them through  (NOT main.cpp, ModuleConfig.h etc)
@@ -198,25 +198,38 @@ namespace CodeGenerator.ProjectBuilders
                 string pathToOutput = Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent());
                 FileImporter.ImportFilesToPath(pathToOutput);
                  
-                CIncToImport.Add(clinc);//the configuration that was written in needs to be added now
-                libraryToImp.AddCIncludeFile(clinc);
+                CIncToImport.Add(clincConfig);//the configuration that was written in needs to be added now
+                libraryToImp.AddCIncludeFile(clincConfig);
                 List<string> allFilePaths = new List<string>();
                 allFilePaths.AddRange(CcompsToImport.Select(cinc => Path.Combine(pathToOutput, cinc.Name)));
                 allFilePaths.AddRange(CIncToImport.Select(cinc => Path.Combine(pathToOutput, cinc.Name)));
 
-                //refactor files
+
+                //refactor files -------------------------------------------------------------------------
                 CppRefactorer refactorer = new CppRefactorer(allFilePaths);
                 List<string> filesInScopeToRefactorCopy = new List<string>(refactorer.FilesInScopeToRefactor);
                 string prefixToAddToAllFilesNames = string.IsNullOrEmpty(libraryToImp.config.ConfTypePrefix) 
                         ?  libraryToImp.config.Prefix + "_" 
                         : libraryToImp.config.Prefix + "_" + libraryToImp.config.ConfTypePrefix + "_";
-               
-                //replace the files defines from the configuration folder values. otherwise the define names will conflict with the main program configuration defines.
+
+                var definesDict = refactorer.GetAllDefines(clincConfig.Name);
                 foreach (var file in filesInScopeToRefactorCopy)
                 {
-                    string configContents = File.ReadAllText(Path.Combine(LibTop.settings.PATHOfProject, clinc.LocationOfFile, clinc.Name));
-                    refactorer.ReplaceDefinesWithDefineValueFile(file, configContents);
+                    foreach (var define in definesDict)
+                    { 
+                        refactorer.RenameDefine(file, define.Key, prefixToAddToAllFilesNames+ define.Key);
+                    } 
                 }
+
+
+                /*
+                //replace the files defines from the configuration folder values. otherwise the define names will conflict with the main program configuration defines.
+                    foreach (var file in filesInScopeToRefactorCopy)
+                {
+                    string configContents = File.ReadAllText(Path.Combine(LibTop.settings.PATHOfProject, clincConfig.LocationOfFile, clincConfig.Name));
+                    refactorer.ReplaceDefinesWithDefineValueFile(file, configContents);
+                }*/
+
                 refactorer.ReloadRefactorer();
                 //change names of all imported files 
                 foreach (var File in filesInScopeToRefactorCopy)
@@ -258,6 +271,7 @@ namespace CodeGenerator.ProjectBuilders
                     File.WriteAllLines(fullPath, contentsNew);
                 }
 
+                /* DONT
                 //remove contents of configuration
                 foreach (var file in refactorer.FilesInScopeToRefactor)
                 {
@@ -267,7 +281,7 @@ namespace CodeGenerator.ProjectBuilders
 
                         File.WriteAllText(fullPath, "");
                     } 
-                }
+                }*/
 
 
                 //finally change the names of all the myincludes and myccompiles

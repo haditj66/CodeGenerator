@@ -51,6 +51,7 @@ void Config::PrintDefines(Config& TopLevelConfig)
 
 	//I need to assert that no config is having a circular dependency to another
 	bool anyCicularDepends = false;
+	Config* theCircularConfig = nullptr;
 	for each (Config* confDepender in Config::ConfigsCreatedSoFar)
 	{
 		// now go through all its dependents, if a dependent is the same as the depender, it is a circular dependence
@@ -59,12 +60,19 @@ void Config::PrintDefines(Config& TopLevelConfig)
 			// SAME IN THIS CASE JUST MEANS SAME PREFIX!!
 			if (confDependent->Prefix == confDepender->Prefix)
 			{
+				theCircularConfig = confDepender;
 				anyCicularDepends = true;
 				break;
 			}
 		}
 	}
-	assert(!anyCicularDepends);
+	if (anyCicularDepends)
+	{
+		std::string msg = "There is a circular dependency for ";
+		theCircularConfig->Problem(msg.append(theCircularConfig->Prefix));
+		return;
+	}
+	//assert(!anyCicularDepends);
 
 
 
@@ -483,6 +491,8 @@ void Config::Problem(std::string msg)
 
 void Config::AddConfigSoFar(Config* configToAdd)
 {
+
+
 	ConfigsCreatedSoFar.push_back(configToAdd);
 }
 
@@ -509,6 +519,10 @@ void Config::DeleteConfigfile()
 	file.close();
 }
 
+
+
+
+
 XMLDocument Config::xmlDoc;
 
 void Config::ConfigToXml()
@@ -529,19 +543,35 @@ void Config::ConfigToXml()
 
 		// I should ignore all configs with instances above 0 and defines to the 0 one
 		if (config->myInstanceNum == 0)
+		//only get top myinstance configs
+		//if (IsTopInstance(config))
 		{ 
 
 			//copy all nonstatic defines to the config from same type configs 
+			int highestinsanceSoFar = 0;
 			for each (Config* conf2 in ConfigsCreatedSoFar)
 			{
+				/*
 				if (conf2->IsEqual(*config) && conf2->myInstanceNum > 0)
 				{
+					if (conf2->myInstanceNum > highestinsanceSoFar)
+					{
+						highestinsanceSoFar =  conf2->myInstanceNum  ;
+						config =  conf2 ;
+					} 
+				}*/
+				
+				if (conf2->IsEqual(*config) && conf2->myInstanceNum > 0)
+				{
+					highestinsanceSoFar = conf2->myInstanceNum > highestinsanceSoFar ? conf2->myInstanceNum : highestinsanceSoFar;
+					config->myInstanceNum = highestinsanceSoFar;
+					config->XmlConfigElement->SetAttribute("myInstanceNum", config->myInstanceNum);
 					//go through public list
 					for each (IDefine* pubDef in conf2->publicDefineList)
 					{
 						if (pubDef->IsStatic == false)
 						{
-							//than copy that over to the instance 0 config
+							//than copy that over to the instance 0 config 
 							pubDef->DefineName.append("_").append(std::to_string(conf2->myInstanceNum));
 							config->publicDefineList.push_back(pubDef);
 						}
@@ -604,6 +634,24 @@ void Config::ConfigToXml()
 	//send to xml file.
 	std::string t = BASE_DIRECTORY;
 	XMLError eResult = xmlDoc.SaveFile(t.append("\\SavedData.xml").c_str());
+
+}
+
+bool Config::IsTopInstance(Config const* const configToCheck)
+{
+	//got through ConfigsCreatedSoFar and check for any that are the same and higher myinstancenum
+	std::vector<int> toRemove;
+	for each (Config* conf in ConfigsCreatedSoFar)
+	{
+		if (configToCheck->IsEqual(*conf))
+		{
+			if (configToCheck->myInstanceNum < conf->myInstanceNum)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 
 }
 

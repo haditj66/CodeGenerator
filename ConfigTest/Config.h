@@ -154,6 +154,7 @@ protected:
 	static void SendToConfigFile(std::string stringToSend);
 	static void DeleteConfigfile();
 	static void ConfigToXml();
+	static bool IsTopInstance(Config const * const configToCheck);
 	void SendLibraryFileNameToIncludeList();
 
 	virtual void InitListPublicOVERRIDE(std::vector<IDefine*>* publicDefVec) = 0;

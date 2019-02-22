@@ -146,7 +146,7 @@ namespace CodeGenerator.ProjectBuilders
             if (!IsTopLevelConfig && !string.IsNullOrEmpty(ConfigInherittedValues))
             {
                 string configuration_hStr = File.ReadAllText(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation, "Configuration.h"));
-                string[] configuration_hStrNew = configuration_hStr.Split('\n');//new string[configuration_hStr.Split('\n').Length];
+                List<string> configuration_hStrNew = configuration_hStr.Split('\n').ToList();//new string[configuration_hStr.Split('\n').Length];
 
                 //go through the ConfigInherittedValues line by line and change the value for the define
                 //that it matches in the configuration_hStr
@@ -171,10 +171,26 @@ namespace CodeGenerator.ProjectBuilders
                                 string newLine = lineconfStr.Substring(0, m.Groups[2].Index);//, lineconfStr.Length-1);
                                 newLine += m2.Groups[1];
                                 configuration_hStrNew[index] = newLine;
+
+                                //I need to check for any nonstatic defines also and append them to the end
+                                var nonstaticDefine = ConfigOfLibraryOfTheOneInheriting.Defines.Define.FirstOrDefault(define =>
+                                {
+                                    return (define.DefineName == m.Groups[1].Value.Trim())
+                                           && (define.IsStatic == "false")
+                                           && (ConfigOfLibraryOfTheOneInheriting.MyInstanceNum != "0");
+                                });
+                                if (nonstaticDefine != null )
+                                {
+                                    //append all define instances to the end
+                                    for (int i = 1; i < Convert.ToInt32(ConfigOfLibraryOfTheOneInheriting.MyInstanceNum)+1; i++)
+                                    {
+                                        string defineStr = @"#define "+ nonstaticDefine.DefineName + "_"+i.ToString() + " " + nonstaticDefine.Value;
+                                        configuration_hStrNew.Add(defineStr);
+                                    }
+                                }
                             }
                         }
-
-                        
+     
                         index++;
                     }
                 }

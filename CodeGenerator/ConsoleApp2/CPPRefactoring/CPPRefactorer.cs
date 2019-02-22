@@ -231,7 +231,7 @@ namespace ConsoleApp2.CPPRefactoring
             //go through each line and look for the define name
             int index = 0;
             foreach (var line in fileContents.Split('\n'))
-            { 
+            {
                 //go through each line in configContents and look for a #define line
                 foreach (var lineconfStr in configContents.Split('\n'))
                 {
@@ -239,22 +239,76 @@ namespace ConsoleApp2.CPPRefactoring
                     //get the name and value of the defines in the configContents
                     Match m = Regex.Match(lineconfStr, @"#define(\b.+?\b)\s+(.+)$", RegexOptions.Multiline);
                     if (m.Success)
-                    { 
+                    {
                         string pattern = @"\b" + m.Groups[1].Value.Trim() + @"\b";
                         Match mm = Regex.Match(line, pattern);
                         if (mm.Success)
                         {
                             fileToReturn[index] = Regex.Replace(fileToReturn[index], pattern, m.Groups[2].Value.Trim());
                         }
-                        
+
 
                     }
                 }
                 index++;
             }
 
-            File.WriteAllLines(fullPAthOffile, fileToReturn);
+            File.WriteAllText(fullPAthOffile, string.Join("\n", fileToReturn));
 
+        }
+
+
+        public void RenameDefine(string inFile, string defineName, string newDefineName)
+        {
+            string fullPAthOffile = GetFullFilePathFromFileNameInScope(inFile);
+            string fileContents = File.ReadAllText(fullPAthOffile);
+            string[] fileToReturn = fileContents.Split('\n');
+
+            //go through each line and look for the define name
+            bool wasChanged = false;
+            int index = 0;
+            foreach (var line in fileContents.Split('\n'))
+            {
+
+                string pattern = @"\b" + defineName + @"\b";
+                Match mm = Regex.Match(line, pattern);
+                if (mm.Success)
+                {
+                    fileToReturn[index] = Regex.Replace(fileToReturn[index], pattern, newDefineName);
+                    wasChanged = true;
+                } 
+
+                index++;
+            }
+
+            if (wasChanged)
+            {
+                File.WriteAllText(fullPAthOffile, string.Join("\n", fileToReturn));
+            } 
+        }
+
+
+
+
+        public Dictionary<string, string> GetAllDefines(string inFile)
+        {
+            string fullPAthOffile = GetFullFilePathFromFileNameInScope(inFile);
+            string fileContents = File.ReadAllText(fullPAthOffile);
+            var defineDictToReturn = new Dictionary<string, string>();
+
+            //go through each line in configContents and look for a #define line
+            foreach (var lineconfStr in fileContents.Split('\n'))
+            {
+                //first make sure that that line is a define
+                //get the name and value of the defines in the configContents
+                Match m = Regex.Match(lineconfStr, @"#define(\b.+?\b)\s+(.+)$", RegexOptions.Multiline);
+                if (m.Success)
+                {
+                    defineDictToReturn.Add(m.Groups[1].Value.Trim(), m.Groups[2].Value.Trim());
+                }
+            }
+
+            return defineDictToReturn;
         }
 
 
