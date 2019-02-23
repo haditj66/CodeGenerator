@@ -86,7 +86,8 @@ namespace CodeGenerator
             //[CommandLine.Value(1), help]
             [Value(0, HelpText = "name of the project you want to create")]
             public string name { get; set; }
-
+            [Option(HelpText = "if this is enabled, it will initialize git, commiting all, and making the first tag")]
+            public bool git { get; set; }
 
         }
 
@@ -146,8 +147,10 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1B";
-        
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1B";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\test";
+
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
         //static string[] command  = "init moda".Split(' ');
@@ -163,8 +166,12 @@ namespace CodeGenerator
         //static string[] command = @"configproj VS --removeinclude C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator".Split(' ');
         //static string[] command = @"configproj VS --addlibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
         //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
+        //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
-        static string[] command  = "generate".Split(' ');
+        //static string[] command  = "generate".Split(' ');
+        //static string[] command  = "init Module".Split(' ');
+        //static string[] command = "init --git".Split(' ');
+        static string[] command = "init Test".Split(' ');
         //static string[] command  = "init Mod".Split(' ');
         //static string[] command = "init ModAA".Split(' ');
         //static string[] command = "init ModA".Split(' ');
@@ -673,7 +680,45 @@ namespace CodeGenerator
         //***************************************************************************************************  
         static ParserResult<object> Init(InitOptions opts)
         {
+
+            #region --git -----------------------------------------------
              
+            if (opts.git)
+            {
+                //check if a git exists, if not, create one and put a gitignore in. 
+                CMDHandler cmd = new CMDHandler(envIronDirectory);
+                GitHandlerForLibrary gitHandler = new GitHandlerForLibrary(cmd);
+                //check that git exists
+                if (!gitHandler.IsPathHaveGit(envIronDirectory))
+                {
+                    gitHandler.InitGitHere(envIronDirectory);
+                    if (!File.Exists(Path.Combine(envIronDirectory, ".gitignore")))
+                    {
+                        File.Copy(".gitignore", Path.Combine(envIronDirectory, ".gitignore"));
+                    }
+                    if (!File.Exists(Path.Combine(envIronDirectory, ".gitattributes")))
+                    {
+                        File.Copy(".gitattributes", Path.Combine(envIronDirectory, ".gitattributes"));
+                    }
+
+                    gitHandler.CommitAll(envIronDirectory);
+                    if (gitHandler.Cmd.Output.Contains("error:") || gitHandler.Cmd.Error.Contains("error:"))
+                    {
+                        ProblemHandle p =new ProblemHandle();
+                        p.ThereisAProblem("there was a problem  doing the first commit all. you should do this manually");
+                    }
+                    gitHandler.AddVersionTag(envIronDirectory, 0, 0, 1);
+                    Console.WriteLine("git initialized here");
+                }
+                else
+                {
+                    Console.WriteLine("there is already a git repo here. nothing was done.");
+                }
+
+                return null;
+            }
+            #endregion
+
             //get the project builder for Visual Studio, as VS is right now the only supporting starting project build
             //IDESetting settingConfig = new IDESetting(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest", ".xml", typeof(Root));
             //ProjectBuilderBase projectBuilderForVs = new ProjectBuilderVS(settingConfig);
@@ -682,7 +727,7 @@ namespace CodeGenerator
             if (savefileProjGlobal.CgenProjects.Projects.Any(p => p.NameOfProject == opts.name))
             {
                 ProblemHandle p = new ProblemHandle();
-                p.ThereisAProblem("The name "+ opts.name+ "already exists");
+                p.ThereisAProblem("The name "+ opts.name+ " already exists");
             }
 
             //check that there isnt already a project here.  
@@ -712,6 +757,7 @@ namespace CodeGenerator
                     return null;
                 }
 
+                ProblemHandle problemHandle = new ProblemHandle();
 
                 //then I need to create a new project as none exist and user wants to create one 
                 try
@@ -730,6 +776,11 @@ namespace CodeGenerator
                     SaveFilecgenProjectLocal.CgenProjects.Project = projToAdd;
                     SaveFilecgenProjectLocal.Save();
                     savefileProjGlobal.Save();
+                     
+                    RemoveProjectCleanup removeProjectCleanup = new RemoveProjectCleanup(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY, savefileProjGlobal, projToAdd);
+                    var projectCleanup = (ICleanUp) removeProjectCleanup;
+                    problemHandle.AddCleanUp(ref projectCleanup);
+                    settings.ProblemHandle = problemHandle;
 
                     #region add platform in scope "ALLPLATFORMS", configtest.lib, and additional include Program.PATHTOCONFIGTEST
 
@@ -762,44 +813,17 @@ namespace CodeGenerator
 
                     Console.WriteLine("Project successfully created");
 
-
-
-                    //4. check if a git exists, if not, create one and put a gitignore in. 
-                    CMDHandler cmd = new CMDHandler(envIronDirectory);
-                    GitHandlerForLibrary gitHandler = new GitHandlerForLibrary(cmd);
-                    //check that git exists
-                    if (!gitHandler.IsPathHaveGit(envIronDirectory))
-                    {
-                        gitHandler.InitGitHere(envIronDirectory);
-                        if (!File.Exists(Path.Combine(envIronDirectory, ".gitignore")))
-                        {
-                            File.Copy(".gitignore",Path.Combine(envIronDirectory, ".gitignore")); 
-                        }
-                        if (!File.Exists(Path.Combine(envIronDirectory, ".gitattributes")))
-                        {
-                            File.Copy(".gitattributes", Path.Combine(envIronDirectory, ".gitattributes"));
-                        }
-
-                        gitHandler.CommitAll(envIronDirectory);
-                        gitHandler.AddVersionTag(envIronDirectory,0,0,1);
-                        Console.WriteLine("git initialized here"); 
-                    }
-
-
+                     
 
                     //5. update CGKeywords.h and alllibraryincludes.h here 
-                    FileTemplateAllLibraryInlcudes faAllLibraryInlcudes = new FileTemplateAllLibraryInlcudes(PATHTOCONFIGTEST, savefileProjGlobal);
-                    FileTemplateCGKeywordDefine fileTemplateCgKeyword = new FileTemplateCGKeywordDefine(PATHTOCONFIGTEST, savefileProjGlobal);
-                    faAllLibraryInlcudes.CreateTemplate();
-                    fileTemplateCgKeyword.CreateTemplate();
-                    Console.WriteLine("LibraryIncludes updated");
+                    UpdateCCGKeywordsIncludes();
 
                 }
                 catch (Exception e)
                 {
                     //todo. I should clean up and use a problem handle to save the settings
                     //todo file in a simple string and replace the .vcxproj and .filters and delete the locat CGenSaveFiles directory
-                    Console.WriteLine("There was a problem with project creation");
+                    problemHandle.ThereisAProblem("Something went wrong initializing. error : \n"+e.Message);
                     Console.WriteLine(e);
                 }
                 // so we have a name and no project exists here. create one 
@@ -908,6 +932,17 @@ namespace CodeGenerator
         #region helper static functions  ***************************************************************************
         //***************************************************************************************************  
 
+
+
+       public static void UpdateCCGKeywordsIncludes()
+        {
+            //update CGKeywords.h and alllibraryincludes.h here
+            FileTemplateAllLibraryInlcudes faAllLibraryInlcudes = new FileTemplateAllLibraryInlcudes(PATHTOCONFIGTEST, savefileProjGlobal);
+            FileTemplateCGKeywordDefine fileTemplateCgKeyword = new FileTemplateCGKeywordDefine(PATHTOCONFIGTEST, savefileProjGlobal);
+            faAllLibraryInlcudes.CreateTemplate();
+            fileTemplateCgKeyword.CreateTemplate();
+            Console.WriteLine("LibraryIncludes updated");
+        }
 
 
         static bool isIncludeExistForPlatform(string forPlatform, string forInclude)

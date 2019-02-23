@@ -104,6 +104,7 @@
     <Compile Include="ProblemHandler\ICleanUp.cs" />
     <Compile Include="ProblemHandler\LibrariesForCheckedOutGit.cs" />
     <Compile Include="ProblemHandler\ProblemHandle.cs" />
+    <Compile Include="ProblemHandler\RemoveProjectCleanup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectBuilders\ConfigurationFileBuilder.cs" />
     <Compile Include="ProjectBuilders\FileDependentImporters\FileDepedentsImporter.cs" />

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CodeGenerator.CMD_Handler;
 using CodeGenerator.ProblemHandler;
+using Extensions;
 
 namespace CodeGenerator.GitHandlerForLibraries
 {
@@ -40,10 +41,10 @@ namespace CodeGenerator.GitHandlerForLibraries
         }
 
 
-        public bool DoesLibraryContainsGitRepoAndTagForMajor(Library Library, out string tag)
+        public bool DoesLibraryContainsGitRepoAndTagForMajor(string pathOfLibrary, string libraryMajor, out string tag)
         {
 
-            if (!IsPathHaveGit(Library.settings.PATHOfProject))
+            if (!IsPathHaveGit(pathOfLibrary))
             {
                 tag = "";
                 return false;
@@ -60,7 +61,7 @@ namespace CodeGenerator.GitHandlerForLibraries
                 if (Regex.IsMatch(line, @"v\d+\.\d+\.\d+"))
                 {
                     //check if the major matches the major of this tag
-                    if (Regex.Match(line.ToLower(), @"v(\d+)\.\d+\.\d+").Groups[1].Value == Library.config.Major)
+                    if (Regex.Match(line.ToLower(), @"v(\d+)\.\d+\.\d+").Groups[1].Value == libraryMajor)
                     {
                         tag = line;
                         return true;
@@ -72,20 +73,24 @@ namespace CodeGenerator.GitHandlerForLibraries
             return false;
         }
 
+        public bool DoesLibraryContainsGitRepoAndTagForMajor(Library Library, out string tag)
+        {
+            return DoesLibraryContainsGitRepoAndTagForMajor(Library.settings.PATHOfProject, Library.config.Major, out tag);
+             
+        }
+
+
         public void StashAndCheckoutTag(Library Library, string tagToCheckoutTo, ProblemHandle problemHandler)
         {
             //get to that working directory
             Cmd.SetWorkingDirectory((Library.settings.PATHOfProject));
             //stash all changes
-            Cmd.ExecuteCommand("git stash");
-            if (Cmd.Error.Contains("error:") || Cmd.Error.Contains("fatal:"))
-            {
-                problemHandler.ThereisAProblem(@"could not ""git stash"" current changes to library " + Library.config.ClassName + ". Resolve these issues Git in that library before trying again");
-            }
+            Cmd.ExecuteCommandWithProblemCheck("git stash", problemHandler, @"could not ""git stash"" current changes to library " + Library.config.ClassName + ". Resolve these issues Git in that library before trying again");
+ 
 
             //checkout that tag
             Cmd.ExecuteCommand("git checkout " + tagToCheckoutTo);
-
+            Cmd.ExecuteCommandWithProblemCheck("git checkout " + tagToCheckoutTo, problemHandler, @"could not ""git checkout -"" for library " + Library.config.ClassName + ". the changes that were stashed as well. you need to check that library and checkout - and restore any stashed changes ");
         }
 
         public void InitGitHere(string envIronDirectory)
@@ -97,8 +102,10 @@ namespace CodeGenerator.GitHandlerForLibraries
         public void CommitAll(string envIronDirectory)
         {
             Cmd.SetWorkingDirectory(envIronDirectory);
-            Cmd.ExecuteCommand("git add --all");
-            Cmd.ExecuteCommand(@"git commit -m ""added all files""");
+            //Cmd.ExecuteCommand("git add .gitignore .gitattributes");
+            //Cmd.ExecuteCommand(@"git commit -m ""added gitignore""");
+            //Cmd.ExecuteCommand("git add --all");
+            Cmd.ExecuteCommand(@"git add -A && git commit -m ""added all files""");
 
         }
 

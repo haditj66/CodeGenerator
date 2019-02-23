@@ -43,6 +43,15 @@ namespace CodeGenerator.cgenXMLSaves.SaveFiles
              
         }
 
+
+        public void RemoveProject(cgenProjectGlobal projectToRemove)
+        {
+            var proj =  CgenProjects.Projects.First(p=> p.NameOfProject == projectToRemove.NameOfProject && p.UniqueIdentifier == projectToRemove.UniqueIdentifier);
+
+            CgenProjects.Projects.Remove((cgenProjectGlobal)proj);
+
+        }
+
         public void AddNewPlatformInScope(string toProjectName, PlatForm PlatformToAdd)
         {
             //check for null first

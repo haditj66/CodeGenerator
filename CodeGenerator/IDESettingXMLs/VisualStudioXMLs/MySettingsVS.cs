@@ -98,6 +98,15 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
                 foreach (var tdg in itemDefinitionGroups)
                 {
+                    if (tdg.Link == null)
+                    {
+                        tdg.Link = new Link();
+                    }
+                    if (tdg.ClCompile == null)
+                    {
+                        tdg.ClCompile = new ClCompile();
+                    }
+
                     tdg.Link.AdditionalDependencies = allLibraries; //string.Join("", allCurrentAdditionalsLibraryDirNoDuplicates);
                     tdg.Link.AdditionalLibraryDirectories = allLibrariesdir;
                     tdg.ClCompile.AdditionalIncludeDirectories = allIncludes;
@@ -400,8 +409,9 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
         public override void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject)
         {
+            
 
-            MyFilter configFilter;
+               MyFilter configFilter;
             if (!myFilters.DoesFilterWithNameExist("Config"))
             {
                 configFilter = new MyFilter("Config");
@@ -522,13 +532,12 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             //XmlFIlters Itemgroup CLCompile
             //xmlProject Itemgroup CLCompile
             //make sure both are created and added  
-            var ItemGroupWithCincludesPROJ = ((Project)XmlProjectClass).ItemGroup.Where((ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).First();
-            var ItemGroupWithCCompilesFILT = ((Filters.Project)XmlFilterClass).ItemGroup.Where((Filters.ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).First();
+            var ItemGroupWithCincludesPROJ = ((Project)XmlProjectClass).ItemGroup.Where((ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).FirstOrDefault();
+            var ItemGroupWithCCompilesFILT = ((Filters.Project)XmlFilterClass).ItemGroup.Where((Filters.ItemGroup itmG) => { return itmG.ClInclude.Count > 0; }).FirstOrDefault();
 
             if (ItemGroupWithCincludesPROJ == null || ItemGroupWithCCompilesFILT == null)
             {
-                ProblemHandle p = new ProblemHandle();
-                p.ThereisAProblem("you need to have at least one .h file in your project to initialize. \n If you do and you still get this message, try reloading the project.");
+                ProblemHandle.ThereisAProblem("you need to have at least one .h file in your project to initialize. \n If you do and you still get this message, try reloading the project.");
             }
 
 
@@ -641,9 +650,8 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             var ItemGroupWithCCompilesFILT = ((Filters.Project)XmlFilterClass).ItemGroup.Where((Filters.ItemGroup itmG) => { return itmG.ClCompile.Count > 0; }).FirstOrDefault();
 
             if (ItemGroupWithCCompilesPROJ == null || ItemGroupWithCCompilesFILT == null)
-            {
-                ProblemHandle p = new ProblemHandle();
-                p.ThereisAProblem("you need to have at least one .cpp file in your project to initialize. \n If you do and you still get this message, try reloading the project.");
+            { 
+                ProblemHandle.ThereisAProblem("you need to have at least one .cpp file in your project to initialize. \n If you do and you still get this message, try reloading the project.");
             }
 
 

@@ -53,12 +53,14 @@ namespace CodeGenerator.CMD_Handler
             processInfo.RedirectStandardOutput = true;
 
             process = Process.Start(processInfo);
+            Output = process.StandardOutput.ReadToEnd();
+            Error = process.StandardError.ReadToEnd();
             process.WaitForExit();
 
             // *** Read the streams ***
             // Warning: This approach can lead to deadlocks, see Edit #2
-            Output = process.StandardOutput.ReadToEnd();
-            Error = process.StandardError.ReadToEnd();
+            //Output = process.StandardOutput.ReadToEnd();
+            
             if (SupressErrorMsg)
             {
                 Output = "";
@@ -68,9 +70,9 @@ namespace CodeGenerator.CMD_Handler
 
             exitCode = process.ExitCode;
 #if DEBUG
-            Console.WriteLine("output>>" + (String.IsNullOrEmpty(Output) ? "(none)" : Output));
-            Console.WriteLine("error>>" + (String.IsNullOrEmpty(Error) ? "(none)" : Error));
-            Console.WriteLine("ExitCode: " + exitCode.ToString(), "ExecuteCommand");
+            //Console.WriteLine("output>>" + (String.IsNullOrEmpty(Output) ? "(none)" : Output));
+            //Console.WriteLine("error>>" + (String.IsNullOrEmpty(Error) ? "(none)" : Error));
+            //Console.WriteLine("ExitCode: " + exitCode.ToString(), "ExecuteCommand");
 #endif
             process.Close();
         }

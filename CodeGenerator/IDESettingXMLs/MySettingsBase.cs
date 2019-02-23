@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodeGenerator.CMD_Handler;
+using CodeGenerator.ProblemHandler;
 
 namespace CodeGenerator.IDESettingXMLs
 {
@@ -24,11 +25,12 @@ namespace CodeGenerator.IDESettingXMLs
         public List<MyCLIncludeFile> CLIncludeFiles { get; private set; }
         public string PATHOfProject { get; private set; }
 
-
+        public ProblemHandle ProblemHandle { get; set; }
 
 
         public MySettingsBase(IDESetting xmlFilterSetting, IDESetting xmlProjectsetting)
         {
+            ProblemHandle = new ProblemHandle();
             _xmlFilterSetting = xmlFilterSetting;
             _xmlProjectsetting = xmlProjectsetting;
             PATHOfProject = xmlProjectsetting.PathWithoutFileNameOfXmlSetting;

@@ -10,6 +10,7 @@ using CodeGenerator.CMD_Handler;
 using CodeGenerator.IDESettingXMLs;
 using CodeGenerator.ProblemHandler;
 using ExtensionMethods;
+using Extensions;
 
 namespace CodeGenerator.ProjectBuilders
 {
@@ -97,32 +98,26 @@ namespace CodeGenerator.ProjectBuilders
             CMDHandlerVSDev cmdHandler = new CMDHandlerVSDev(DIRECTORYOFTHISCG, DIRECTORYOFTHISCG);
             cmdHandler.SetWorkingDirectory(DIRECTORYOFTHISCG);
             cmdHandler.ExecuteCommand(ss);
-            //check if compilation was succesful
-            if (cmdHandler.Output.Contains(": error") || cmdHandler.Output.Contains(": fatal"))
+            //cmdHandler.ExecuteCommandWithProblemCheck(ss, ProblemHandler, "ERROR: there was a problem with compilation for the Configuration.h file of your library at location \n" + VSsetting.PATHOfProject + "\n make sure your configuration app builds for that library");
+
+            //if no problem than run that config.exe, run the 
+            cmdHandler.SetWorkingDirectory(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation));
+            cmdHandler.ExecuteCommand("CALL configGen.exe");
+
+            //check to see if there were any problems with generating the configurationfrom the conig.exe.
+            Match m = Regex.Match(cmdHandler.Output, @"PROBLEM::(.*)");
+            if (m.Success)
             {
-                ProblemHandler.ThereisAProblem("ERROR: there was a problem with compilation for the Configuration.h file of your library at location \n" + VSsetting.PATHOfProject + "\n make sure your configuration app builds for that library");
+                ProblemHandler.ThereisAProblem("building the ConfigurationCG.h for library at path \n" + VSsetting.PATHOfProject + "\n encountered a problem \n" + m.Groups[1].Value);
             }
-            else
+
+            if (IsTopLevelConfig)
             {
-                //if no problem than run that config.exe, run the 
-                cmdHandler.SetWorkingDirectory(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation));
-                cmdHandler.ExecuteCommand("CALL configGen.exe");
-
-                //check to see if there were any problems with generating the configurationfrom the conig.exe.
-                Match m = Regex.Match(cmdHandler.Output, @"PROBLEM::(.*)");
-                if (m.Success)
-                {
-                    ProblemHandler.ThereisAProblem("building the ConfigurationCG.h for library at path \n" + VSsetting.PATHOfProject+ "\n encountered a problem \n"+ m.Groups[1].Value);
-                }
-
-                if (IsTopLevelConfig)
-                {
-                    ConfigInherittedValues = cmdHandler.Output;
-                }
-
-
-                Console.WriteLine("TEMP ConfigurationCG.h File Created");
+                ConfigInherittedValues = cmdHandler.Output;
             }
+
+
+            Console.WriteLine("TEMP ConfigurationCG.h File Created");
         }
 
         public void WriteTempConfigurationToFinalFile(string ToNewFile = "")
@@ -157,13 +152,13 @@ namespace CodeGenerator.ProjectBuilders
                     foreach (var lineconfStr in configuration_hStr.Split('\n'))
                     {
                         //first make sure that that line is a define
-                        Match m = Regex.Match(lineconfStr, @"#define(\b.+?\b)\s+(.+)$",RegexOptions.Multiline);
+                        Match m = Regex.Match(lineconfStr, @"#define(\b.+?\b)\s+(.+)$", RegexOptions.Multiline);
                         if (m.Success)
                         {
                             //check this define has form of the classname*conftypeprefix*definename 
-                            string strPattern = !string.IsNullOrEmpty(ConfigOfLibraryOfTheOneInheriting.ConfTypePrefix) 
+                            string strPattern = !string.IsNullOrEmpty(ConfigOfLibraryOfTheOneInheriting.ConfTypePrefix)
                                 ? @"#define " + ConfigOfLibraryOfTheOneInheriting.ClassName + @"\*" + ConfigOfLibraryOfTheOneInheriting.ConfTypePrefix + @"\*" + m.Groups[1].Value.Trim() + @"\s+(.*)"
-                                : @"#define " + ConfigOfLibraryOfTheOneInheriting.ClassName + @"\*"+ m.Groups[1].Value.Trim() + @"\s+(.*)";
+                                : @"#define " + ConfigOfLibraryOfTheOneInheriting.ClassName + @"\*" + m.Groups[1].Value.Trim() + @"\s+(.*)";
                             Match m2 = Regex.Match(line, strPattern);//@"#define modaaConf1\*MODE0\*BUFFERSIZE\s*(.*)");
                             if (m2.Success)
                             {
@@ -179,24 +174,24 @@ namespace CodeGenerator.ProjectBuilders
                                            && (define.IsStatic == "false")
                                            && (ConfigOfLibraryOfTheOneInheriting.MyInstanceNum != "0");
                                 });
-                                if (nonstaticDefine != null )
+                                if (nonstaticDefine != null)
                                 {
                                     //append all define instances to the end
-                                    for (int i = 1; i < Convert.ToInt32(ConfigOfLibraryOfTheOneInheriting.MyInstanceNum)+1; i++)
+                                    for (int i = 1; i < Convert.ToInt32(ConfigOfLibraryOfTheOneInheriting.MyInstanceNum) + 1; i++)
                                     {
-                                        string defineStr = @"#define "+ nonstaticDefine.DefineName + "_"+i.ToString() + " " + nonstaticDefine.Value;
+                                        string defineStr = @"#define " + nonstaticDefine.DefineName + "_" + i.ToString() + " " + nonstaticDefine.Value;
                                         configuration_hStrNew.Add(defineStr);
                                     }
                                 }
                             }
                         }
-     
+
                         index++;
                     }
                 }
 
 
-                File.WriteAllText(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation, "Configuration.h"),  string.Join("\n",configuration_hStrNew));
+                File.WriteAllText(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation, "Configuration.h"), string.Join("\n", configuration_hStrNew));
 
             }
 

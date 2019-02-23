@@ -94,8 +94,8 @@ namespace CodeGenerator.cgenXMLSaves
     public class cgenProjectsGlobal
     {
         [XmlElement(ElementName = "Projects")]
-        public List<cgenProjectGlobal> Projects { get; set; } 
-
+        public List<cgenProjectGlobal> Projects { get; set; }
+         
 
     }
 
