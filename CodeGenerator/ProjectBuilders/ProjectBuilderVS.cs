@@ -150,16 +150,9 @@ namespace CodeGenerator.ProjectBuilders
             //5. git library back to commit it was before checked out
             
 
-            var lowestLevelLibraries = LibTop.LibrariesIDependOn.Where((Library lib) =>
-            {
-                return true;// lib.LibrariesIDependOn == null || lib.LibrariesIDependOn.Count == 0;
-            }).ToList();
-
-
-
 
             //go through lowest level libraries first to import in      
-                foreach (var libraryToImp in lowestLevelLibraries)
+                foreach (var libraryToImp in LibTop.LibrariesIDependOn)
             {
 
                 //1. check out git tags for ALL dependent libraries
@@ -297,6 +290,70 @@ namespace CodeGenerator.ProjectBuilders
 
 
 
+        }
+
+        public void ImportConfigFiles()
+        { 
+            //steps 
+            //1. check out git tags for ALL dependent libraries
+            //2. build configuration for that dependent library in temp folder
+            //2.5 send that configurationCG.h file to final librarydependencies/xx/xx folder
+            //3. get all files that are able to be imported in from dependent library (NOT main.cpp, ModuleConfig.h etc)
+            //4. import those files from dependent library to main library.
+            //5. git library back to commit it was before checked out 
+
+            //go through lowest level libraries first to import in      
+            foreach (var libraryToImp in LibTop.LibrariesIDependOn)
+            {
+
+                //1. check out git tags for ALL dependent libraries
+                CheckoutLibraryToCorrectMajor(libraryToImp);
+
+                //2. ---------------------
+                //create Configuration.h in temporary folder but dont put it in project so to not change anything 
+                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(libraryToImp.settings, Program.CGCONFCOMPILATOINSBASEDIRECTORY, Program.DIRECTORYOFTHISCG, Program.PATHTOCONFIGTEST, ProblemHandle);
+                configFileBuilder.CreateConfigurationToTempFolder();
+
+
+                //create a configuration.h myinclude for the dependent library so to include that in the importing
+                var filtForConfiguration_h = libraryToImp.GetAllFitlers().Where((MyFilter filt) =>
+                {
+                    return filt.GetFullAddress() == "Config";//Path.Combine("LibraryDependencies", lowestLevelLibrary.GetPathToProjectAsADependent());
+                }).First();
+
+                string e = libraryToImp.GetPathToProjectAsADependent();
+                MyCLIncludeFile clincConfig = new MyCLIncludeFile(filtForConfiguration_h, "Configuration.h", Program.CGCONFCOMPILATOINSBASEDIRECTORY);
+
+                 
+
+                //2.5 send that configurationCG.h file to final librarydependencies/xx/xx folder. but first inherit values
+                configFileBuilder.InheritFromTopConfig(libraryToImp.config);
+
+                //refactor config in temporary first
+                string pathToOutput = Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent());
+                CppRefactorer refactorer = new CppRefactorer(new List<string>() { Path.Combine(Program.DIRECTORYOFTHISCG, Program.CGCONFCOMPILATOINSBASEDIRECTORY, "Configuration.h") });
+                List<string> filesInScopeToRefactorCopy = new List<string>(refactorer.FilesInScopeToRefactor);
+                string prefixToAddToAllFilesNames = string.IsNullOrEmpty(libraryToImp.config.ConfTypePrefix)
+                    ? libraryToImp.config.Prefix + "_"
+                    : libraryToImp.config.Prefix + "_" + libraryToImp.config.ConfTypePrefix + "_";
+
+                //refactor names of defines in config
+                var definesDict = refactorer.GetAllDefines(clincConfig.Name);
+                foreach (var file in filesInScopeToRefactorCopy)
+                {
+                    foreach (var define in definesDict)
+                    {
+                        refactorer.RenameDefine(file, define.Key, prefixToAddToAllFilesNames + define.Key);
+                    }
+                }
+
+                configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent(), prefixToAddToAllFilesNames+ "ConfigurationCG.h"));
+ 
+                //5. --------------------- 
+                //revert it back to its previous state
+                LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(libraryToImp);
+                Console.WriteLine("Configuration has been imported for library " + libraryToImp.config.ClassName);
+            }
         }
 
 

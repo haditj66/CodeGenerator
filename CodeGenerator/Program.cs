@@ -50,6 +50,10 @@ namespace CodeGenerator
         [Verb("generate", HelpText = "generate the code")]
         public class GenerateOptions
         {
+
+            [Option(HelpText = "only build the configurations for the dependent libraries and not importing all files")]
+            public bool config { get; set; }
+
             /*
             [Option('t', Separator = ':')]
             public IEnumerable<string> Types { get; set; }
@@ -145,11 +149,11 @@ namespace CodeGenerator
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";// 
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
-        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1B";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module";
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\test";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\test";
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
@@ -169,9 +173,10 @@ namespace CodeGenerator
         //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
         //static string[] command  = "generate".Split(' ');
+        static string[] command = "generate --config".Split(' ');
         //static string[] command  = "init Module".Split(' ');
         //static string[] command = "init --git".Split(' ');
-        static string[] command = "init Test".Split(' ');
+        //static string[] command = "init Test".Split(' ');
         //static string[] command  = "init Mod".Split(' ');
         //static string[] command = "init ModAA".Split(' ');
         //static string[] command = "init ModA".Split(' ');
@@ -685,34 +690,45 @@ namespace CodeGenerator
              
             if (opts.git)
             {
-                //check if a git exists, if not, create one and put a gitignore in. 
-                CMDHandler cmd = new CMDHandler(envIronDirectory);
-                GitHandlerForLibrary gitHandler = new GitHandlerForLibrary(cmd);
-                //check that git exists
-                if (!gitHandler.IsPathHaveGit(envIronDirectory))
+                if (IsProjectExistsAtEnvironDirectory())
                 {
-                    gitHandler.InitGitHere(envIronDirectory);
-                    if (!File.Exists(Path.Combine(envIronDirectory, ".gitignore")))
+                    //check if a git exists, if not, create one and put a gitignore in. 
+                    CMDHandler cmd = new CMDHandler(envIronDirectory);
+                    GitHandlerForLibrary gitHandler = new GitHandlerForLibrary(cmd);
+                    //check that git exists
+                    if (!gitHandler.IsPathHaveGit(envIronDirectory))
                     {
-                        File.Copy(".gitignore", Path.Combine(envIronDirectory, ".gitignore"));
+                        gitHandler.InitGitHere(envIronDirectory);
+                        if (!File.Exists(Path.Combine(envIronDirectory, ".gitignore")))
+                        {
+                            File.Copy(".gitignore", Path.Combine(envIronDirectory, ".gitignore"));
+                        }
+
+                        if (!File.Exists(Path.Combine(envIronDirectory, ".gitattributes")))
+                        {
+                            File.Copy(".gitattributes", Path.Combine(envIronDirectory, ".gitattributes"));
+                        }
+
+                        gitHandler.CommitAll(envIronDirectory);
+                        if (gitHandler.Cmd.Output.Contains("error:") || gitHandler.Cmd.Error.Contains("error:"))
+                        {
+                            ProblemHandle p = new ProblemHandle();
+                            p.ThereisAProblem(
+                                "there was a problem  doing the first commit all. you should do this manually");
+                        }
+
+                        gitHandler.AddVersionTag(envIronDirectory, 0, 0, 1);
+                        Console.WriteLine("git initialized here");
                     }
-                    if (!File.Exists(Path.Combine(envIronDirectory, ".gitattributes")))
+                    else
                     {
-                        File.Copy(".gitattributes", Path.Combine(envIronDirectory, ".gitattributes"));
+                        Console.WriteLine("there is already a git repo here. nothing was done.");
                     }
 
-                    gitHandler.CommitAll(envIronDirectory);
-                    if (gitHandler.Cmd.Output.Contains("error:") || gitHandler.Cmd.Error.Contains("error:"))
-                    {
-                        ProblemHandle p =new ProblemHandle();
-                        p.ThereisAProblem("there was a problem  doing the first commit all. you should do this manually");
-                    }
-                    gitHandler.AddVersionTag(envIronDirectory, 0, 0, 1);
-                    Console.WriteLine("git initialized here");
                 }
                 else
                 {
-                    Console.WriteLine("there is already a git repo here. nothing was done.");
+                    Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   "); 
                 }
 
                 return null;
@@ -844,6 +860,65 @@ namespace CodeGenerator
         static ParserResult<object> Generate(GenerateOptions opts)
         {
 
+            #region --config 
+            if (opts.config)
+            {
+                //first make sure that a project exists here
+                if (IsProjectExistsAtEnvironDirectory())
+                {
+
+                    //get the project settings for the project configs I want to generate. for VS for NOW!
+                    MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(envIronDirectory);
+
+                    //1. I need to create the configuration file for the top level library just so that I can have all
+                    // the libraries configs information that it depends on. in the saveddata.xml file.
+                    ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY, DIRECTORYOFTHISCG, PATHTOCONFIGTEST, null, true);
+                    configFileBuilder.CreateConfigurationToTempFolder();
+
+                    //create project builder. and check if all libraries support the platform Im on
+                    ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
+                    string libraryNameNotSupportingPlat = projectBuilderForVs.GetLibraryThatDoesNOTSupportPlatform(savefileProjGlobal);
+                    if (libraryNameNotSupportingPlat != null)
+                    {
+                        ProblemHandle p = new ProblemHandle();
+                        p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen projconfig -a <nameofScope> \n to add platform to that project scope.");
+                    }
+                    configFileBuilder.WriteTempConfigurationToFinalFile();
+
+
+                    //2.  add filters and folders directories from that toplevel project directory as:
+                    //LibraryDependencies
+                    //  prefix(of libraries top level uses)
+                    //      confTypePrefix(for libraries that are same but different template type.)    
+                    //projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
+
+                    //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
+                    //first grab all lowest level libraries that have no dependencies
+                    projectBuilderForVs.ImportConfigFiles();
+
+
+
+                    //4. For the settings(.vcxproj .filters) of the top level I need to get all the cIncludes,
+                    //cClompiles, additionalincludes additional libraries from the other libraries and add to top level
+                    // to the top level library. 
+                    //projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
+
+
+                    //5. Finally recreate the xml settings files. 
+                    //projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
+
+
+
+                }
+                else
+                {
+                    //project does not exist
+                    Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   ");
+                }
+
+                return null;
+            }
+            #endregion
 
 
             //first make sure that a project exists here
