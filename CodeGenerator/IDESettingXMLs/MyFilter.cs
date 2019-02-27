@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace CodeGenerator.IDESettingXMLs
 {
+    [Serializable]
     public class MyFilter : IEnumerable<MyFilter>
     {
         public MyFilter Parent { get; set; }
@@ -71,11 +72,30 @@ namespace CodeGenerator.IDESettingXMLs
             return child;
         }
 
+        public MyFilter AddChildFilter(MyFilter childFilter)
+        {
+            childFilter.Parent = this;
+            ChildrenFilters.Add(childFilter);
+            return childFilter;
+        }
+
+
+
         public MyFilter GetFilterFromAddress(string address)
         {
             //address needs to be of form name1\name2\name3\name4
 
+            foreach (var filterPossiblity in this)
+            {
+                if (filterPossiblity.GetFullAddress() == address)
+                {
+                    return filterPossiblity;
+                }
+            }
+
+            return null;
             //first check if it still has a parent 
+            /*
             string pattern = @"^([^\\.]+)\\";
             Regex regex = new Regex(pattern); 
              Match match = regex.Match(address);
@@ -105,6 +125,7 @@ namespace CodeGenerator.IDESettingXMLs
             }
 
             return finalChildFilter;
+            */
         }
 
 
@@ -161,6 +182,40 @@ namespace CodeGenerator.IDESettingXMLs
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+
+
+        public List<string> GetAncestors()
+        { 
+            List<string> ancestors = new List<string>();
+            ancestors.Add(this.Name);
+            MyFilter parent = this.Parent;
+            while (parent != null)
+            {
+                ancestors.Add(parent.Name);
+                parent = parent.Parent;
+            }
+            ancestors.Reverse();
+            return ancestors;
+
+        }
+
+        public MyFilter GetTopParent()
+        {
+            if (Parent == null)
+            {
+                return Parent;
+            }
+            MyFilter filtToReturn = this;
+            MyFilter filtToReturnPrev = null;
+            while (filtToReturn != null)
+            {
+                filtToReturnPrev = filtToReturn;
+                filtToReturn = filtToReturn.Parent;
+            } 
+
+            return filtToReturnPrev;
         }
     }
 }

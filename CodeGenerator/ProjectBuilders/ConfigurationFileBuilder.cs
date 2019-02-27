@@ -16,7 +16,7 @@ namespace CodeGenerator.ProjectBuilders
 {
     public class ConfigurationFileBuilder
     {
-        public MySettingsBase VSsetting { get; }
+        public MyMainSettingsBase VSsetting { get; }
         public string PathToOutPutCompilation { get; }
         protected string DIRECTORYOFTHISCG { get; }
         public string PATHTOCONFIGTEST { get; }
@@ -25,7 +25,7 @@ namespace CodeGenerator.ProjectBuilders
         private static string ConfigInherittedValues;
 
 
-        public ConfigurationFileBuilder(MySettingsBase settingsOfProjectToBuildConfigfileFore, string PathToOutPutCompilation, string DIRECTORYOFTHISCG, string PATHTOCONFIGTEST, ProblemHandle problemHandler = null, bool isTopLevelConfig = false)
+        public ConfigurationFileBuilder(MyMainSettingsBase settingsOfProjectToBuildConfigfileFore, string PathToOutPutCompilation, string DIRECTORYOFTHISCG, string PATHTOCONFIGTEST, ProblemHandle problemHandler = null, bool isTopLevelConfig = false)
         {
             if (problemHandler == null)
             {

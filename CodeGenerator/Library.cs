@@ -16,10 +16,10 @@ namespace CodeGenerator
         static public MyFilter LibraryDependencyFilter = new MyFilter("LibraryDependencies");
         public MyFilter LibraryBaseFilter { get; private set; }
         public  Config config { get; private set; } 
-        public MySettingsBase settings { get; protected set; }
+        public MyMainSettingsBase settings { get; protected set; }
         public List<Library> LibrariesIDependOn { get; protected set; }
 
-        public Library(Config config, MySettingsBase settings)
+        public Library(Config config, MyMainSettingsBase settings)
         {
             this.config = config;
             LibrariesIDependOn = new List<Library>();

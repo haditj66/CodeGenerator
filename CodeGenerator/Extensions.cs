@@ -57,6 +57,29 @@ namespace Extensions
 
 
 
+        //directory ---------------------------------------------------------
+        public static void CopyAllContentsInDirectory(string source_dir, string destination_dir)
+        {
+            //string source_dir = source_dir;//@"E:\";
+            //string destination_dir = destination_dir;//@"C:\";
+
+            // substring is to remove destination_dir absolute path (E:\).
+
+            // Create subdirectory structure in destination    
+            foreach (string dir in System.IO.Directory.GetDirectories(source_dir, "*", System.IO.SearchOption.AllDirectories))
+            {
+                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(destination_dir, dir.Substring(source_dir.Length + 1)));
+                // Example:
+                //     > C:\sources (and not C:\E:\sources)
+            }
+
+            foreach (string file_name in System.IO.Directory.GetFiles(source_dir, "*", System.IO.SearchOption.AllDirectories))
+            {
+                System.IO.File.Copy(file_name, System.IO.Path.Combine(destination_dir, file_name.Substring(source_dir.Length + 1)));
+            }
+        }
+
+
         //cmdhandler ---------------------------------------------------------
 
         public static void ExecuteCommandWithProblemCheck(this CMDHandler cmd, string command, ProblemHandle problemHandle, string problemMSG)

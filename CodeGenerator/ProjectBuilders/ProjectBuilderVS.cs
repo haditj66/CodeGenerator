@@ -28,7 +28,7 @@ namespace CodeGenerator.ProjectBuilders
         }
 
 
-        protected override MySettingsBase GetSettingsOVERRIDE(string pathToProjectSettings)
+        protected override MyMainSettingsBase GetSettingsOVERRIDE(string pathToProjectSettings)
         {
 
             return MySettingsVS.CreateMySettingsVS(pathToProjectSettings);

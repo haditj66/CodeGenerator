@@ -24,6 +24,7 @@ using ClangSharp;
 using CodeGenerator.FileTemplates;
 using CodeGenerator.FileTemplatesMacros;
 using CodeGenerator.GitHandlerForLibraries;
+using CodeGenerator.IDESettingXMLs.IAR_XMLs;
 using CodeGenerator.ProblemHandler;
 using CommandLine.Text;
 using ConsoleApp2;
@@ -83,6 +84,15 @@ namespace CodeGenerator
             public IEnumerable<string> IncludeFiles { get; set; }
 
         }
+
+        [Verb("sync", HelpText = "sync to other project from you main VS project")]
+        public class SyncOptions
+        {
+            //[CommandLine.Value(1), help]
+            [Value(0, HelpText = "name of the project you want to sync")]
+            public string name { get; set; }
+        }
+
 
         [Verb("init", HelpText = "create a new CG project")]
         public class InitOptions
@@ -148,8 +158,8 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";// 
-        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1B";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module";
@@ -173,7 +183,8 @@ namespace CodeGenerator
         //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
         //static string[] command  = "generate".Split(' ');
-        static string[] command = "generate --config".Split(' ');
+        //static string[] command = "generate --config".Split(' ');
+        static string[] command = "init".Split(' ');
         //static string[] command  = "init Module".Split(' ');
         //static string[] command = "init --git".Split(' ');
         //static string[] command = "init Test".Split(' ');
@@ -181,7 +192,7 @@ namespace CodeGenerator
         //static string[] command = "init ModAA".Split(' ');
         //static string[] command = "init ModA".Split(' ');
         //static string[] command = "init ModB".Split(' ');
-
+        //static string[] command = "sync iar".Split(' ');
 
 #else
         static string[] command;
@@ -203,11 +214,13 @@ namespace CodeGenerator
             //ProjectVSTest();
             //CreateProjectBuilder(); this should not be done here as a saveddata.xml may not even be created yet
 
+
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, ConfigOptions, ProjConfigOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions, ProjConfigOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
+.WithParsed<SyncOptions>(opts => Sync(opts))
 .WithParsed<InitOptions>(opts => Init(opts))
 .WithParsed<ConfigOptions>(opts => Config(opts))
 .WithParsed<ProjConfigOptions>(opts => ProjConfig(opts));
@@ -385,20 +398,20 @@ namespace CodeGenerator
                 {
                     ProblemHandle p = new ProblemHandle();
                     p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen -a <platform> to set project in scope");
-                } 
+                }
 
                 //make sure it is of proper path format. it needs to not have an extension and directory needs to exist 
                 if (Path.HasExtension(opts.addinclude))
                 {
                     ProblemHandle p = new ProblemHandle();
                     p.ThereisAProblem("The include \n" + opts.addinclude + "\n should be a path to directory, not a file.");
-                } 
+                }
                 if (!Directory.Exists(opts.addinclude))
                 {
                     ProblemHandle p = new ProblemHandle();
                     p.ThereisAProblem("The include \n" + opts.addinclude + "\n does not exist");
                 }
-                 
+
                 if (isIncludeExistForPlatform(opts.platform, opts.addinclude))
                 {
                     ProblemHandle p = new ProblemHandle();
@@ -413,7 +426,7 @@ namespace CodeGenerator
                 savefileProjGlobal.Save();
 
 
-                Console.WriteLine(opts.addinclude + "\nhas been added from platform " + opts.platform); 
+                Console.WriteLine(opts.addinclude + "\nhas been added from platform " + opts.platform);
                 return null;
             }
             #endregion
@@ -461,7 +474,7 @@ namespace CodeGenerator
                     .AdditionalIncludes.AdditionalInclude.Remove(opts.removeinclude);
                 savefileProjGlobal.Save();
 
-                Console.WriteLine(opts.removeinclude+"\nhas been removed from platform "+ opts.platform);
+                Console.WriteLine(opts.removeinclude + "\nhas been removed from platform " + opts.platform);
                 return null;
             }
 
@@ -483,7 +496,7 @@ namespace CodeGenerator
                 {
                     ProblemHandle p = new ProblemHandle();
                     p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen -a <platform> to set project in scope");
-                } 
+                }
 
                 if (!(Path.GetExtension(opts.addlibrary) == ".lib"))
                 {
@@ -679,7 +692,74 @@ namespace CodeGenerator
 
         #endregion
 
-         
+
+
+        #region Sync command ***************************************************************************
+        //***************************************************************************************************  
+        static ParserResult<object> Sync(SyncOptions opts)
+        {
+
+            SynchronizeProjectBase synchronizeProject = null;
+
+            if (opts.name == "iar")
+            {
+                synchronizeProject = SynchronizeProjectIAR.CreateSynchronizeProjectIAR(Path.Combine(envIronDirectory,
+                    SynchronizeProjectIAR.FirstIARDir, SynchronizeProjectIAR.SecondIARDir));
+                synchronizeProject.Initiate();
+            }
+
+            if (synchronizeProject != null)
+            {
+                synchronizeProject = SynchronizeProjectIAR.CreateSynchronizeProjectIAR(Path.Combine(envIronDirectory, SynchronizeProjectIAR.FirstIARDir, SynchronizeProjectIAR.SecondIARDir));
+                synchronizeProject.Initiate();
+                MySettingsVS settings = MySettingsVS.CreateMySettingsVS(envIronDirectory,true);
+                /*
+                synchronizeProjectiar.AddAdditionalInclude("bla\\bla2");
+                MyFilter blaFilter = new MyFilter("bla");
+                synchronizeProjectiar.AddFilter(blaFilter);
+                MyCLCompileFile ccom = new MyCLCompileFile(blaFilter, "someLibrary.cpp", "Config");
+                synchronizeProjectiar.AddCLCompileFile(ccom);
+                */
+
+                //first sync all filters
+                foreach (var settingsMyFilter in settings.myFilters)
+                {
+                    synchronizeProject.AddFilter(settingsMyFilter); 
+                }
+
+                //sync all files exxcept mainCG.cpp
+                foreach (var ccomps in settings.CLCompileFiles)
+                {
+                    if (ccomps.Name != "mainCG.cpp")
+                    {
+                        synchronizeProject.AddCLCompileFile(ccomps);
+                    } 
+                }
+                foreach (var cincl in settings.CLIncludeFiles)
+                {
+                    synchronizeProject.AddCLIncludeFile(cincl);
+                }
+
+                //sync all additional includes
+                foreach (var additinclude in settings.StringIncludes)
+                {
+                    synchronizeProject.AddAdditionalInclude(additinclude);
+                }
+
+                synchronizeProject.Save(Path.Combine(envIronDirectory, SynchronizeProjectIAR.FirstIARDir, SynchronizeProjectIAR.SecondIARDir));
+
+                Console.WriteLine("project IAR was synced up with VS");
+            }
+            else
+            {
+                ProblemHandle p = new ProblemHandle();
+                p.ThereisAProblem("No projects of that name availabe. available projects to sync are: \niar");
+
+            }
+            return null;
+        }
+        #endregion
+
 
         #region Init command ***************************************************************************
         //***************************************************************************************************  
@@ -687,7 +767,7 @@ namespace CodeGenerator
         {
 
             #region --git -----------------------------------------------
-             
+
             if (opts.git)
             {
                 if (IsProjectExistsAtEnvironDirectory())
@@ -728,7 +808,7 @@ namespace CodeGenerator
                 }
                 else
                 {
-                    Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   "); 
+                    Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   ");
                 }
 
                 return null;
@@ -743,7 +823,7 @@ namespace CodeGenerator
             if (savefileProjGlobal.CgenProjects.Projects.Any(p => p.NameOfProject == opts.name))
             {
                 ProblemHandle p = new ProblemHandle();
-                p.ThereisAProblem("The name "+ opts.name+ " already exists");
+                p.ThereisAProblem("The name " + opts.name + " already exists");
             }
 
             //check that there isnt already a project here.  
@@ -792,9 +872,9 @@ namespace CodeGenerator
                     SaveFilecgenProjectLocal.CgenProjects.Project = projToAdd;
                     SaveFilecgenProjectLocal.Save();
                     savefileProjGlobal.Save();
-                     
+
                     RemoveProjectCleanup removeProjectCleanup = new RemoveProjectCleanup(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY, savefileProjGlobal, projToAdd);
-                    var projectCleanup = (ICleanUp) removeProjectCleanup;
+                    var projectCleanup = (ICleanUp)removeProjectCleanup;
                     problemHandle.AddCleanUp(ref projectCleanup);
                     settings.ProblemHandle = problemHandle;
 
@@ -813,7 +893,7 @@ namespace CodeGenerator
                     savefileProjGlobal.AddNewPlatformInScope(opts.name, newplatformInScope);
                     savefileProjGlobal.AddNewInclude(opts.name, "ALLPLATFORMS", PATHTOCONFIGTEST);
                     savefileProjGlobal.AddNewLibrary(opts.name, "ALLPLATFORMS", Path.Combine(PATHTOCONFIGTEST, "ConfigTest.lib"));
-                    
+
 
                     settings.AddAdditionalInclude(PATHTOCONFIGTEST);
                     settings.AddAdditionalLibrary(Path.Combine(PATHTOCONFIGTEST, "ConfigTest.lib"));
@@ -829,7 +909,7 @@ namespace CodeGenerator
 
                     Console.WriteLine("Project successfully created");
 
-                     
+
 
                     //5. update CGKeywords.h and alllibraryincludes.h here 
                     UpdateCCGKeywordsIncludes();
@@ -839,7 +919,7 @@ namespace CodeGenerator
                 {
                     //todo. I should clean up and use a problem handle to save the settings
                     //todo file in a simple string and replace the .vcxproj and .filters and delete the locat CGenSaveFiles directory
-                    problemHandle.ThereisAProblem("Something went wrong initializing. error : \n"+e.Message);
+                    problemHandle.ThereisAProblem("Something went wrong initializing. error : \n" + e.Message);
                     Console.WriteLine(e);
                 }
                 // so we have a name and no project exists here. create one 
@@ -930,15 +1010,15 @@ namespace CodeGenerator
 
                 //1. I need to create the configuration file for the top level library just so that I can have all
                 // the libraries configs information that it depends on. in the saveddata.xml file.
-                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY, DIRECTORYOFTHISCG, PATHTOCONFIGTEST,null,true);
-                configFileBuilder.CreateConfigurationToTempFolder(); 
-                 
+                ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY, DIRECTORYOFTHISCG, PATHTOCONFIGTEST, null, true);
+                configFileBuilder.CreateConfigurationToTempFolder();
+
                 //create project builder. and check if all libraries support the platform Im on
                 ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
                 string libraryNameNotSupportingPlat = projectBuilderForVs.GetLibraryThatDoesNOTSupportPlatform(savefileProjGlobal);
                 if (libraryNameNotSupportingPlat != null)
                 {
-                    ProblemHandle p =new ProblemHandle();
+                    ProblemHandle p = new ProblemHandle();
                     p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen projconfig -a <nameofScope> \n to add platform to that project scope.");
                 }
                 configFileBuilder.WriteTempConfigurationToFinalFile();
@@ -1009,7 +1089,7 @@ namespace CodeGenerator
 
 
 
-       public static void UpdateCCGKeywordsIncludes()
+        public static void UpdateCCGKeywordsIncludes()
         {
             //update CGKeywords.h and alllibraryincludes.h here
             FileTemplateAllLibraryInlcudes faAllLibraryInlcudes = new FileTemplateAllLibraryInlcudes(PATHTOCONFIGTEST, savefileProjGlobal);
@@ -1035,7 +1115,7 @@ namespace CodeGenerator
 
         static bool isLibraryExistForPlatform(string forPlatform, string forLibrary)
         {
-            var libraries=  savefileProjGlobal.CgenProjects.Projects
+            var libraries = savefileProjGlobal.CgenProjects.Projects
                 .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
                 .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == forPlatform)
                 .AdditionalLibraries.AdditionalLibrary;
@@ -1087,7 +1167,7 @@ namespace CodeGenerator
                 if (File.Exists(fullpath))
                 {
                     return true;
-                } 
+                }
             }
             return false;
         }
@@ -1119,9 +1199,9 @@ namespace CodeGenerator
             return new ProjectBuilderVS(settingConfig);
 
         }
-         
 
-        #endregion 
+
+        #endregion
 
 
 

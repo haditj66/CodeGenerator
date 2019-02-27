@@ -15,15 +15,25 @@ using CodeGenerator.ProblemHandler;
 
 namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 {
-    public class MySettingsVS : MySettingsBase
+    public class MySettingsVS : MyMainSettingsBase
     {
-
+         
         static Random rng = new Random();
+
+        private readonly IDESetting _xmlFilterSetting;
+        private readonly IDESetting _xmlProjectsetting;
+
+        public object XmlFilterClass { get => _xmlFilterSetting.RootOfSetting; }
+        public object XmlProjectClass { get => _xmlProjectsetting.RootOfSetting; }
 
         public MySettingsVS(IDESetting xmlFilterSetting, IDESetting xmlProjectsetting) :
             base(xmlFilterSetting,
                 xmlProjectsetting) //(Filters.Project xmlFilterClass, CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project XMLProjectClass) : base(xmlFilterClass, XMLProjectClass)
         {
+
+            _xmlFilterSetting = xmlFilterSetting;
+            _xmlProjectsetting = xmlProjectsetting;
+
             /*
             IM HERE
             THIS IS NOT WORKING BECAUSE IF I WANT TO REMOVE AN INCLUDE I WILL NEED TO SPOT THE DIFFERENCE
@@ -120,7 +130,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
         }
 
 
-        public static MySettingsVS CreateMySettingsVS(string pathToProjectSettings)
+        public static MySettingsVS CreateMySettingsVS(string pathToProjectSettings, bool keepMentionsOfLibraryDepends = false)
         {
 
             IDESettingVSProj settingProj = new IDESettingVSProj(pathToProjectSettings, ".vcxproj", typeof(IDESettingXMLs.VisualStudioXMLs.Project));
@@ -128,6 +138,8 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             IDESetting settingFilter = new IDESetting(pathToProjectSettings, ".filters", typeof(IDESettingXMLs.VisualStudioXMLs.Filters.Project));
 
             MySettingsVS vssetting = new MySettingsVS(settingFilter, settingProj);
+
+            vssetting.KeepMentionsOfLibraryDepends = keepMentionsOfLibraryDepends;
             vssetting.Initiate();
             return vssetting;
         }
@@ -466,6 +478,25 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
             Save(Program.envIronDirectory);
 
 
+            //create directory to synced projects like IAR.
+            string IARDirPath = Path.Combine(Program.envIronDirectory, "IAR");
+            if (!Directory.Exists(IARDirPath))
+            {
+                Directory.CreateDirectory(IARDirPath);
+                //also put in an empty IAR project
+                //Directory.CreateDirectory(Path.Combine(IARDirPath,"EWARM"));
+                string templateIARDir = Path.Combine(Program.DIRECTORYOFTHISCG, "IARDefaultProj");
+                Extensions.restOfExtensions.CopyAllContentsInDirectory(templateIARDir, Path.Combine(IARDirPath));
+                Console.WriteLine("template project for IAR was created");
+
+                //change project name 
+                string pathToFile = Path.Combine(IARDirPath, "EWARM");
+                string[] files =  Directory.GetFiles(pathToFile);
+                string fileEWW = files.First(f => Path.GetExtension(f) == ".eww");
+                File.Move(Path.Combine(pathToFile, Path.GetFileName(fileEWW)), Path.Combine(pathToFile, Path.GetFileName(NameOfCGenProject+".eww")));
+            } 
+
+
         }
 
         protected override void RemoveAllMentionsOfLibraryDependencyFilters()
@@ -517,6 +548,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                             return fil.GetFilterFromAddress(clInclude.Filter) != null;
                         })
                         .First();
+                    filterTheCincBelongsTo = filterTheCincBelongsTo.GetFilterFromAddress(clInclude.Filter);
                     var MyClInc = new MyCLIncludeFile(filterTheCincBelongsTo, Path.GetFileName(clInclude.Include), Path.GetDirectoryName(clInclude.Include));
 
                     MyCLIncludeFileResult.Add(MyClInc);
@@ -626,10 +658,11 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
                     //the name will be the file at the end of the path minus the extension .h  
                     //the filter will be the one that matches the path of the inlcude minus filename
                     var filterTheCcompBelongsTo = myFilters
-                        .Where((MyFilter fil) => { return fil.GetFilterFromAddress(cCompile.Filter) != null; })
-                        .First();
+                        .First((MyFilter fil) => { return fil.GetFilterFromAddress(cCompile.Filter) != null; });
+                    //.First();
+                    filterTheCcompBelongsTo = filterTheCcompBelongsTo.GetFilterFromAddress(cCompile.Filter);
 
-                    var MyCComp = new MyCLCompileFile(filterTheCcompBelongsTo, Path.GetFileName(cCompile.Include), Path.GetDirectoryName(cCompile.Include));
+                var MyCComp = new MyCLCompileFile(filterTheCcompBelongsTo, Path.GetFileName(cCompile.Include), Path.GetDirectoryName(cCompile.Include));
 
                     MyCLCompileFileResult.Add(MyCComp);
                 }

@@ -52,7 +52,7 @@ namespace CodeGenerator.ProjectBuilders
                 BaseDirectoryForProject = config.IsTopLevel == "true" ? PathToProjectSettings : BaseDirectoryForProject;
 
 
-                MySettingsBase Settings = GetSettingsOVERRIDE(PathToProjectSettings);
+                MyMainSettingsBase Settings = GetSettingsOVERRIDE(PathToProjectSettings);
                 Libraries.Add(new Library(config, Settings));
             }
 
@@ -168,7 +168,7 @@ namespace CodeGenerator.ProjectBuilders
             }
         }
 
-        protected abstract MySettingsBase GetSettingsOVERRIDE(string pathToProjectSettings);
+        protected abstract MyMainSettingsBase GetSettingsOVERRIDE(string pathToProjectSettings);
 
         /// <summary>
         /// this imports settings from dependent libraries into the settings of your project program
