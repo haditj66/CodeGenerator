@@ -99,13 +99,13 @@ namespace CodeGenerator.GitHandlerForLibraries
             Cmd.ExecuteCommand("git init");
         }
 
-        public void CommitAll(string envIronDirectory)
+        public void CommitAll(string envIronDirectory, bool suppressErrorMsg)
         {
             Cmd.SetWorkingDirectory(envIronDirectory);
             //Cmd.ExecuteCommand("git add .gitignore .gitattributes");
             //Cmd.ExecuteCommand(@"git commit -m ""added gitignore""");
             //Cmd.ExecuteCommand("git add --all");
-            Cmd.ExecuteCommand(@"git add -A && git commit -m ""added all files""");
+            Cmd.ExecuteCommand(@"git add -A && git commit -m ""added all files""", suppressErrorMsg);
 
         }
 

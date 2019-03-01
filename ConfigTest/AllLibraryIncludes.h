@@ -4,6 +4,18 @@
 #endif 
 
   
+#if USING_GAEmbedded
+#include "C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\GA for embedded\GAembeddedcgen\GA embedded\Config\GAEmbeddedConf.h"
+#endif 
+  
+#if USING_PsuedoRNG
+#include "C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\My psuedo RNG\RNG psuedo\Config\PsuedoRNGConf.h"
+#endif 
+  
+#if USING_Wavelet
+#include "C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\Wavelettransform\WaveletsTrans\Config\WaveletConf.h"
+#endif 
+  
 #if USING_Test
 #include "C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\test\Config\TestConf.h"
 #endif 
@@ -29,6 +41,12 @@
 #endif 
 
 
+  
+//_GAEmbedded 
+  
+//_PsuedoRNG 
+  
+//_Wavelet 
   
 //_Test 
   

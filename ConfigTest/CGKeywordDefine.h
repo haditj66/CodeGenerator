@@ -1,6 +1,9 @@
 //#pragma once
   
  #define USING_GlobalBuildConfig_H false 
+#define USING_GAEmbedded false
+#define USING_PsuedoRNG false
+#define USING_Wavelet false
 #define USING_Test false
 #define USING_Module false
 #define USING_ModB false

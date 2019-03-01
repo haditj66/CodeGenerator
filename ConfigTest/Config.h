@@ -130,7 +130,9 @@ public:
 	static XMLDocument xmlDoc;
 protected:
 
-	
+	static bool thereWasAProblem;
+	static std::string TheProblemMsg;
+
 	XMLElement* XmlConfigElement;
 	static std::vector<Config*> ConfigsCreatedSoFar;
 	std::vector<IDefine*> privateDefineList;

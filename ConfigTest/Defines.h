@@ -23,6 +23,7 @@ public:
 	Defines(std::string  defineName, bool IsStatic);
 
 	void SetValue(T value);
+	T GetValue();
 	void operator=(T  value) ; 
 
 private: 
@@ -77,6 +78,12 @@ inline void Defines<T>::SetValue(T value)
 	ValueAlreadySet = true;
 }
 
+template <class T>
+T Defines<T>::GetValue()
+{
+	return Value;
+}
+
 template<class T>
 inline void Defines<T>::operator=(T value) 
 {
@@ -116,6 +123,17 @@ inline void Defines<int>::SetValueAsString()
 {
 	ValueAsString = std::to_string(Value);
 }
+template<>
+inline void Defines<uint32_t>::SetValueAsString()
+{
+	ValueAsString = std::to_string(Value);
+}
+template<>
+inline void Defines<float>::SetValueAsString()
+{
+	ValueAsString = std::to_string(Value);
+}
+
 template<>
 inline void Defines<std::string>::SetValueAsString()
 {

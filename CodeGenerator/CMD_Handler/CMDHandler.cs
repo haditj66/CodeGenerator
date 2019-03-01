@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeGenerator.CMD_Handler
@@ -52,21 +53,47 @@ namespace CodeGenerator.CMD_Handler
             processInfo.RedirectStandardError = true;
             processInfo.RedirectStandardOutput = true;
 
+            //string error = "";
+            //string output = "";
+
             process = Process.Start(processInfo);
-            Output = process.StandardOutput.ReadToEnd();
-            Error = process.StandardError.ReadToEnd();
+            /*
+            process.OutputDataReceived += (sender, args) =>
+            {
+                string output = args.Data;
+                // ...
+            };
+            process.ErrorDataReceived += (sender, args) =>
+            {
+                string error = args.Data;
+                // ...
+            };
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            */
+            if (!SupressErrorMsg)
+            {
+                Output = process.StandardOutput.ReadToEnd();
+                Error = process.StandardError.ReadToEnd();
+            }
+            else
+            {
+                Output = "";
+                Error = ""; 
+            }
             process.WaitForExit();
 
             // *** Read the streams ***
             // Warning: This approach can lead to deadlocks, see Edit #2
             //Output = process.StandardOutput.ReadToEnd();
-            
-            if (SupressErrorMsg)
-            {
-                Output = "";
-                Error = "";
-            }
 
+             
+
+
+            while (Output == null)
+            {
+
+            }
 
             exitCode = process.ExitCode;
 #if DEBUG

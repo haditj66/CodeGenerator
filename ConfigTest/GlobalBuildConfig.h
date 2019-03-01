@@ -12,6 +12,7 @@ enum PlatformEnum
 	VS,	
 	stm32f4,
 	stm32f5
+,stm32f7
 };
 
 enum BuildEnum

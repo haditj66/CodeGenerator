@@ -1,4 +1,4 @@
-﻿#define TESTING 
+﻿//#define TESTING 
 
 using System;
 using System.Collections.Generic;
@@ -158,12 +158,15 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";// 
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1B";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\test";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\Wavelettransform\WaveletsTrans";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\My psuedo RNG\RNG psuedo";
+
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
@@ -184,9 +187,10 @@ namespace CodeGenerator
         //static string[] command  = "".Split(' '); 
         //static string[] command  = "generate".Split(' ');
         //static string[] command = "generate --config".Split(' ');
-        static string[] command = "init".Split(' ');
+        //static string[] command = "init".Split(' ');
+        //static string[] command = "init Wavelet".Split(' ');
         //static string[] command  = "init Module".Split(' ');
-        //static string[] command = "init --git".Split(' ');
+        static string[] command = "init --git".Split(' ');
         //static string[] command = "init Test".Split(' ');
         //static string[] command  = "init Mod".Split(' ');
         //static string[] command = "init ModAA".Split(' ');
@@ -374,7 +378,7 @@ namespace CodeGenerator
         #endregion
 
 
-        #region ProjConfig command***************************************************************************
+        #region configproj command***************************************************************************
         //***************************************************************************************************   
         static ParserResult<object> ProjConfig(ProjConfigOptions opts)
         {
@@ -397,7 +401,7 @@ namespace CodeGenerator
                 if (!isPlatformInProjectScope(opts.platform, projGlob))
                 {
                     ProblemHandle p = new ProblemHandle();
-                    p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen -a <platform> to set project in scope");
+                    p.ThereisAProblem("The platform " + opts.platform + " is a project not in scope for this project \n use option cgen configproj -a <platform> to set project in scope");
                 }
 
                 //make sure it is of proper path format. it needs to not have an extension and directory needs to exist 
@@ -765,6 +769,7 @@ namespace CodeGenerator
         //***************************************************************************************************  
         static ParserResult<object> Init(InitOptions opts)
         {
+            Console.WriteLine(DIRECTORYOFTHISCG);
 
             #region --git -----------------------------------------------
 
@@ -789,7 +794,7 @@ namespace CodeGenerator
                             File.Copy(".gitattributes", Path.Combine(envIronDirectory, ".gitattributes"));
                         }
 
-                        gitHandler.CommitAll(envIronDirectory);
+                        gitHandler.CommitAll(envIronDirectory,true);
                         if (gitHandler.Cmd.Output.Contains("error:") || gitHandler.Cmd.Error.Contains("error:"))
                         {
                             ProblemHandle p = new ProblemHandle();
@@ -917,12 +922,40 @@ namespace CodeGenerator
                 }
                 catch (Exception e)
                 {
+                    
                     //todo. I should clean up and use a problem handle to save the settings
                     //todo file in a simple string and replace the .vcxproj and .filters and delete the locat CGenSaveFiles directory
                     problemHandle.ThereisAProblem("Something went wrong initializing. error : \n" + e.Message);
                     Console.WriteLine(e);
                 }
                 // so we have a name and no project exists here. create one 
+
+
+                try
+                { 
+                    //create directory to synced projects like IAR.
+                    string IARDirPath = Path.Combine(Program.envIronDirectory, "IAR");
+                    if (!Directory.Exists(IARDirPath))
+                    {
+                        Directory.CreateDirectory(IARDirPath);
+                        //also put in an empty IAR project
+                        //Directory.CreateDirectory(Path.Combine(IARDirPath,"EWARM"));
+                        string templateIARDir = Path.Combine(Program.DIRECTORYOFTHISCG, "IARDefaultProj");
+                        Extensions.restOfExtensions.CopyAllContentsInDirectory(templateIARDir, Path.Combine(IARDirPath));
+                        Console.WriteLine("template project for IAR was created");
+
+                        //change project name 
+                        string pathToFile = Path.Combine(IARDirPath, "EWARM");
+                        string[] files = Directory.GetFiles(pathToFile);
+                        string fileEWW = files.First(f => Path.GetExtension(f) == ".eww");
+                        File.Move(Path.Combine(pathToFile, Path.GetFileName(fileEWW)), Path.Combine(pathToFile, Path.GetFileName(opts.name + ".eww")));
+                    }
+                }
+                catch (Exception e )
+                {
+
+                    Console.WriteLine("there was a problem importing the IAR project. Check to make sure all was imported ok by building that project");
+                }
 
 
             }
@@ -1019,7 +1052,7 @@ namespace CodeGenerator
                 if (libraryNameNotSupportingPlat != null)
                 {
                     ProblemHandle p = new ProblemHandle();
-                    p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen projconfig -a <nameofScope> \n to add platform to that project scope.");
+                    p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen configproj -a <nameofScope> \n to add platform to that project scope.");
                 }
                 configFileBuilder.WriteTempConfigurationToFinalFile();
 

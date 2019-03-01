@@ -476,25 +476,7 @@ namespace CodeGenerator.IDESettingXMLs.VisualStudioXMLs
 
             //save the settings 
             Save(Program.envIronDirectory);
-
-
-            //create directory to synced projects like IAR.
-            string IARDirPath = Path.Combine(Program.envIronDirectory, "IAR");
-            if (!Directory.Exists(IARDirPath))
-            {
-                Directory.CreateDirectory(IARDirPath);
-                //also put in an empty IAR project
-                //Directory.CreateDirectory(Path.Combine(IARDirPath,"EWARM"));
-                string templateIARDir = Path.Combine(Program.DIRECTORYOFTHISCG, "IARDefaultProj");
-                Extensions.restOfExtensions.CopyAllContentsInDirectory(templateIARDir, Path.Combine(IARDirPath));
-                Console.WriteLine("template project for IAR was created");
-
-                //change project name 
-                string pathToFile = Path.Combine(IARDirPath, "EWARM");
-                string[] files =  Directory.GetFiles(pathToFile);
-                string fileEWW = files.First(f => Path.GetExtension(f) == ".eww");
-                File.Move(Path.Combine(pathToFile, Path.GetFileName(fileEWW)), Path.Combine(pathToFile, Path.GetFileName(NameOfCGenProject+".eww")));
-            } 
+             
 
 
         }

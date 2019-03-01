@@ -7,7 +7,10 @@ std::vector<Config*> Config::ConfigsCreatedSoFar;
 
 void Config::PrintDefines(Config& TopLevelConfig)
 {
-
+	if (thereWasAProblem)
+	{
+		TopLevelConfig.Problem(Config::TheProblemMsg);
+	}
 
 	//set as toplevel
 	TopLevelConfig.isTopLevel = true;
@@ -185,7 +188,7 @@ void Config::PrintDefines(Config& TopLevelConfig)
 			//print the value now
 			strDefToPrint.append("  ");
 
-			//assert that ValueAsString is not empty
+			//assert that ValueAsString is not empty 
 			assert(!var->ValueAsString.empty());
 			strDefToPrint.append(var->ValueAsString);
 
@@ -480,13 +483,18 @@ bool Config::IsEqual(const Config& configToCompare) const
 	return false;
 }
 
+
+bool Config::thereWasAProblem = false;
+std::string Config::TheProblemMsg;
 void Config::Problem(std::string msg)
-{
+{ 
 	std::string p = "PROBLEM:: ";
 	std::cout << std::endl;
 	std::cout << p.append(msg) << std::endl;
 	std::cout << std::endl;
 
+	thereWasAProblem = true;
+	TheProblemMsg = msg;
 }
 
 void Config::AddConfigSoFar(Config* configToAdd)
