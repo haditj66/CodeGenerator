@@ -159,13 +159,13 @@ namespace CodeGenerator
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";// 
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
-        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1B";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\test";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\Wavelettransform\WaveletsTrans";
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\My psuedo RNG\RNG psuedo";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\My psuedo RNG\RNG psuedo";
 
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
@@ -185,12 +185,12 @@ namespace CodeGenerator
         //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
         //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
-        //static string[] command  = "generate".Split(' ');
+        static string[] command  = "generate".Split(' ');
         //static string[] command = "generate --config".Split(' ');
         //static string[] command = "init".Split(' ');
         //static string[] command = "init Wavelet".Split(' ');
         //static string[] command  = "init Module".Split(' ');
-        static string[] command = "init --git".Split(' ');
+        //static string[] command = "init --git".Split(' ');
         //static string[] command = "init Test".Split(' ');
         //static string[] command  = "init Mod".Split(' ');
         //static string[] command = "init ModAA".Split(' ');

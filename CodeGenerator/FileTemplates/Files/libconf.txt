@@ -36,6 +36,8 @@ protected:
 
 		//define private defines here --------------------------
 		//these defines are only meant to be changed locally and are hidden from other libraries
+		//PRIVATE_DEF_DECLARE(BUFFERSIZEL, int) //Example
+
 		PRIVATE_DEF_START
 		//PRIVATE_DEF_CREATION1(BUFFERSIZEL, int, 80, true) //Example
 		END

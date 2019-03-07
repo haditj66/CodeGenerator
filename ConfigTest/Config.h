@@ -33,11 +33,17 @@ publicDefVec->push_back((IDefine*)(name));
 #define PUBLIC_DEF_CREATION2(name,type) name = new Defines<type>(STRINGIFY(name), true); \
 publicDefVec->push_back((IDefine*)(name));
 
-//private defines
+//private defines 
 #define PRIVATE_DEF_START protected: \
 void InitListPrivateOVERRIDE(std::vector<IDefine*>* privateDefVec) override{  
-#define PRIVATE_DEF_CREATION1(name,type,value, Static) privateDefVec->push_back((IDefine*)(new Defines<type>(STRINGIFY(name), value, Static)));
-#define PRIVATE_DEF_CREATION2(name,type) privateDefVec->push_back((IDefine*)(new Defines<type>(STRINGIFY(name), true)));
+#define PRIVATE_DEF_DECLARE(name, type) protected: \
+Defines<type>* name;
+#define PRIVATE_DEF_CREATION1(name,type,value, Static) name = new Defines<type>(STRINGIFY(name), value, Static); \
+privateDefVec->push_back((IDefine*)(name));
+#define PRIVATE_DEF_CREATION2(name,type) name = new Defines<type>(STRINGIFY(name), true); \
+privateDefVec->push_back((IDefine*)(name));
+//#define PRIVATE_DEF_CREATION1(name,type,value, Static) privateDefVec->push_back((IDefine*)(new Defines<type>(STRINGIFY(name), value, Static)));
+//#define PRIVATE_DEF_CREATION2(name,type) privateDefVec->push_back((IDefine*)(new Defines<type>(STRINGIFY(name), true)));
 
 
 

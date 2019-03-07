@@ -4,6 +4,10 @@
 #endif 
 
   
+#if USING_myUartDriver
+#include "C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\myUARTDriver\myUartDriver\Config\myUartDriverConf.h"
+#endif 
+  
 #if USING_GAEmbedded
 #include "C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\GA for embedded\GAembeddedcgen\GA embedded\Config\GAEmbeddedConf.h"
 #endif 
@@ -41,6 +45,8 @@
 #endif 
 
 
+  
+//_myUartDriver 
   
 //_GAEmbedded 
   

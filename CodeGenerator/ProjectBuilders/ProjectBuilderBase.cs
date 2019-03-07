@@ -163,6 +163,7 @@ namespace CodeGenerator.ProjectBuilders
             else
             {
                 //since it has the needed tag. stash everything, checkout to that tag 
+                Console.WriteLine("checking out library  " + libraryToCheckout.config.ClassName + " to tag " + tagToCheckoutTo );
                 GitHandlerforLib.StashAndCheckoutTag(libraryToCheckout, tagToCheckoutTo, ProblemHandle);
                 LibGitCleanUp.AddLibraryCheckedOutSoFar(libraryToCheckout);
             }

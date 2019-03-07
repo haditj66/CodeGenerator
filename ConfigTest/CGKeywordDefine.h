@@ -1,6 +1,7 @@
 //#pragma once
   
  #define USING_GlobalBuildConfig_H false 
+#define USING_myUartDriver false
 #define USING_GAEmbedded false
 #define USING_PsuedoRNG false
 #define USING_Wavelet false

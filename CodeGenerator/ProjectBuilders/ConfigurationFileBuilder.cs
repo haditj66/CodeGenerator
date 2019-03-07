@@ -97,12 +97,12 @@ namespace CodeGenerator.ProjectBuilders
             //use CMDHandler to compile and build the config for the top level library
             CMDHandlerVSDev cmdHandler = new CMDHandlerVSDev(DIRECTORYOFTHISCG, DIRECTORYOFTHISCG);
             cmdHandler.SetWorkingDirectory(DIRECTORYOFTHISCG);
-            cmdHandler.ExecuteCommand(ss);
+            cmdHandler.ExecuteCommandWithProblemCheck(ss, ProblemHandler, "building the ConfigurationCG.h for library at path \n" + VSsetting.PATHOfProject + "\n encountered a compilation error. go to that commit to see what is wrong. \n");
             //cmdHandler.ExecuteCommandWithProblemCheck(ss, ProblemHandler, "ERROR: there was a problem with compilation for the Configuration.h file of your library at location \n" + VSsetting.PATHOfProject + "\n make sure your configuration app builds for that library");
 
             //if no problem than run that config.exe, run the 
             cmdHandler.SetWorkingDirectory(Path.Combine(DIRECTORYOFTHISCG, PathToOutPutCompilation));
-            cmdHandler.ExecuteCommand("CALL configGen.exe");
+            cmdHandler.ExecuteCommandWithProblemCheck("CALL configGen.exe", ProblemHandler, "building the ConfigurationCG.h for library at path \n" + VSsetting.PATHOfProject + "\n encountered a runtime error. go to that commit to see what is wrong. \n");
 
             //check to see if there were any problems with generating the configurationfrom the conig.exe.
             Match m = Regex.Match(cmdHandler.Output, @"PROBLEM::(.*)");

@@ -14,19 +14,16 @@
                 <EnumDefinition Name="BUILD_TESTING" Value="2"/>
             </EnumsDefinintions>
             <Defines>
-                <Define DefineName="PLATFORM" Type="enum PlatformEnum" Value="4" MyPrivacy="public" PrefixName="GlobalConfigBuild" IsStatic="true"/>
+                <Define DefineName="PLATFORM" Type="enum PlatformEnum" Value="3" MyPrivacy="public" PrefixName="GlobalConfigBuild" IsStatic="true"/>
                 <Define DefineName="BUILD" Type="enum BuildEnum" Value="0" MyPrivacy="public" PrefixName="GlobalConfigBuild" IsStatic="true"/>
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="PsuedoRNGConf0" myInstanceNum="0" Major="0" ConfTypePrefix="RANDOMMECHANISM1" isTopLevel="true" FileNameString="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\My psuedo RNG\RNG psuedo\Config\PsuedoRNGconf.h" ClassName="PsuedoRNGConf0">
-            <EnumsDefinintions>
-                <EnumDefinition Name="RANDOMMECHANISM_PSUEDO" Value="0"/>
-                <EnumDefinition Name="RANDOMMECHANISM_REALTIMESEEDING" Value="1"/>
-            </EnumsDefinintions>
+        <Config Prefix="myUartDriverConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\myUARTDriver\myUartDriver\Config\myUartDriverconf.h" ClassName="myUartDriverConf0">
+            <EnumsDefinintions/>
             <Defines>
-                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="PsuedoRNGConf0" IsStatic="true"/>
-                <Define DefineName="RANDOMMECHANISM" Type="enum RandomMechanism" Value="1" MyPrivacy="template" PrefixName="PsuedoRNGConf0" IsStatic="true"/>
+                <Define DefineName="USING_DMA" Type="bool" Value="0" MyPrivacy="private" PrefixName="myUartDriverConf0" IsStatic="true"/>
+                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="myUartDriverConf0" IsStatic="true"/>
             </Defines>
             <Depends/>
         </Config>

@@ -285,7 +285,7 @@ namespace CodeGenerator.ProjectBuilders
                 //5. --------------------- 
                 //revert it back to its previous state
                 LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(libraryToImp);
-                Console.WriteLine("Files have been imported for library " + libraryToImp.config.ClassName);
+                Console.WriteLine("Files have been imported for library " + libraryToImp.config.ClassName + "\n");
             }
 
 
