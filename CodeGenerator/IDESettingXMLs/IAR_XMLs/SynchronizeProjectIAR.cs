@@ -114,6 +114,10 @@ namespace CodeGenerator.IDESettingXMLs.IAR_XMLs
                     group2prev = group2;
                     //are any of the children matching the next ancestor
                     ancestors.RemoveAt(0);
+                    if (ancestors.Count == 0)
+                    {
+                        break;
+                    }
                     group = group.GroupNested.FirstOrDefault(g => g.Name == ancestors[0]);
                     group2 = group2.GroupNested.FirstOrDefault(g => g.Name == ancestors[0]);
                 } while (group != null);

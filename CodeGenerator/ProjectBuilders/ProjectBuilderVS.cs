@@ -139,7 +139,7 @@ namespace CodeGenerator.ProjectBuilders
             return plaformOfSetup;
         }
 
-        public override void ImportDependentLibrariesFiles()
+        public override void ImportDependentLibrariesFiles(bool usingGit)
         { 
             //steps 
             //1. check out git tags for ALL dependent libraries
@@ -156,7 +156,11 @@ namespace CodeGenerator.ProjectBuilders
             {
 
                 //1. check out git tags for ALL dependent libraries
-                CheckoutLibraryToCorrectMajor(libraryToImp);
+                if (usingGit)
+                {
+                    CheckoutLibraryToCorrectMajor(libraryToImp);
+                }
+                
 
                 //2. ---------------------
                 //create Configuration.h in temporary folder but dont put it in project so to not change anything 
@@ -284,7 +288,11 @@ namespace CodeGenerator.ProjectBuilders
 
                 //5. --------------------- 
                 //revert it back to its previous state
-                LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(libraryToImp);
+                if (usingGit)
+                {
+                    LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(libraryToImp);
+                }
+
                 Console.WriteLine("Files have been imported for library " + libraryToImp.config.ClassName + "\n");
             }
 
@@ -292,7 +300,7 @@ namespace CodeGenerator.ProjectBuilders
 
         }
 
-        public void ImportConfigFiles()
+        public void ImportConfigFiles(bool usingGit)
         { 
             //steps 
             //1. check out git tags for ALL dependent libraries
@@ -307,7 +315,11 @@ namespace CodeGenerator.ProjectBuilders
             {
 
                 //1. check out git tags for ALL dependent libraries
-                CheckoutLibraryToCorrectMajor(libraryToImp);
+                if (usingGit)
+                {
+                    CheckoutLibraryToCorrectMajor(libraryToImp);
+                }
+                
 
                 //2. ---------------------
                 //create Configuration.h in temporary folder but dont put it in project so to not change anything 
@@ -348,10 +360,14 @@ namespace CodeGenerator.ProjectBuilders
                 }
 
                 configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent(), prefixToAddToAllFilesNames+ "ConfigurationCG.h"));
- 
+
                 //5. --------------------- 
                 //revert it back to its previous state
-                LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(libraryToImp);
+                if (usingGit)
+                {
+                    LibGitCleanUp.UncheckoutLibraryCheckedOutSoFar(libraryToImp);
+                }
+
                 Console.WriteLine("Configuration has been imported for library " + libraryToImp.config.ClassName);
             }
         }

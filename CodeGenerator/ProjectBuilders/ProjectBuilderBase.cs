@@ -82,6 +82,11 @@ namespace CodeGenerator.ProjectBuilders
                 return false;
             }
 
+            if (CComp.FilterIBelongTo.DoesAddressExist("AE") != null)
+            {
+                return false;
+            }
+
             if ((CComp.Name == "main.cpp")   )
             {
                 return false;
@@ -179,7 +184,7 @@ namespace CodeGenerator.ProjectBuilders
         /// <summary>
         /// this will import all physical files from libraries your top library depends on.
         /// </summary>
-        public abstract void ImportDependentLibrariesFiles();
+        public abstract void ImportDependentLibrariesFiles(bool usingGit);
         //public abstract void RecreateConfigurationFilterFolderIncludes(string NameOfCGenProject, string pathOfConfigTestDir);
 
 

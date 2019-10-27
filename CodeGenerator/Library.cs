@@ -18,9 +18,22 @@ namespace CodeGenerator
         public  Config config { get; private set; } 
         public MyMainSettingsBase settings { get; protected set; }
         public List<Library> LibrariesIDependOn { get; protected set; }
+        public static string IgnoreFilesFromFilter;
 
         public Library(Config config, MyMainSettingsBase settings)
         {
+
+            //remove any files that are located in the user defined "IgnoreFilesFromFilter" 
+            if (settings.CLCompileFiles != null)
+            {
+                settings.CLCompileFiles.RemoveAll(ccomp => ccomp.FilterIBelongTo.GetAncestors().Contains(IgnoreFilesFromFilter));
+            }
+            if (settings.CLIncludeFiles != null)
+            {
+                settings.CLIncludeFiles.RemoveAll(cinc => cinc.FilterIBelongTo.GetAncestors().Contains(IgnoreFilesFromFilter));
+            }
+
+
             this.config = config;
             LibrariesIDependOn = new List<Library>();
             if (config.IsTopLevel == "true")

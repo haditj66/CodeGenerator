@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 // default implementation
+
+typedef const char* stringWithoutQuotations;
+//class stringWithoutQuotations {};
+
 template <class T>
 class TypeName
 {
@@ -87,5 +91,14 @@ struct TypeName<std::string>
 	static const char* Get()
 	{
 		return "string";
+	}
+};
+
+template <>
+struct TypeName<stringWithoutQuotations>
+{
+	static const char* Get()
+	{
+		return "stringWithoutQuotations";
 	}
 };

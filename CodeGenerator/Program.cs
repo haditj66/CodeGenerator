@@ -33,6 +33,7 @@ using ConsoleApp2.MyClangWrapperClasses;
 using ConsoleApp2.MyClangWrapperClasses.CXCursors;
 using ConsoleApp2.MyClangWrapperClasses.CXCursors.MyCursorKinds;
 using ConsoleApp2.Parsing;
+using CPPParser;
 using Extensions;
 using Project = CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project;
 
@@ -48,12 +49,26 @@ namespace CodeGenerator
         #region Options classes  ***************************************************************************
         //*************************************************************************************************** 
         //Verbs help delineate and separate options and values for multiple commands within a single app
+
+        [Verb("projects", HelpText = "Get all CG projects that have been created.")]
+        public class ProjectsOptions
+        {
+
+        }
+
+
         [Verb("generate", HelpText = "generate the code")]
         public class GenerateOptions
         {
 
             [Option(HelpText = "only build the configurations for the dependent libraries and not importing all files")]
             public bool config { get; set; }
+
+            [Option(HelpText = "This will use git to go to switch to an appropriate version when fetching other libraries. use this when you have a library that has been changed and you want to use a past version of that library.")]
+            public bool ignoreGit { get; set; }
+
+            [Option('i', HelpText = "This will ignore all files that are anywhere in this filter. use this when you have 3rd party files that are shared within ALL libraries.")]
+            public string ignoreFilesInFilter { get; set; }
 
             /*
             [Option('t', Separator = ':')]
@@ -102,7 +117,8 @@ namespace CodeGenerator
             public string name { get; set; }
             [Option(HelpText = "if this is enabled, it will initialize git, commiting all, and making the first tag")]
             public bool git { get; set; }
-
+            [Option(HelpText = "setup iar project")]
+            public bool iar { get; set; }
         }
 
         [Verb("config", HelpText = "Configure Code Generator. add and remove targets. configurations are Debug or Release")]
@@ -159,14 +175,16 @@ namespace CodeGenerator
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1B";// 
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1AA";
-        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1A";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module1B";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\Module";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGeneratorTestModules\test";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\Wavelettransform\WaveletsTrans";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\My psuedo RNG\RNG psuedo";
-
+        //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\GA for embedded\GAembeddedcgen\GA embedded";
+        //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UUartDriver\UUartDriver";
+        public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UploadDataToPCTDU\UploadDataToPCTDU";
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
@@ -185,7 +203,8 @@ namespace CodeGenerator
         //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
         //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
-        static string[] command  = "generate".Split(' ');
+        static string[] command  = "generate -i AE --ignoregit ".Split(' ');
+        //static string[] command = "generate --g".Split(' ');
         //static string[] command = "generate --config".Split(' ');
         //static string[] command = "init".Split(' ');
         //static string[] command = "init Wavelet".Split(' ');
@@ -196,7 +215,9 @@ namespace CodeGenerator
         //static string[] command = "init ModAA".Split(' ');
         //static string[] command = "init ModA".Split(' ');
         //static string[] command = "init ModB".Split(' ');
+        //static string[] command = "init UUartDriver".Split(' ');
         //static string[] command = "sync iar".Split(' ');
+        //static string[] command = "projects".Split(' ');
 
 #else
         static string[] command;
@@ -221,13 +242,15 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions, ProjConfigOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions,ProjectsOptions, ProjConfigOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
 .WithParsed<InitOptions>(opts => Init(opts))
 .WithParsed<ConfigOptions>(opts => Config(opts))
+.WithParsed<ProjectsOptions>(opts => Projects(opts))
 .WithParsed<ProjConfigOptions>(opts => ProjConfig(opts));
+                
             };
 
 #if !TESTING
@@ -771,6 +794,41 @@ namespace CodeGenerator
         {
             Console.WriteLine(DIRECTORYOFTHISCG);
 
+            #region --iar -----------------------------------------------------
+
+            if (opts.iar)
+            {
+                try
+                {
+                    //create directory to synced projects like IAR.
+                    string IARDirPath = Path.Combine(Program.envIronDirectory, "IAR");
+                    if (!Directory.Exists(IARDirPath))
+                    {
+                        Directory.CreateDirectory(IARDirPath);
+                        //also put in an empty IAR project
+                        //Directory.CreateDirectory(Path.Combine(IARDirPath,"EWARM"));
+                        string templateIARDir = Path.Combine(Program.DIRECTORYOFTHISCG, "IARDefaultProj");
+                        Extensions.restOfExtensions.CopyAllContentsInDirectory(templateIARDir, Path.Combine(IARDirPath));
+                        Console.WriteLine("template project for IAR was created");
+
+                        //change project name 
+                        string pathToFile = Path.Combine(IARDirPath, "EWARM");
+                        string[] files = Directory.GetFiles(pathToFile);
+                        string fileEWW = files.First(f => Path.GetExtension(f) == ".eww");
+                        File.Move(Path.Combine(pathToFile, Path.GetFileName(fileEWW)), Path.Combine(pathToFile, Path.GetFileName(opts.name + ".eww")));
+                    }
+                }
+                catch (Exception e)
+                {
+
+                    Console.WriteLine("there was a problem importing the IAR project. Check to make sure all was imported ok by building that project");
+                }
+
+                return null;
+            }
+            #endregion
+
+
             #region --git -----------------------------------------------
 
             if (opts.git)
@@ -966,12 +1024,33 @@ namespace CodeGenerator
         #endregion
 
 
+        #region Projects command ***************************************************************************
+        static ParserResult<object> Projects(ProjectsOptions opts)
+        { 
+            foreach (var proj in savefileProjGlobal.CgenProjects.Projects)
+            {
+                Console.Write("Project: ");
+                Console.WriteLine(proj.NameOfProject);
+                Console.WriteLine(proj.PathOfProject + "\n");
+            } 
+
+            return null;
+        }
+        #endregion
+
 
         #region Generate command ***************************************************************************
         //***************************************************************************************************  
+        
+        //private static bool UsingGit = false;
 
         static ParserResult<object> Generate(GenerateOptions opts)
         {
+
+            if (!opts.ignoreFilesInFilter.IsAnEmptyLine())
+            {
+                Library.IgnoreFilesFromFilter = opts.ignoreFilesInFilter;
+            }
 
             #region --config 
             if (opts.config)
@@ -1007,7 +1086,7 @@ namespace CodeGenerator
 
                     //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
                     //first grab all lowest level libraries that have no dependencies
-                    projectBuilderForVs.ImportConfigFiles();
+                    projectBuilderForVs.ImportConfigFiles(!opts.ignoreGit);
 
 
 
@@ -1052,7 +1131,7 @@ namespace CodeGenerator
                 if (libraryNameNotSupportingPlat != null)
                 {
                     ProblemHandle p = new ProblemHandle();
-                    p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen configproj -a <nameofScope> \n to add platform to that project scope.");
+                    p.ThereisAProblem("\n you are building for a platform "+ projectBuilderForVs.GetPlatFormThisisSetupFor()+ " as stated in your mainCG.cpp file, but "+ libraryNameNotSupportingPlat + " does not support the platform you are building for.  \n use cgen configproj -a <nameofScope> \n to add platform to that project scope.");
                 }
                 configFileBuilder.WriteTempConfigurationToFinalFile();
 
@@ -1065,7 +1144,7 @@ namespace CodeGenerator
 
                 //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
                 //first grab all lowest level libraries that have no dependencies
-                projectBuilderForVs.ImportDependentLibrariesFiles();
+                projectBuilderForVs.ImportDependentLibrariesFiles(!opts.ignoreGit);
 
 
 

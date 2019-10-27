@@ -150,5 +150,15 @@ inline void Defines<char>::SetValueAsString()
 	ValueAsString.append(std::to_string(Value));
 	ValueAsString.append("\'");
 }
+
+template<>
+inline void Defines<stringWithoutQuotations>::SetValueAsString()
+{
+	ValueAsString = "";
+	//ValueAsString.append("\'");
+	std::string s(Value);
+	ValueAsString.append(s);
+	//ValueAsString.append("\'");
+}
  
  

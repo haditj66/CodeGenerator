@@ -19,11 +19,14 @@
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="myUartDriverConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\myUARTDriver\myUartDriver\Config\myUartDriverconf.h" ClassName="myUartDriverConf0">
+        <Config Prefix="UUartDriverConf0" myInstanceNum="0" Major="0" ConfTypePrefix="SizeOfTransmitBuffer100PoolSize10" isTopLevel="true" FileNameString="C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UUartDriver\UUartDriver\Config\UUartDriverconf.h" ClassName="UUartDriverConf0">
             <EnumsDefinintions/>
             <Defines>
-                <Define DefineName="USING_DMA" Type="bool" Value="0" MyPrivacy="private" PrefixName="myUartDriverConf0" IsStatic="true"/>
-                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="myUartDriverConf0" IsStatic="true"/>
+                <Define DefineName="NameOfAUartDriverInstance" Type="stringWithoutQuotations" Value="uartDriver" MyPrivacy="public" PrefixName="UUartDriverConf0" IsStatic="false"/>
+                <Define DefineName="TypeOfUARTDriver" Type="stringWithoutQuotations" Value="UUartDriver" MyPrivacy="private" PrefixName="UUartDriverConf0" IsStatic="true"/>
+                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="UUartDriverConf0" IsStatic="true"/>
+                <Define DefineName="SizeOfTransmitBuffer" Type="int" Value="100" MyPrivacy="template" PrefixName="UUartDriverConf0" IsStatic="true"/>
+                <Define DefineName="PoolSize" Type="int" Value="10" MyPrivacy="template" PrefixName="UUartDriverConf0" IsStatic="true"/>
             </Defines>
             <Depends/>
         </Config>
