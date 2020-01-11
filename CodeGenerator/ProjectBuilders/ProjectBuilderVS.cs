@@ -238,10 +238,13 @@ namespace CodeGenerator.ProjectBuilders
 
                 refactorer.ReloadRefactorer();
 
-                
 
-                //add the prefix as a namespace to all files as well.
-                refactorer.InsertNamespaceIntoAllFiles(prefixToAddToAllFilesNames);
+
+                //add the prefix as a namespace to all files as well. however remove the last character if it is a "_" 
+                string namespaceprefix = prefixToAddToAllFilesNames.Last().Equals('_')
+                    ? prefixToAddToAllFilesNames.Remove(prefixToAddToAllFilesNames.Length-1, 1)
+                    : prefixToAddToAllFilesNames;
+                refactorer.InsertNamespaceIntoAllFiles(namespaceprefix);
                 refactorer.ReloadRefactorer();
 
 

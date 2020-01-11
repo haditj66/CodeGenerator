@@ -117,6 +117,9 @@ using namespace tinyxml2;
 
 class Config
 {
+	template<class T>
+	friend class Defines;
+
 public:
 	Config* ParentDepender;
 
@@ -130,8 +133,7 @@ public:
 
 	template<class T> 
 	void SetPublicDefineValue(std::string name, T valueToChangeTo);
-
-	
+	 
 	
 	static XMLDocument xmlDoc;
 protected:
@@ -202,4 +204,4 @@ inline void Config::SetPublicDefineValue(std::string name, T valueToChangeTo)
 	g->SetValue(valueToChangeTo);
 }
 
- 
+  

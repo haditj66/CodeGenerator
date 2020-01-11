@@ -19,14 +19,11 @@
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="UUartDriverConf0" myInstanceNum="0" Major="0" ConfTypePrefix="SizeOfTransmitBuffer100PoolSize10" isTopLevel="true" FileNameString="C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UUartDriver\UUartDriver\Config\UUartDriverconf.h" ClassName="UUartDriverConf0">
+        <Config Prefix="stmFlashConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\stm32FlashPeripheral\stm32flashperiph\Config\stmFlashConf.h" ClassName="stmFlashConf0">
             <EnumsDefinintions/>
             <Defines>
-                <Define DefineName="NameOfAUartDriverInstance" Type="stringWithoutQuotations" Value="uartDriver" MyPrivacy="public" PrefixName="UUartDriverConf0" IsStatic="false"/>
-                <Define DefineName="TypeOfUARTDriver" Type="stringWithoutQuotations" Value="UUartDriver" MyPrivacy="private" PrefixName="UUartDriverConf0" IsStatic="true"/>
-                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="UUartDriverConf0" IsStatic="true"/>
-                <Define DefineName="SizeOfTransmitBuffer" Type="int" Value="100" MyPrivacy="template" PrefixName="UUartDriverConf0" IsStatic="true"/>
-                <Define DefineName="PoolSize" Type="int" Value="10" MyPrivacy="template" PrefixName="UUartDriverConf0" IsStatic="true"/>
+                <Define DefineName="Target_RealSTMFlash" Type="bool" Value="0" MyPrivacy="public" PrefixName="stmFlashConf0" IsStatic="true"/>
+                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="stmFlashConf0" IsStatic="true"/>
             </Defines>
             <Depends/>
         </Config>

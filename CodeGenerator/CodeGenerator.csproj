@@ -84,11 +84,13 @@
     <Compile Include="CMD_Handler\CMDHandlerVSDev.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="FileTemplates\GeneralMacoTemplate\FileTemplateGeneral.cs" />
     <Compile Include="FileTemplates\FileTemplateAllLibraryInlcudes.cs" />
     <Compile Include="FileTemplates\FileTemplateBase.cs" />
     <Compile Include="FileTemplates\FileTemplateCGKeywordDefine.cs" />
     <Compile Include="FileTemplates\FileTemplateLibConf.cs" />
     <Compile Include="FileTemplates\FileTemplateMainCG.cs" />
+    <Compile Include="FileTemplates\GeneralMacoTemplate\GeneralMacro.cs" />
     <Compile Include="GitHandlerForLibraries\GitHandlerForLibrary.cs" />
     <Compile Include="IDESettingXMLs\IAR_XMLs\IARXML_DEPClasses.cs" />
     <Compile Include="IDESettingXMLs\IAR_XMLs\IARXML_ewdClasses.cs" />

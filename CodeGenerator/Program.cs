@@ -36,6 +36,7 @@ using ConsoleApp2.Parsing;
 using CPPParser;
 using Extensions;
 using Project = CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project;
+using CodeGenerator.FileTemplates.GeneralMacoTemplate;
 
 namespace CodeGenerator
 {
@@ -52,6 +53,12 @@ namespace CodeGenerator
 
         [Verb("projects", HelpText = "Get all CG projects that have been created.")]
         public class ProjectsOptions
+        {
+
+        }
+
+        [Verb("macro", HelpText = "create a macro file in this directory out of all .cgenM files")]
+        public class MacroOptions
         {
 
         }
@@ -184,7 +191,12 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\microcontroller stuff\My psuedo RNG\RNG psuedo";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\GA for embedded\GAembeddedcgen\GA embedded";
         //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UUartDriver\UUartDriver";
-        public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UploadDataToPCTDU\UploadDataToPCTDU";
+        //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UploadDataToPCTDU\UploadDataToPCTDU";
+        //public static string envIronDirectory = @" C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\WaveletTransformSPB\WaveletTransformSPB";
+        //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\HolterMonitor\HolterMonitor";
+        //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\SPISlaveFSM\SPISlaveFSMcont";
+        public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UVariableSaver\UVariableSaver";
+
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
@@ -203,8 +215,8 @@ namespace CodeGenerator
         //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
         //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
-        static string[] command  = "generate -i AE --ignoregit ".Split(' ');
-        //static string[] command = "generate --g".Split(' ');
+        //static string[] command  = "generate -i AE --ignoregit ".Split(' ');
+        //static string[] command = "generate".Split(' ');
         //static string[] command = "generate --config".Split(' ');
         //static string[] command = "init".Split(' ');
         //static string[] command = "init Wavelet".Split(' ');
@@ -217,6 +229,7 @@ namespace CodeGenerator
         //static string[] command = "init ModB".Split(' ');
         //static string[] command = "init UUartDriver".Split(' ');
         //static string[] command = "sync iar".Split(' ');
+        static string[] command = "macro".Split(' ');
         //static string[] command = "projects".Split(' ');
 
 #else
@@ -242,13 +255,14 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions,ProjectsOptions, ProjConfigOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions,ProjectsOptions, MacroOptions, ProjConfigOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
 .WithParsed<InitOptions>(opts => Init(opts))
 .WithParsed<ConfigOptions>(opts => Config(opts))
 .WithParsed<ProjectsOptions>(opts => Projects(opts))
+.WithParsed<MacroOptions>(opts => Macro(opts))
 .WithParsed<ProjConfigOptions>(opts => ProjConfig(opts));
                 
             };
@@ -1039,17 +1053,54 @@ namespace CodeGenerator
         #endregion
 
 
+        #region Macro command ***************************************************************************
+        static ParserResult<object> Macro(MacroOptions opts)
+        {
+
+            //get all macro files in the environment directory
+            List<string> cgenMFiles = Directory.GetFiles(envIronDirectory).Where((file) =>
+            { 
+                return Path.GetExtension(file).Equals(".cgenM");
+            }).ToList();
+
+            if (cgenMFiles.Count == 0)
+            {
+                Console.WriteLine("no files with extension .cgenM was found at this directory.");
+            }
+            else
+            {
+
+                //go through each .cgenM file and create it
+                foreach (var cgenMFilePath in cgenMFiles)
+                {
+                    string s = Path.GetDirectoryName(cgenMFilePath);
+                    GeneralMacro generalMacro = new GeneralMacro(s, Path.GetFileName(cgenMFilePath));
+                    generalMacro.CreateTemplate();
+
+                    Console.WriteLine(Path.GetFileName(cgenMFilePath)+" macro was created.");
+                }  
+
+            }
+             
+            return null;
+        }
+        #endregion
+
+
         #region Generate command ***************************************************************************
         //***************************************************************************************************  
-        
+
         //private static bool UsingGit = false;
 
         static ParserResult<object> Generate(GenerateOptions opts)
         {
 
-            if (!opts.ignoreFilesInFilter.IsAnEmptyLine())
+            if (opts.ignoreFilesInFilter != null)
             {
-                Library.IgnoreFilesFromFilter = opts.ignoreFilesInFilter;
+                if (!opts.ignoreFilesInFilter.IsAnEmptyLine())
+                {
+                    Library.IgnoreFilesFromFilter = opts.ignoreFilesInFilter;
+                }
             }
 
             #region --config 

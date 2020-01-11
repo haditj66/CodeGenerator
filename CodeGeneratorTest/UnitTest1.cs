@@ -10,6 +10,7 @@ using CodeGenerator.cgenXMLSaves.SaveFiles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeGenerator.IDESettingXMLs;
 using CodeGenerator.FileTemplates;
+using CodeGenerator.FileTemplates.Files;
 using CodeGenerator.FileTemplatesMacros;
 using CodeGenerator.IDESettingXMLs.VisualStudioXMLs;
 using CodeGenerator.ProjectBuilders;
@@ -18,6 +19,8 @@ using ConsoleApp2.CPPRefactoring;
 using ConsoleApp2.MyClangWrapperClasses.CXCursors.MyCursorKinds;
 using ConsoleApp2.Parsing;
 using CPPParser;
+using System.Text.RegularExpressions;
+using CodeGenerator.FileTemplates.GeneralMacoTemplate;
 
 namespace CodeGeneratorTest
 {
@@ -82,6 +85,29 @@ namespace CodeGeneratorTest
             FileTemplateMainCG maincgTemplate = new FileTemplateMainCG("", "moda1");
             maincgTemplate.CreateTemplate();
         }
+
+        [TestMethod]
+        public void GeneralTemplateTest()
+        {
+            string pathtoTemplateFileAndOutputFiles = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug";
+            string nameOfcGenMacroFile = "testForGeneral.cgenM";
+
+            GeneralMacro generalMacro = new GeneralMacro(pathtoTemplateFileAndOutputFiles, nameOfcGenMacroFile);
+            generalMacro.CreateTemplate();
+             
+        }
+
+        [TestMethod]
+        public void GeneralTemplateTest2()
+        {
+            string pathtoTemplateFileAndOutputFiles = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug";
+            string nameOfcGenMacroFile = "AEObjectTest.cgenM";
+
+            GeneralMacro generalMacro = new GeneralMacro(pathtoTemplateFileAndOutputFiles, nameOfcGenMacroFile);
+            generalMacro.CreateTemplate();
+
+        }
+
 
         [TestMethod]
         public void MacroLoopSectionTest()

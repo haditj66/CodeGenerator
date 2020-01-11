@@ -4,6 +4,38 @@
 #endif 
 
   
+#if USING_stmFlash
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\stm32FlashPeripheral\stm32flashperiph\Config\stmFlashConf.h"
+#endif 
+  
+#if USING_VariableSaver
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UVariableSaver\UVariableSaver\Config\VariableSaverConf.h"
+#endif 
+  
+#if USING_blinds
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\blinds\WaveletTransformSPB\Config\blindsConf.h"
+#endif 
+  
+#if USING_SPISlave
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\SPISlaveFSM\SPISlaveFSMcont\Config\SPISlaveConf.h"
+#endif 
+  
+#if USING_HumidityControl
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\HumidityController\HumidityController\Config\HumidityControlConf.h"
+#endif 
+  
+#if USING_HolterMonitor
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\HolterMonitor\HolterMonitor\Config\HolterMonitorConf.h"
+#endif 
+  
+#if USING_waveletSPB
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\WaveletTransformSPB\WaveletTransformSPB\Config\waveletSPBConf.h"
+#endif 
+  
+#if USING_WTwentyFiveDriver
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\w25DriverTDU\w25DriverTDU\Config\WTwentyFiveDriverConf.h"
+#endif 
+  
 #if USING_UploadDataToPCTDU
 #include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UploadDataToPCTDU\UploadDataToPCTDU\Config\UploadDataToPCTDUConf.h"
 #endif 
@@ -49,6 +81,22 @@
 #endif 
 
 
+  
+//_stmFlash 
+  
+//_VariableSaver 
+  
+//_blinds 
+  
+//_SPISlave 
+  
+//_HumidityControl 
+  
+//_HolterMonitor 
+  
+//_waveletSPB 
+  
+//_WTwentyFiveDriver 
   
 //_UploadDataToPCTDU 
   

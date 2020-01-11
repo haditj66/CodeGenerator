@@ -1,0 +1,27 @@
+//generated file: VarSaverObjects.h
+
+
+#pragma once
+
+#include "ConfigurationCG.h"
+
+//macro for being able to check if a macro is empty --------------------------------------
+##LOOP_1##  
+#if defined(SaveVar<#i#>) && (EXPAND(SaveVar<#i#>) == 0) 
+	#if (SaveVar<#i#>Type == 0)  
+	#define SaveVar<#i#>Type_t uint32_t 
+	#endif
+	#if (SaveVar<#i#>Type == 1)  
+	#define SaveVar<#i#>Type_t uint16_t
+	#endif
+	#if (SaveVar<#i#>Type == 2)  
+	#define SaveVar<#i#>Type_t uint8_t
+	#endif
+	#if (SaveVar<#i#>Type == 3)  
+	#define SaveVar<#i#>Type_t float
+	#endif
+	#if (SaveVar<#i#>Type == 4)  
+	#define SaveVar<#i#>Type_t char
+	#endif
+#endif
+##END##

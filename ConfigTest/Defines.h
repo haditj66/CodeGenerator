@@ -5,6 +5,7 @@
 #include "Config.h"
 #include "IDefine.h"
 #include "TypeName.h"
+#include <exception>
 
 #define STRINGIFY(MACRO) #MACRO
 
@@ -59,6 +60,8 @@ private:
 
 };
 
+
+
  
 template<class T>
 inline void Defines<T>::SetValue(T value)
@@ -68,6 +71,19 @@ inline void Defines<T>::SetValue(T value)
 	//as statics can only be set once.
 	//THIS ASSERTION DOES NOT NEED TO BE MADE AS THERE CAN BE MANY CHANGES EVEN TO A STATIC
 	//assert(!(IsStatic == true && ValueAlreadySet == true));
+	 
+	 
+	//todo create an assertion that makes sure this config was initialized first. 
+	if (this == nullptr)
+	{ 
+		std::cout << "PROBLEM:  you probably did not assert the config first before setting the define values." << std::endl; 
+		//assert(false && "-----------------------------------------------PROBLEM:  ---------------------------------\n you probably did not assert the config first before setting the define values.\n------------------------------------------------------\n------------------");//(this != nullptr)
+			
+	}  
+	else
+	{
+		
+	}
 
 	//only public members should show
 	Value = value;
@@ -76,6 +92,7 @@ inline void Defines<T>::SetValue(T value)
 	SetValueAsString();
 
 	ValueAlreadySet = true;
+
 }
 
 template <class T>
