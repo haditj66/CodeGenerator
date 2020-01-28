@@ -19,11 +19,10 @@
             </Defines>
             <Depends/>
         </Config>
-        <Config Prefix="stmFlashConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\stm32FlashPeripheral\stm32flashperiph\Config\stmFlashConf.h" ClassName="stmFlashConf0">
+        <Config Prefix="MotorDriverConf0" myInstanceNum="0" Major="0" ConfTypePrefix="" isTopLevel="true" FileNameString="C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\MotorDriverU\MotorDriverU\Config\MotorDriverUConf.h" ClassName="MotorDriverConf0">
             <EnumsDefinintions/>
             <Defines>
-                <Define DefineName="Target_RealSTMFlash" Type="bool" Value="0" MyPrivacy="public" PrefixName="stmFlashConf0" IsStatic="true"/>
-                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="stmFlashConf0" IsStatic="true"/>
+                <Define DefineName="MAJOR" Type="int" Value="0" MyPrivacy="private" PrefixName="MotorDriverConf0" IsStatic="true"/>
             </Defines>
             <Depends/>
         </Config>

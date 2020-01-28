@@ -4,6 +4,12 @@
 #endif 
 
   
+#if USING_MotorDriverEncoder
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\MotorEncoderDriverTDU\MotorEncoderDriverTDU\Config\MotorDriverEncoderconf.h"
+#endif
+#if USING_MotorDriverU
+#include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\MotorDriverU\MotorDriverU\Config\MotorDriverUconf.h"
+#endif
 #if USING_stmFlash
 #include "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\stm32FlashPeripheral\stm32flashperiph\Config\stmFlashConf.h"
 #endif 

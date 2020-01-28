@@ -130,15 +130,24 @@ namespace CodeGenerator.FileTemplates
                 int countAdjustedForEndLength = 0;
                 int indexAdjustedForLOOPLength = 0;
                 int totalReplaced;
+                int loopindex = 1;//Convert.ToInt32(((Macro)(macroGroupForThisSection.MacroGroups[0].Where(macr => macr.NameInFile == "i")).First()).ValueToReplace);
+                bool islastIndex = true;
+                macroGroupForThisSection.MacroGroups.Reverse();
                 foreach (var macroGroup in macroGroupForThisSection.MacroGroups)
                 {
                     indexAdjustedForLOOPLength = index + 9 + macroGroupForThisSection.NameOfLoop.Length;
                     countAdjustedForEndLength = lengthofSubstring - 7 - 9 - macroGroupForThisSection.NameOfLoop.Length;
+                     
+                    string IfLoopContentsFiltered = RemoveContentOfInvalidIfLoop(templateFileContents, loopindex, indexAdjustedForLOOPLength, countAdjustedForEndLength, islastIndex);
+                     
+                    string MacrosInsertedSubstring = InsertMacrosWithinContents(IfLoopContentsFiltered, macroGroup,0, IfLoopContentsFiltered.Length);// indexAdjustedForLOOPLength, countAdjustedForEndLength, index + lengthofSubstring, out totalReplaced);
+                     
+                    //append this to the end of the templatecontents AFTER the loop
+                    templateFileContents = templateFileContents.Insert(index + lengthofSubstring + totalLoopUnfoldedCount, MacrosInsertedSubstring);
+                    totalLoopUnfoldedCount += MacrosInsertedSubstring.Length;
 
-                    templateFileContents = InsertMacrosWithinContents(templateFileContents, macroGroup, indexAdjustedForLOOPLength, countAdjustedForEndLength, index + lengthofSubstring, out totalReplaced);
-                    totalLoopUnfoldedCount += totalReplaced;
-
-
+                    islastIndex = false;
+                    loopindex++;
                 }
                 //remove the loop section I just finished doing
                 templateFileContents = templateFileContents.Remove(index, lengthofSubstring);
@@ -158,7 +167,8 @@ namespace CodeGenerator.FileTemplates
                 }
 
 
-                m = Regex.Match(templateFileContents, patternForLoop, RegexOptions.Multiline);
+
+                    m = Regex.Match(templateFileContents, patternForLoop, RegexOptions.Multiline);
                 indexOfLoop++;
 
             }
@@ -233,10 +243,10 @@ namespace CodeGenerator.FileTemplates
             return contentsWithRemovedSubstring.Insert(startindex, substringToReplace);
         }
 
-        private static string InsertMacrosWithinContents(string contentWithMacros, List<Macro> macros, int startindex, int count, int indexOfInsertion, out int countReplaced)
+        private static string InsertMacrosWithinContents(string contentWithMacros, List<Macro> macros, int startindex, int count)
         {
             //first remove the contents from that range
-            string substringToReplace = contentWithMacros.Substring(startindex, count);
+            string substringToReplace = contentWithMacros;//contentWithMacros.Substring(startindex, count);
 
             //get that and replace all macros with their approprieate values
             foreach (var macro in macros)
@@ -244,8 +254,130 @@ namespace CodeGenerator.FileTemplates
                 substringToReplace = Regex.Replace(substringToReplace, @"<#\s*" + macro.NameInFile + @"\s*#>", macro.ValueToReplace);
             }
 
-            countReplaced = substringToReplace.Length;
-            return contentWithMacros.Insert(indexOfInsertion, substringToReplace);
+            return substringToReplace;
+
+            //countReplaced = substringToReplace.Length;
+            //return contentWithMacros.Insert(indexOfInsertion, substringToReplace);
+        }
+
+
+
+        private static string RemoveContentOfInvalidIfLoop(string contentsOfLoopSection, int loopnum, int startindex, int count, bool isLastIndex = false)
+        {
+            //first remove the contents from that range
+            string substringToReplace = contentsOfLoopSection.Substring(startindex, count);
+
+
+            //completely remove any contenets inbetween a ##i1## some content ##i1END## 
+            //that dont match the current index of the loop.
+            string patternIfIndex = @"<#if(\d+?)#>((.|\n)*?)<#ifEND#>";
+            Match mmm = Regex.Match(substringToReplace, patternIfIndex, RegexOptions.Multiline);
+            while (mmm.Success)
+            {
+                int indexofIfIndex = Convert.ToInt32(mmm.Groups[1].Value);
+                int startOfMatch = mmm.Groups[0].Index;
+                int endofMatch = startOfMatch + mmm.Groups[0].Length;
+
+                int sizeOfFirstTag = 7;
+                if (indexofIfIndex > 9)
+                {
+                    sizeOfFirstTag++;
+                }
+                if (indexofIfIndex > 99)
+                {
+                    sizeOfFirstTag++;
+                }
+
+                //if Ifindex is less than the current index then remove all contents in there
+                if (indexofIfIndex > loopnum)
+                {
+                    //remove tags first
+                    substringToReplace = substringToReplace.Remove(startOfMatch, sizeOfFirstTag);
+                    substringToReplace = substringToReplace.Remove(endofMatch - 9 - sizeOfFirstTag, 9);
+                    //now remove constents with adjested lengths
+                    startOfMatch = startOfMatch - sizeOfFirstTag +5;
+                    endofMatch = endofMatch - sizeOfFirstTag ;
+                    substringToReplace = substringToReplace.Remove(startOfMatch, mmm.Length - 14);
+                }
+                //else just remove the <##if##> tag
+                else
+                {
+                    substringToReplace = substringToReplace.Remove(startOfMatch, sizeOfFirstTag);
+                    substringToReplace = substringToReplace.Remove(endofMatch - 9 - sizeOfFirstTag, 9);
+                    /*
+                    //if this is the last loop index, remove all <#!L#>\<#EndL#> tags AND the contents
+                    if (isLastIndex == true)
+                    {
+                        string patternForContents = @"<#!L#>((.|\n)*?)<#EndL#>";
+                        substringToReplace = Regex.Replace(substringToReplace, patternForContents, "");
+                        substringToReplace = Regex.Replace(substringToReplace, @"<#!L#>", "");
+                        substringToReplace = Regex.Replace(substringToReplace, @"<#EndL#>", ""); 
+                    }
+                    else
+                    {
+                        //just remove the tags 
+                        substringToReplace = Regex.Replace(substringToReplace, @"<#!L#>", "");
+                        substringToReplace = Regex.Replace(substringToReplace, @"<#EndL#>", "");
+                    }*/
+                }
+
+                mmm = Regex.Match(substringToReplace, patternIfIndex, RegexOptions.Multiline);
+            }
+
+
+
+
+
+
+
+
+            //now do the same thing for the NOT if tags
+            string patternNotIfIndex = @"<#if!(\d+?)#>((.|\n)*?)<#if!END#>";
+            Match mmmm = Regex.Match(substringToReplace, patternNotIfIndex, RegexOptions.Multiline);
+            while (mmmm.Success)
+            {
+                int indexofIfIndex = Convert.ToInt32(mmmm.Groups[1].Value);
+                int startOfMatch = mmmm.Groups[0].Index;
+                int endofMatch = startOfMatch + mmmm.Groups[0].Length;
+
+                int sizeOfFirstTag = 8;
+                if (indexofIfIndex > 9)
+                {
+                    sizeOfFirstTag++;
+                }
+                if (indexofIfIndex > 99)
+                {
+                    sizeOfFirstTag++;
+                }
+
+                //if same loop then remove all contents
+                if (indexofIfIndex == loopnum)
+                {
+                    //remove tags first
+                    substringToReplace = substringToReplace.Remove(startOfMatch, sizeOfFirstTag);
+                    substringToReplace = substringToReplace.Remove(endofMatch - 10 - sizeOfFirstTag, 10);
+                    //now remove constents with adjested lengths
+                    startOfMatch = startOfMatch - sizeOfFirstTag + 7;
+                    endofMatch = endofMatch - sizeOfFirstTag;
+                    substringToReplace = substringToReplace.Remove(startOfMatch, mmmm.Length - 16);
+                }
+                //else just remove the <##if##> tag
+                else
+                {
+                    substringToReplace = substringToReplace.Remove(startOfMatch, sizeOfFirstTag);
+                    substringToReplace = substringToReplace.Remove(endofMatch - 10 - sizeOfFirstTag, 10);
+                  
+                }
+
+                mmmm = Regex.Match(substringToReplace, patternNotIfIndex, RegexOptions.Multiline);
+            }
+
+
+
+            return substringToReplace;
+
+            //countReplaced = substringToReplace.Length;
+            //return contentsOfLoopSection.Insert(indexOfInsertion, substringToReplace);
         }
 
 
@@ -310,3 +442,4 @@ namespace CodeGenerator.FileTemplates
 
     }
 }
+

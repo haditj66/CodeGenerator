@@ -134,6 +134,8 @@ public:
 	template<class T> 
 	void SetPublicDefineValue(std::string name, T valueToChangeTo);
 	 
+
+	virtual void LastChanceDefineChanges() {};
 	
 	static XMLDocument xmlDoc;
 protected:

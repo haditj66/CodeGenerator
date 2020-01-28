@@ -1,6 +1,8 @@
 //#pragma once
   
  #define USING_GlobalBuildConfig_H false 
+#define USING_MotorDriverEncoder false
+#define USING_MotorDriverU false
 #define USING_stmFlash false
 #define USING_VariableSaver false
 #define USING_blinds false

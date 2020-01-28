@@ -1,27 +1,253 @@
-//generated file: VarSaverObjects.h
+//generated file: UartPeripheral.h
 
 
 #pragma once
+#include "AEConfig.h"
+#include "MCUTypeDefs.h"
 
-#include "ConfigurationCG.h"
 
-//macro for being able to check if a macro is empty --------------------------------------
-##LOOP_1##  
-#if defined(SaveVar<#i#>) && (EXPAND(SaveVar<#i#>) == 0) 
-	#if (SaveVar<#i#>Type == 0)  
-	#define SaveVar<#i#>Type_t uint32_t 
-	#endif
-	#if (SaveVar<#i#>Type == 1)  
-	#define SaveVar<#i#>Type_t uint16_t
-	#endif
-	#if (SaveVar<#i#>Type == 2)  
-	#define SaveVar<#i#>Type_t uint8_t
-	#endif
-	#if (SaveVar<#i#>Type == 3)  
-	#define SaveVar<#i#>Type_t float
-	#endif
-	#if (SaveVar<#i#>Type == 4)  
-	#define SaveVar<#i#>Type_t char
-	#endif
+#define InitializeAllPeripheral<#Macro1#>
+
+#if PLATFORM == PLATFORM_stm32f4
+
+//includes
+#ifdef Target_Real<#Macro1#>
+##UserCode
+
 #endif
+
+#ifndef Target_Real<#Macro1#>
+##UserCode
+
+#endif 
+
+
+#if defined(<#Macro1#>PERIPHERAL1) || defined(<#Macro1#>PERIPHERAL2) || defined(<#Macro1#>PERIPHERAL3) || defined(<#Macro1#>PERIPHERAL4) || defined(<#Macro1#>PERIPHERAL5) || defined(<#Macro1#>PERIPHERAL6) || defined(<#Macro1#>PERIPHERAL7)
+
+
+
+#define HandleType char
+//set handletype if any
+#define HandleType
+
+//number of pins this peripheral takes
+##LOOP_1##  
+#define NumOFPinsNeeded <#i#> 
 ##END##
+
+ 
+
+ #if NumOFPinsNeeded ==1
+#define templateFor<#Macro1#>  uint16_t WhichInstanceOf<#Macro1#>, Portenum <#Macro1#>_<#Macro2#>_Port, PinEnum <#Macro1#>_<#Macro2#>_Pin
+#define templateargsFor<#Macro1#> WhichInstanceOf<#Macro1#>, <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin
+#define templateargsForHardware  <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin
+#endif
+#if NumOFPinsNeeded ==2
+#define templateFor<#Macro1#> uint16_t WhichInstanceOf<#Macro1#>, Portenum <#Macro1#>_<#Macro2#>_Port, PinEnum <#Macro1#>_<#Macro2#>_Pin, Portenum <#Macro1#>_<#Macro3#>_Port, PinEnum <#Macro1#>_<#Macro3#>_Pin
+#define templateargsFor<#Macro1#> WhichInstanceOf<#Macro1#>, <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin
+#define templateargsForHardware <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin
+#endif
+#if NumOFPinsNeeded ==3
+#define templateFor<#Macro1#> uint16_t WhichInstanceOf<#Macro1#>, Portenum <#Macro1#>_<#Macro2#>_Port, PinEnum <#Macro1#>_<#Macro2#>_Pin, Portenum <#Macro1#>_<#Macro3#>_Port, PinEnum <#Macro1#>_<#Macro3#>_Pin, Portenum <#Macro1#>_<#Macro4#>_Port, PinEnum <#Macro1#>_<#Macro4#>_Pin
+#define templateargsFor<#Macro1#> WhichInstanceOf<#Macro1#>, <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin, <#Macro1#>_<#Macro4#>_Port, <#Macro1#>_<#Macro4#>_Pin
+#define templateargsForHardware <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin, <#Macro1#>_<#Macro4#>_Port, <#Macro1#>_<#Macro4#>_Pin
+#endif
+ #if NumOFPinsNeeded ==4
+#define templateFor<#Macro1#> uint16_t WhichInstanceOf<#Macro1#>, Portenum <#Macro1#>_<#Macro2#>_Port, PinEnum <#Macro1#>_<#Macro2#>_Pin, Portenum <#Macro1#>_<#Macro3#>_Port, PinEnum <#Macro1#>_<#Macro3#>_Pin, Portenum <#Macro1#>_<#Macro4#>_Port, PinEnum <#Macro1#>_<#Macro4#>_Pin, Portenum <#Macro1#>_<#Macro5#>_Port, PinEnum <#Macro1#>_<#Macro5#>_Pin
+#define templateargsFor<#Macro1#> WhichInstanceOf<#Macro1#>, <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin, <#Macro1#>_<#Macro4#>_Port, <#Macro1#>_<#Macro4#>_Pin, <#Macro1#>_<#Macro5#>_Port, <#Macro1#>_<#Macro5#>_Pin
+#define templateargsForHardware  <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin, <#Macro1#>_<#Macro4#>_Port, <#Macro1#>_<#Macro4#>_Pin, <#Macro1#>_<#Macro5#>_Port, <#Macro1#>_<#Macro5#>_Pin
+#endif
+#if NumOFPinsNeeded ==5
+#define templateFor<#Macro1#> uint16_t WhichInstanceOf<#Macro1#>, Portenum <#Macro1#>_<#Macro2#>_Port, PinEnum <#Macro1#>_<#Macro2#>_Pin, Portenum <#Macro1#>_<#Macro3#>_Port, PinEnum <#Macro1#>_<#Macro3#>_Pin, Portenum <#Macro1#>_<#Macro4#>_Port, PinEnum <#Macro1#>_<#Macro4#>_Pin, Portenum <#Macro1#>_<#Macro5#>_Port, PinEnum <#Macro1#>_<#Macro5#>_Pin, Portenum <#Macro1#>_<#Macro6#>_Port, PinEnum <#Macro1#>_<#Macro6#>_Pin
+#define templateargsFor<#Macro1#> WhichInstanceOf<#Macro1#>, <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin, <#Macro1#>_<#Macro4#>_Port, <#Macro1#>_<#Macro4#>_Pin, <#Macro1#>_<#Macro5#>_Port, <#Macro1#>_<#Macro5#>_Pin, <#Macro1#>_<#Macro6#>_Port, <#Macro1#>_<#Macro6#>_Pin 
+#define templateargsForHardware  <#Macro1#>_<#Macro2#>_Port, <#Macro1#>_<#Macro2#>_Pin, <#Macro1#>_<#Macro3#>_Port, <#Macro1#>_<#Macro3#>_Pin, <#Macro1#>_<#Macro4#>_Port, <#Macro1#>_<#Macro4#>_Pin, <#Macro1#>_<#Macro5#>_Port, <#Macro1#>_<#Macro5#>_Pin, <#Macro1#>_<#Macro6#>_Port, <#Macro1#>_<#Macro6#>_Pin 
+#endif
+
+
+//interrupt function pointers types
+#define <#Macro1#>Interrupt1 <#Macro7#>
+#define <#Macro1#>Interrupt2 <#Macro8#>
+#define <#Macro1#>Interrupt3 <#Macro9#>
+
+#if <#Macro1#>Interrupt1 != 1
+typedef void(*AE_<#Macro1#>_<#Macro7#>Callback_t)(void);
+#endif  
+#if <#Macro1#>Interrupt2 != 1
+typedef void(*AE_<#Macro1#>_<#Macro8#>Callback_t)(void);
+#endif
+#if <#Macro1#>Interrupt3 != 1
+typedef void(*AE_<#Macro1#>_<#Macro9#>Callback_t)(void);
+#endif 
+
+
+
+template<templateFor<#Macro1#>>
+class <#Macro1#>Peripheral : public HardwarePeripheral <<#Macro1#>Peripheral<templateargsFor<#Macro1#>>, NumOFPinsNeeded,
+#ifndef Target_Real<#Macro1#>
+	char,
+#endif 
+#ifdef Target_Real<#Macro1#>
+	<#Macro10#>,
+#endif
+	templateargsForHardware>
+	{
+public:
+
+#if <#Macro1#>Interrupt1 != 1
+static AE_<#Macro1#>_<#Macro7#>Callback_t AE_<#Macro1#>_<#Macro7#>Callback; 
+#endif  
+#if <#Macro1#>Interrupt2 != 1
+static AE_<#Macro1#>_<#Macro8#>Callback_t AE_<#Macro1#>_<#Macro8#>Callback;
+#endif
+#if <#Macro1#>Interrupt3 != 1
+static AE_<#Macro1#>_<#Macro9#>Callback_t AE_<#Macro1#>_<#Macro9#>Callback;
+#endif 
+
+#ifndef Target_Real<#Macro1#>
+	//declare any static functions here.
+	##UserCode
+#endif  
+#ifdef Target_Real<#Macro1#>
+//declare any static functions here.
+	//static UART_HandleTypeDef* Ghuart2;
+	//static char readBuffer[100]; 
+	##UserCode
+#endif   
+
+protected:
+
+
+	// Inherited via HardwarePeripheral 
+	void _InitializePinSelectors(CreateTypeSelector_funcPtr(&functPtrsToChangeTypeSelectorss)[NumOFPinsNeeded]) override;
+
+
+	void MSP_Initialize(Port_t port1, Pin_t pin1, Port_t port2, Pin_t pin2, Port_t port3, Pin_t pin3, Port_t port4, Pin_t pin4, Port_t port5, Pin_t pin5)override;
+
+
+	// Inherited via HardwarePeripheral
+	void _Initialize(Port_t port1, Pin_t pin1, Port_t port2, Pin_t pin2, Port_t port3, Pin_t pin3, Port_t port4, Pin_t pin4, Port_t port5, Pin_t pin5)override;
+
+	};
+	
+template<templateFor<#Macro1#>>
+inline void <#Macro1#>Peripheral<templateargsFor<#Macro1#>>::_InitializePinSelectors(CreateTypeSelector_funcPtr(&functPtrsToChangeTypeSelectorss)[NumOFPinsNeeded])
+{
+/*
+	this->functPtrsToChangeTypeSelectors[0] = []() -> void
+	{PinSelector::getInstance()->IncludePossiblePin(Portenum::PortA, PinEnum::PIN2);
+	PinSelector::getInstance()->IncludePossiblePin(Portenum::PortD, PinEnum::PIN5); };
+
+	this->functPtrsToChangeTypeSelectors[1] = []() -> void
+	{PinSelector::getInstance()->IncludePossiblePin(Portenum::PortA, PinEnum::PIN3);
+	PinSelector::getInstance()->IncludePossiblePin(Portenum::PortD, PinEnum::PIN6); }; 
+*/
+##UserCode
+
+
+}
+
+template<templateFor<#Macro1#>>
+inline void <#Macro1#>Peripheral<templateargsFor<#Macro1#>>::MSP_Initialize(Port_t port1, Pin_t pin1, Port_t port2, Pin_t pin2, Port_t port3, Pin_t pin3, Port_t port4, Pin_t pin4, Port_t port5, Pin_t pin5)
+{
+##UserCode
+}
+
+
+
+template<templateFor<#Macro1#>>
+inline void <#Macro1#>Peripheral<templateargsFor<#Macro1#>>::_Initialize(Port_t port1, Pin_t pin1, Port_t port2, Pin_t pin2, Port_t port3, Pin_t pin3, Port_t port4, Pin_t pin4, Port_t port5, Pin_t pin5)
+{
+
+#ifdef Target_Real<#Macro1#>
+ //initialize the real peripheral here
+##UserCode
+#endif
+}
+ 
+
+ //interupt callback static definitions
+ #if <#Macro1#>Interrupt1 != 1 
+ template<templateFor<#Macro1#>>
+AE_<#Macro1#>_<#Macro7#>Callback_t <#Macro1#>Peripheral<templateargsFor<#Macro1#>>::AE_<#Macro1#>_<#Macro7#>Callback;
+#endif  
+ #if <#Macro1#>Interrupt2 != 1 
+ template<templateFor<#Macro1#>>
+AE_<#Macro1#>_<#Macro8#>Callback_t <#Macro1#>Peripheral<templateargsFor<#Macro1#>>::AE_<#Macro1#>_<#Macro8#>Callback;
+#endif  
+ #if <#Macro1#>Interrupt3 != 1 
+ template<templateFor<#Macro1#>>
+AE_<#Macro1#>_<#Macro9#>Callback_t <#Macro1#>Peripheral<templateargsFor<#Macro1#>>::AE_<#Macro1#>_<#Macro9#>Callback;
+#endif  
+
+
+
+#ifdef Target_Real<#Macro1#>
+//define any static functions here.
+##UserCode 
+#endif
+
+#ifndef Target_Real<#Macro1#>
+//define any static functions here.
+##UserCode 
+#endif 
+
+
+#define <#Macro1#>PERIPHERAL1_INITIALIZE
+#define <#Macro1#>PERIPHERAL2_INITIALIZE
+#define <#Macro1#>PERIPHERAL3_INITIALIZE
+#define <#Macro1#>PERIPHERAL4_INITIALIZE
+#define <#Macro1#>PERIPHERAL5_INITIALIZE
+#define <#Macro1#>PERIPHERAL6_INITIALIZE
+
+
+ //global pheripherals declaration
+#ifdef <#Macro1#>PERIPHERAL1
+extern <#Macro1#>PERIPHERAL1* <#Macro1#>PERIPHERAL1_Instance;  
+#define <#Macro1#>PERIPHERAL1_INITIALIZE <#Macro1#>PERIPHERAL1_Instance->initializePeripheral();
+#endif 
+#ifdef <#Macro1#>PERIPHERAL2
+extern <#Macro1#>PERIPHERAL2* <#Macro1#>PERIPHERAL2_Instance;  
+#define <#Macro1#>PERIPHERAL2_INITIALIZE <#Macro1#>PERIPHERAL2_Instance->initializePeripheral();
+#endif 
+#ifdef <#Macro1#>PERIPHERAL3
+extern <#Macro1#>PERIPHERAL3* <#Macro1#>PERIPHERAL3_Instance;  
+#define <#Macro1#>PERIPHERAL3_INITIALIZE <#Macro1#>PERIPHERAL3_Instance->initializePeripheral();
+#endif 
+#ifdef <#Macro1#>PERIPHERAL4
+extern <#Macro1#>PERIPHERAL4* <#Macro1#>PERIPHERAL4_Instance;  
+#define <#Macro1#>PERIPHERAL4_INITIALIZE <#Macro1#>PERIPHERAL4_Instance->initializePeripheral();
+#endif 
+#ifdef <#Macro1#>PERIPHERAL5
+extern <#Macro1#>PERIPHERAL5* <#Macro1#>PERIPHERAL5_Instance;  
+#define <#Macro1#>PERIPHERAL5_INITIALIZE <#Macro1#>PERIPHERAL5_Instance->initializePeripheral();
+#endif 
+#ifdef <#Macro1#>PERIPHERAL6
+extern <#Macro1#>PERIPHERAL6* <#Macro1#>PERIPHERAL6_Instance;  
+#define <#Macro1#>PERIPHERAL6_INITIALIZE <#Macro1#>PERIPHERAL6_Instance->initializePeripheral();
+#endif 
+
+
+#define InitializeAllPeripheral<#Macro1#> \
+<#Macro1#>PERIPHERAL1_INITIALIZE \
+<#Macro1#>PERIPHERAL2_INITIALIZE \
+<#Macro1#>PERIPHERAL3_INITIALIZE \
+<#Macro1#>PERIPHERAL4_INITIALIZE \
+<#Macro1#>PERIPHERAL5_INITIALIZE \
+<#Macro1#>PERIPHERAL6_INITIALIZE
+
+
+#endif //using_peripheral
+ 
+#endif //target_stm32f4
+
+
+
+
+
+
+
+
+
+
+
+

@@ -215,7 +215,7 @@ namespace CodeGenerator
         //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
         //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
-        //static string[] command  = "generate -i AE --ignoregit ".Split(' ');
+        static string[] command  = "generate -i AE --ignoregit ".Split(' ');
         //static string[] command = "generate".Split(' ');
         //static string[] command = "generate --config".Split(' ');
         //static string[] command = "init".Split(' ');
@@ -229,7 +229,7 @@ namespace CodeGenerator
         //static string[] command = "init ModB".Split(' ');
         //static string[] command = "init UUartDriver".Split(' ');
         //static string[] command = "sync iar".Split(' ');
-        static string[] command = "macro".Split(' ');
+        //static string[] command = "macro".Split(' ');
         //static string[] command = "projects".Split(' ');
 
 #else

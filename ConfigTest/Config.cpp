@@ -22,7 +22,7 @@ void Config::PrintDefines(Config& TopLevelConfig)
 		{
 			config->isTopLevel = true;
 		}*/
-
+		config->LastChanceDefineChanges();
 
 
 		//----- set the xml values ------

@@ -71,6 +71,8 @@ namespace CodeGenerator.ProjectBuilders
             cl.AdditionalIncludes.Add(VSsetting.PATHOfProject);
             cl.AdditionalIncludes.Add(Path.Combine(VSsetting.PATHOfProject, "Config"));
 
+            
+
 
             //the output will be the same path as the where the mod_conf.h file is located
             cl.OutputLocation = PathToOutPutCompilation;//Path.Combine(projectBuilderForVs.BaseDirectoryForProject, "Config");
