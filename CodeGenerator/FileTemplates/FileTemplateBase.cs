@@ -196,6 +196,11 @@ namespace CodeGenerator.FileTemplates
                 
             }
 
+
+            //go through all <#ifMacro3#>  <#EndIf#>
+            templateFileContents = FilterAllIfMacros(templateFileContents);
+
+
             //now write this into the destination File
             //this will overwrite the file itf it exists file does not exist
             string FullFilePathDestination = Path.Combine(TemplateOutputDestination, NameOfOutputTemplateFile);
@@ -258,6 +263,93 @@ namespace CodeGenerator.FileTemplates
 
             //countReplaced = substringToReplace.Length;
             //return contentWithMacros.Insert(indexOfInsertion, substringToReplace);
+        }
+
+
+        private string FilterAllIfMacros(string thingToFilter)
+        {
+            string strToReturn = thingToFilter;
+            //string patternForLoop = @"<#ifMacro(\d+?)#>((.|\n)*?)<#ifMEnd#>";
+            string tag1 = @"<#ifMacro(\d+?)#>";
+            string tag2 = @"<#ifMEnd#>";
+
+            Match m = GetInnerMatchBetweenTags(strToReturn, tag1, tag2,1); 
+            while (m.Success)
+            {
+                //get the number of that macro
+                int numOfMacro = Convert.ToInt32(m.Groups[1].Value); 
+                //tags length
+                int digitlengthOfTag = numOfMacro < 10 ? 1 : numOfMacro < 100 ? 2 : numOfMacro < 100 ? 3 : 4;
+                int tag1length = 11 + digitlengthOfTag;
+                int tag2length = 10;
+                //check if that macro value is empty, if it is, remove all contents within that iftag along with the tags
+                if (Macros[numOfMacro-1].ValueToReplace.IsAnEmptyLine() || 
+                    (Macros[numOfMacro - 1].ValueToReplace == "##Macro"+ (numOfMacro+1).ToString()))
+                { 
+                    //contents with tags removed
+                    strToReturn = strToReturn.Remove(m.Index, m.Length);
+                }
+                else
+                {
+                    //remove first tag
+                    strToReturn = strToReturn.Remove(m.Index, tag1length);
+                    //remove second tag
+                    strToReturn = strToReturn.Remove(m.Index - tag1length - tag2length + m.Length, tag2length);
+                }  
+
+                m = GetInnerMatchBetweenTags(strToReturn, tag1, tag2, 1);
+            }
+
+
+            return strToReturn;
+
+        }
+
+        private Match GetInnerMatchBetweenTags(string contents, string tag1, string tag2, int numOfGroupsWithinTag1)
+        {
+            Match MatchToReturn;
+
+            numOfGroupsWithinTag1++;
+
+            //find the regex match of the two tags
+            string patternForLoop = @""+tag1+"((.|\n)*?)"+tag2+"";
+            MatchToReturn = Regex.Match(contents, patternForLoop, RegexOptions.Multiline);
+
+            //if no match return MatchToReturn
+            if (!MatchToReturn.Success) { return MatchToReturn; }
+
+
+            int indexOforiginalMatch = MatchToReturn.Groups[0 + numOfGroupsWithinTag1].Index;
+            int lengthOforiginalMatch = MatchToReturn.Groups[0 + numOfGroupsWithinTag1].Length;
+
+            string MatchedContents = contents.Substring(indexOforiginalMatch, lengthOforiginalMatch);
+
+
+
+            //keep looking for if there is another match on the appropriate group for only tag 1 this time
+            string patternFortag1 = @"" + tag1 + "";
+            Match InnerFirstTagMatch = Regex.Match(MatchedContents, patternFortag1, RegexOptions.Multiline);
+            int indexOfinnerMatch = 0;
+            int lengthOfinnerMatch = 0;
+            while (InnerFirstTagMatch.Success)
+            {
+                indexOfinnerMatch = InnerFirstTagMatch.Groups[0].Index;
+                lengthOfinnerMatch = InnerFirstTagMatch.Groups[0].Length;
+
+                string sub = contents.Substring((indexOforiginalMatch + indexOfinnerMatch),
+                    contents.Length - (indexOforiginalMatch + indexOfinnerMatch));
+                MatchToReturn = Regex.Match(sub, patternForLoop, RegexOptions.Multiline);
+                MatchToReturn = Regex.Match(contents, ""+tag1+"" +MatchToReturn.Groups[numOfGroupsWithinTag1].Value+""+ tag2 + "", RegexOptions.Multiline);
+
+                MatchedContents = contents.Substring(indexOforiginalMatch + lengthOfinnerMatch + indexOfinnerMatch, 
+                    lengthOforiginalMatch - lengthOfinnerMatch);
+                InnerFirstTagMatch = Regex.Match(MatchedContents, patternFortag1, RegexOptions.Multiline); 
+            }
+
+            
+
+            return MatchToReturn;
+
         }
 
 
