@@ -193,7 +193,19 @@ namespace CodeGenerator.IDESettingXMLs
             CLIncludeFiles.ForEach(cinc => cinc.Name = prefixToAddToAllFilesNames + cinc.Name);
         }
 
-
+        public void SetPrefixToCLIncFiles(string prefixToAddToAllFilesNames, string nameOfFileToPrefix)
+        {
+            
+            CLIncludeFiles.ForEach(cinc =>
+            {
+                if (Path.GetFileName(cinc.Name) == nameOfFileToPrefix)
+                {
+                    cinc.Name = prefixToAddToAllFilesNames + cinc.Name;
+                } 
+            }
+                );
+        }
+       
 
     }
 }

@@ -37,6 +37,8 @@ using CPPParser;
 using Extensions;
 using Project = CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project;
 using CodeGenerator.FileTemplates.GeneralMacoTemplate;
+using MyLibClangVisitors.ConsoleApp2;
+using System.Threading;
 
 namespace CodeGenerator
 {
@@ -46,6 +48,9 @@ namespace CodeGenerator
 
     public class Program
     {
+
+
+
 
         #region Options classes  ***************************************************************************
         //*************************************************************************************************** 
@@ -63,6 +68,10 @@ namespace CodeGenerator
 
         }
 
+        [Verb("cmakegui", HelpText = "create a macro file in this directory out of all .cgenM files")]
+        public class cmakeguiOptions
+        {
+        }
 
         [Verb("generate", HelpText = "generate the code")]
         public class GenerateOptions
@@ -72,7 +81,7 @@ namespace CodeGenerator
             public bool config { get; set; }
 
             [Option(HelpText = "This will use git to go to switch to an appropriate version when fetching other libraries. use this when you have a library that has been changed and you want to use a past version of that library.")]
-            public bool ignoreGit { get; set; }
+            public bool git { get; set; }
 
             [Option('i', HelpText = "This will ignore all files that are anywhere in this filter. use this when you have 3rd party files that are shared within ALL libraries.")]
             public string ignoreFilesInFilter { get; set; }
@@ -171,11 +180,12 @@ namespace CodeGenerator
         }
         #endregion
 
-
+        // C:\\Users\\Hadi\\OneDrive\\Documents\\VisualStudioprojects\\Projects\\cSharp\\CodeGenerator\\CodeGenerator\\CodeGenerator\\bin\\Debug"
         public static string DIRECTORYOFTHISCG = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string CGSAVEFILESBASEDIRECTORY = "CGensaveFiles";
         public static string CGCONFCOMPILATOINSBASEDIRECTORY = "ConfigCompilations";
-        public static string PATHTOCONFIGTEST = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest";
+        public static string PATHTOCONFIGTEST = DIRECTORYOFTHISCG + "..\\..\\..\\..\\ConfigTest"; //@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest";
+        public static string PATHTOCMAKEGUI = DIRECTORYOFTHISCG + "..\\..\\..\\..\\CgenCmakeGui";
 
 #if TESTING
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
@@ -195,7 +205,10 @@ namespace CodeGenerator
         //public static string envIronDirectory = @" C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\WaveletTransformSPB\WaveletTransformSPB";
         //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\HolterMonitor\HolterMonitor";
         //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\SPISlaveFSM\SPISlaveFSMcont";
-        public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UVariableSaver\UVariableSaver";
+        //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UVariableSaver\UVariableSaver";
+        //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UMasterToArduino\UMasterToArduino";
+        //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\blinds\WaveletTransformSPB";
+        public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CgenCmakeGui\TestFiles";
 
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
@@ -215,7 +228,7 @@ namespace CodeGenerator
         //static string[] command = @"configproj VS --removelibrary C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest\ConfigTest.lib".Split(' ');
         //static string[] command = @"configproj ALLPLATFORMS --addinclude C:\Users\Hadi\Downloads\PROClient_64".Split(' ');
         //static string[] command  = "".Split(' '); 
-        static string[] command  = "generate -i AE --ignoregit ".Split(' ');
+        //static string[] command  = "generate -i AE ".Split(' ');
         //static string[] command = "generate".Split(' ');
         //static string[] command = "generate --config".Split(' ');
         //static string[] command = "init".Split(' ');
@@ -231,6 +244,7 @@ namespace CodeGenerator
         //static string[] command = "sync iar".Split(' ');
         //static string[] command = "macro".Split(' ');
         //static string[] command = "projects".Split(' ');
+        static string[] command = "cmakegui".Split(' ');
 
 #else
         static string[] command;
@@ -247,6 +261,8 @@ namespace CodeGenerator
         static void Main(string[] args)
         {
 
+
+
             //string e = Environment.CurrentDirectory;
             //Console.WriteLine(e);
             //ProjectVSTest();
@@ -255,7 +271,7 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions,ProjectsOptions, MacroOptions, ProjConfigOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions,ProjectsOptions, MacroOptions, ProjConfigOptions, cmakeguiOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
@@ -263,6 +279,7 @@ namespace CodeGenerator
 .WithParsed<ConfigOptions>(opts => Config(opts))
 .WithParsed<ProjectsOptions>(opts => Projects(opts))
 .WithParsed<MacroOptions>(opts => Macro(opts))
+.WithParsed<cmakeguiOptions>(opts => cmakegui(opts))
 .WithParsed<ProjConfigOptions>(opts => ProjConfig(opts));
                 
             };
@@ -1087,6 +1104,60 @@ namespace CodeGenerator
         #endregion
 
 
+        #region CmakeConfig command ***************************************************************************
+        //***************************************************************************************************  
+
+
+        //step 1:
+        //Dir_Step1.txt:
+        //main CMakeLists.txt will call the cgen_start() function. this function will write to
+        //${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/Dir_StepOne.txt
+        // it will write the build directory ${CMAKE_CURRENT_BINARY_DIR}
+
+        //step 2:
+        //Dir_Step2.txt:
+        //cgen cmakegui command will be called which will read the Dir_Step1.txt file, and forward that information into 
+        //the Dir_Step2.txt which will be located at this CgenCmakeGui project directory. information forwared will be the 
+        // ${CMAKE_CURRENT_BINARY_DIR} and the ${CMAKE_CURRENT_SOURCE_DIR}
+
+        //directory of cgencmakegui project
+        string cgencmakeguiProj = "";
+
+        static ParserResult<object> cmakegui(cmakeguiOptions opts)
+        {
+            string ggg = DIRECTORYOFTHISCG;
+
+
+
+            string environcgensaveFile = Path.Combine(envIronDirectory, "CGensaveFiles", "Dir_Step1.txt");
+            if (Directory.Exists(Path.GetDirectoryName(environcgensaveFile)) == false)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(environcgensaveFile)); 
+            }
+            if (File.Exists(environcgensaveFile) == false)
+            {
+                File.Create(environcgensaveFile);
+            }
+
+            Thread.Sleep(500);
+            if (File.Exists(environcgensaveFile) == false)
+            {
+                File.Create(environcgensaveFile);
+            }
+
+            //read all contents of the Dir_Step1 in the current working directory
+            string Dir_Step1Contents = File.ReadAllText(envIronDirectory +"/CGensaveFiles/Dir_Step1.txt");
+             
+            //forward this content to the PATHTOCMAKEGUI directory
+            File.WriteAllText(PATHTOCMAKEGUI + "/Dir_Step2.txt", Dir_Step1Contents);
+
+
+            return null;
+        }
+
+        #endregion
+
+
         #region Generate command ***************************************************************************
         //***************************************************************************************************  
 
@@ -1137,7 +1208,7 @@ namespace CodeGenerator
 
                     //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
                     //first grab all lowest level libraries that have no dependencies
-                    projectBuilderForVs.ImportConfigFiles(!opts.ignoreGit);
+                    projectBuilderForVs.ImportConfigFiles(opts.git);
 
 
 
@@ -1195,7 +1266,7 @@ namespace CodeGenerator
 
                 //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
                 //first grab all lowest level libraries that have no dependencies
-                projectBuilderForVs.ImportDependentLibrariesFiles(!opts.ignoreGit);
+                projectBuilderForVs.ImportDependentLibrariesFiles(opts.git);
 
 
 
@@ -1244,6 +1315,8 @@ namespace CodeGenerator
         }
 
         #endregion
+
+
 
 
 

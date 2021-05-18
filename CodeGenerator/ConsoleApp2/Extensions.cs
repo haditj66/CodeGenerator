@@ -97,7 +97,7 @@ namespace CPPParser
         {
             List<CXTranslationUnit> resultsTU = new List<CXTranslationUnit>();
 
-            CXUnsavedFile cxf = new CXUnsavedFile();
+            //CXUnsavedFile cxf = new CXUnsavedFile();
             CXIndex index = clang.createIndex(0, 0); 
             CXUnsavedFile[] unsavedFile = new CXUnsavedFile[0];
             string[] arr = { "-x", "c++" };

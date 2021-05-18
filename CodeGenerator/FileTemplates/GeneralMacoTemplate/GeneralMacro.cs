@@ -39,14 +39,16 @@ namespace CodeGenerator.FileTemplates.GeneralMacoTemplate
             {
                 Debug.Assert(false, "you need a ##ToFile with the file name of your destination file that the macro will generate code to");
             }
-
-
+            
 
             while (matches.Count > 0)
             {
                 var mm = matches[matches.Count - 1];
                 GeneralTemplate = new FileTemplateGeneral(PathtoTemplateFileAndOutputFiles, NameOfcGenMacroFile, mm.Groups[1].Value.Trim());
 
+
+
+                 
                 //get all contents after the ##ToFile stuff
                 string macroContents = contents.Substring(mm.Index + mm.Length, contents.Length - (mm.Index + mm.Length));
 

@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using ClangSharp;
 using ConsoleApp2.MyClangWrapperClasses.CXCursors;
+ 
+using ClangSharpPInvokeGenerator;
+using ConsoleApp2.MyClangWrapperClasses;
+using MyLibClangVisitors.ConsoleApp2;
 
 namespace ConsoleApp2.MyClangWrapperClasses
 {

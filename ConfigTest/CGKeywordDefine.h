@@ -1,6 +1,15 @@
 //#pragma once
   
  #define USING_GlobalBuildConfig_H false 
+#define USING_ITwoCDriver false
+#define USING_ControlProjectthree false
+#define USING_escController false
+#define USING_MicrowaveDopler false
+#define USING_PoseLib false
+#define USING_mpudriver false
+#define USING_ControlHover false
+#define USING_ButtonDriver false
+#define USING_UMasterToArd false
 #define USING_MotorDriverEncoder false
 #define USING_MotorDriverU false
 #define USING_stmFlash false

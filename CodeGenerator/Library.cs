@@ -262,6 +262,11 @@ namespace CodeGenerator
             settings.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames);
         }
 
+        public void SetPrefixToCLIncFiles(string prefixToAddToAllFilesNames, string nameOfFileToPrefix)
+        {
+            settings.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames, nameOfFileToPrefix);
+        }
+
 
     }
 

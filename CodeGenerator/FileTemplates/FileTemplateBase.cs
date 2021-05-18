@@ -91,6 +91,8 @@ namespace CodeGenerator.FileTemplates
                 problem.ThereisAProblem("the file " + pathToGeneratedFile + "is not able to be accessed yet. make sure it is not open and is created");
             }
 
+             
+
             string patternUserCode = @"\/\/UserCode_Section(.*)((.|\n)*)\/\/UserCode_Section\1_end";
             var matches = Regex.Matches(generatedContent, patternUserCode, RegexOptions.Multiline);
             foreach (Match mmat in matches)
@@ -213,6 +215,19 @@ namespace CodeGenerator.FileTemplates
             string strToReturn = content;
 
             //replace all UserCode macros with a comment and a prefix for the sextion of usercode
+
+            //replace user codes that have a user given subscript first
+            string patternForUserCode_ = @"##UserCode_(\w)";
+            var mm_ = Regex.Match(strToReturn, patternForUserCode_, RegexOptions.Multiline); 
+            while (mm_.Success)
+            {
+                strToReturn = strToReturn.Remove(mm_.Index, mm_.Length);
+                strToReturn = strToReturn.Insert(mm_.Index, "//UserCode_Section" + mm_.Groups[1].Value + "\n" + "//UserCode_Section" + mm_.Groups[1].Value + "_end");
+                mm_ = Regex.Match(strToReturn, patternForUserCode_, RegexOptions.Multiline);
+
+            }
+
+
             string patternForUserCode = @"##UserCode";
             var mm = Regex.Match(strToReturn, patternForUserCode, RegexOptions.Multiline);
             int indexforUserCode = 0;
@@ -301,6 +316,38 @@ namespace CodeGenerator.FileTemplates
             }
 
 
+            //for ifNotTags <#!fMacro1#> -------------
+
+            tag1 = @"<#!fMacro(\d+?)#>";
+            tag2 = @"<#!fMEnd#>";
+
+            m = GetInnerMatchBetweenTags(strToReturn, tag1, tag2, 1);
+            while (m.Success)
+            {
+                //get the number of that macro
+                int numOfMacro = Convert.ToInt32(m.Groups[1].Value);
+                //tags length
+                int digitlengthOfTag = numOfMacro < 10 ? 1 : numOfMacro < 100 ? 2 : numOfMacro < 100 ? 3 : 4;
+                int tag1length = 11 + digitlengthOfTag;
+                int tag2length = 10;
+                //check if that macro value is empty, if it is, remove all contents within that iftag along with the tags
+                if (! (Macros[numOfMacro - 1].ValueToReplace.IsAnEmptyLine() || (Macros[numOfMacro - 1].ValueToReplace == "##Macro" + (numOfMacro + 1).ToString())))
+                {
+                    //contents with tags removed
+                    strToReturn = strToReturn.Remove(m.Index, m.Length);
+                }
+                else
+                {
+                    //remove first tag
+                    strToReturn = strToReturn.Remove(m.Index, tag1length);
+                    //remove second tag
+                    strToReturn = strToReturn.Remove(m.Index - tag1length - tag2length + m.Length, tag2length);
+                }
+
+                m = GetInnerMatchBetweenTags(strToReturn, tag1, tag2, 1);
+            }
+
+
             return strToReturn;
 
         }
@@ -312,7 +359,7 @@ namespace CodeGenerator.FileTemplates
             numOfGroupsWithinTag1++;
 
             //find the regex match of the two tags
-            string patternForLoop = @""+tag1+"((.|\n)*?)"+tag2+"";
+            string patternForLoop = @""+tag1 +@"((.|\n)*?)"+ tag2 + "";
             MatchToReturn = Regex.Match(contents, patternForLoop, RegexOptions.Multiline);
 
             //if no match return MatchToReturn
@@ -331,6 +378,7 @@ namespace CodeGenerator.FileTemplates
             Match InnerFirstTagMatch = Regex.Match(MatchedContents, patternFortag1, RegexOptions.Multiline);
             int indexOfinnerMatch = 0;
             int lengthOfinnerMatch = 0;
+            int TimesNested = 0; 
             while (InnerFirstTagMatch.Success)
             {
                 indexOfinnerMatch = InnerFirstTagMatch.Groups[0].Index;
@@ -339,11 +387,23 @@ namespace CodeGenerator.FileTemplates
                 string sub = contents.Substring((indexOforiginalMatch + indexOfinnerMatch),
                     contents.Length - (indexOforiginalMatch + indexOfinnerMatch));
                 MatchToReturn = Regex.Match(sub, patternForLoop, RegexOptions.Multiline);
-                MatchToReturn = Regex.Match(contents, ""+tag1+"" +MatchToReturn.Groups[numOfGroupsWithinTag1].Value+""+ tag2 + "", RegexOptions.Multiline);
+                MatchToReturn = Regex.Match(contents, ""+ tag1 + "" + Regex.Escape(MatchToReturn.Groups[numOfGroupsWithinTag1].Value)+""+ tag2 + "", RegexOptions.Multiline);
 
-                MatchedContents = contents.Substring(indexOforiginalMatch + lengthOfinnerMatch + indexOfinnerMatch, 
-                    lengthOforiginalMatch - lengthOfinnerMatch);
-                InnerFirstTagMatch = Regex.Match(MatchedContents, patternFortag1, RegexOptions.Multiline); 
+                //if there are more than 1000 nests then break out of this
+                if (TimesNested >1000){break;}
+
+                try 
+                {
+                    MatchedContents = contents.Substring(indexOforiginalMatch + lengthOfinnerMatch + indexOfinnerMatch,
+                        lengthOforiginalMatch - lengthOfinnerMatch);
+                }
+                catch (System.ArgumentOutOfRangeException)
+                {
+                    break; 
+                }
+                
+                InnerFirstTagMatch = Regex.Match(MatchedContents, patternFortag1, RegexOptions.Multiline);
+                TimesNested++;
             }
 
             

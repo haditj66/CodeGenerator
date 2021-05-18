@@ -16,6 +16,8 @@ namespace ConsoleApp2
     {
         static void Main(string[] args)
         {
+            CXIndex index = clang.createIndex(0, 0);
+
             //CXIndex ind = clang.createIndex(0, 0);
             /* 
 

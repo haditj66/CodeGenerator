@@ -21,6 +21,8 @@ using ConsoleApp2.Parsing;
 using CPPParser;
 using System.Text.RegularExpressions;
 using CodeGenerator.FileTemplates.GeneralMacoTemplate;
+using ConsoleApp2.MyClangWrapperClasses;
+using MyLibClangVisitors.ConsoleApp2;
 
 namespace CodeGeneratorTest
 {
@@ -85,6 +87,19 @@ namespace CodeGeneratorTest
             FileTemplateMainCG maincgTemplate = new FileTemplateMainCG("", "moda1");
             maincgTemplate.CreateTemplate();
         }
+
+
+        [TestMethod]
+        public void GeneralTemplateUserCodesTest()
+        {
+            string pathtoTemplateFileAndOutputFiles = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug";
+            string nameOfcGenMacroFile = "testForUserCodes.cgenM";
+
+            GeneralMacro generalMacro = new GeneralMacro(pathtoTemplateFileAndOutputFiles, nameOfcGenMacroFile);
+            generalMacro.CreateTemplate();
+
+        }
+
 
         [TestMethod]
         public void GeneralTemplateTest()
@@ -170,6 +185,8 @@ namespace CodeGeneratorTest
         [TestMethod]
         public void ChangeFileName()
         {
+
+
             CppRefactorer refact = new CppRefactorer(new DirectoryInfo(@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGeneratorTest\bin\Debug\TestCppRefactor\FileNameChange"));
 
             refact.ChangeNameOfFile(@"rg.h","pre_rg.h"); 

@@ -46,7 +46,7 @@ namespace CodeGenerator.ProjectBuilders
             AllNotTopAndNotGlobal
                 .ForEach((Library lib) =>
                 {
-                    var includes = saveProjGlob.CgenProjects.Projects.First(p =>  p.PathOfProject == lib.settings.PATHOfProject)
+                    var includes = saveProjGlob.CgenProjects.Projects.First(p => p.PathOfProject == lib.settings.PATHOfProject)
                         .PlatFormsInScope.GetIncludesFromPlatForm(plaformOfSetup);
                     includes.ForEach((string inc) =>
                     {
@@ -91,9 +91,9 @@ namespace CodeGenerator.ProjectBuilders
                 .ForEach((MyCLCompileFile inc) =>
                 {
                     //exclude files that are in the Config filter of that project or the LibraryDependencies. exclude main.cpp and as well
-                    if (IsCCompDependencyAbleForImporting(inc, lib.config.Prefix+"_", lib.config.Prefix + "_"+ lib.config.ConfTypePrefix+"_"))
+                    if (IsCCompDependencyAbleForImporting(inc, lib.config.Prefix + "_", lib.config.Prefix + "_" + lib.config.ConfTypePrefix + "_"))
                     {
-                        
+
                         //change it so that the location of these files will be the same as the filters they are set in
                         inc.LocationOfFile = Path.GetDirectoryName(inc.FullFilterName);
 
@@ -140,7 +140,7 @@ namespace CodeGenerator.ProjectBuilders
         }
 
         public override void ImportDependentLibrariesFiles(bool usingGit)
-        { 
+        {
             //steps 
             //1. check out git tags for ALL dependent libraries
             //2. build configuration for that dependent library in temp folder
@@ -148,11 +148,11 @@ namespace CodeGenerator.ProjectBuilders
             //3. get all files that are able to be imported in from dependent library (NOT main.cpp, ModuleConfig.h etc)
             //4. import those files from dependent library to main library.
             //5. git library back to commit it was before checked out
-            
+
 
 
             //go through lowest level libraries first to import in      
-                foreach (var libraryToImp in LibTop.LibrariesIDependOn)
+            foreach (var libraryToImp in LibTop.LibrariesIDependOn)
             {
 
                 //1. check out git tags for ALL dependent libraries
@@ -160,7 +160,7 @@ namespace CodeGenerator.ProjectBuilders
                 {
                     CheckoutLibraryToCorrectMajor(libraryToImp);
                 }
-                
+
 
                 //2. ---------------------
                 //create Configuration.h in temporary folder but dont put it in project so to not change anything 
@@ -175,16 +175,16 @@ namespace CodeGenerator.ProjectBuilders
                 }).First();
                 //todo the path here should be to the temp folder?
                 string e = libraryToImp.GetPathToProjectAsADependent();
-                MyCLIncludeFile clincConfig = new MyCLIncludeFile(filtForConfiguration_h,"ConfigurationCG.h", Path.Combine("LibraryDependencies", libraryToImp.GetPathToProjectAsADependent()));
+                MyCLIncludeFile clincConfig = new MyCLIncludeFile(filtForConfiguration_h, "ConfigurationCG.h", Path.Combine("LibraryDependencies", libraryToImp.GetPathToProjectAsADependent()));
 
 
                 //2.5 send that configurationCG.h file to final librarydependencies/xx/xx folder. but first inherit values
                 configFileBuilder.InheritFromTopConfig(libraryToImp.config);
-                configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject ,clincConfig.LocationOfFile,clincConfig.Name));
+                configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject, clincConfig.LocationOfFile, clincConfig.Name));
 
                 //3. --------------------- 
                 //grab all files that are qualified to be imported in and send them through  (NOT main.cpp, ModuleConfig.h etc)
-                var CcompsToImport = libraryToImp.GetAllCCompile().Where((MyCLCompileFile ccom) => { return IsCCompDependencyAbleForImporting(ccom);}).ToList();
+                var CcompsToImport = libraryToImp.GetAllCCompile().Where((MyCLCompileFile ccom) => { return IsCCompDependencyAbleForImporting(ccom); }).ToList();
                 var CIncToImport = libraryToImp.GetAllCincludes().Where((MyCLIncludeFile cinc) => { return IsCIncDependencyAbleForImporting(cinc); }).ToList();
                 //CIncToImport.Add(clinc); dont do this yet as you only want to refactor this, not import it.
 
@@ -194,7 +194,7 @@ namespace CodeGenerator.ProjectBuilders
                 FileDepedentsImporter FileImporter = new FileDepedentsImporter(libraryToImp.GetFullPrefix(), CcompsToImport, CIncToImport, libraryToImp.settings.PATHOfProject);
                 string pathToOutput = Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent());
                 FileImporter.ImportFilesToPath(pathToOutput);
-                 
+
                 CIncToImport.Add(clincConfig);//the configuration that was written in needs to be added now
                 libraryToImp.AddCIncludeFile(clincConfig);
                 List<string> allFilePaths = new List<string>();
@@ -203,73 +203,124 @@ namespace CodeGenerator.ProjectBuilders
 
 
                 //refactor files -------------------------------------------------------------------------
+                var isStaticdef = libraryToImp.config.Defines.Define.FirstOrDefault(d => d.DefineName == "STATIC");
+                bool isStatic = isStaticdef == null ? true : Convert.ToInt32(isStaticdef.Value) == 0 ? false : true;
+
                 CppRefactorer refactorer = new CppRefactorer(allFilePaths);
                 List<string> filesInScopeToRefactorCopy = new List<string>(refactorer.FilesInScopeToRefactor);
-                string prefixToAddToAllFilesNames = string.IsNullOrEmpty(libraryToImp.config.ConfTypePrefix) 
-                        ?  libraryToImp.config.Prefix + "_" 
+                string prefixToAddToAllFilesNames = string.IsNullOrEmpty(libraryToImp.config.ConfTypePrefix)
+                        ? libraryToImp.config.Prefix + "_"
                         : libraryToImp.config.Prefix + "_" + libraryToImp.config.ConfTypePrefix + "_";
 
-                var definesDict = refactorer.GetAllDefines(clincConfig.Name);
-                foreach (var file in filesInScopeToRefactorCopy)
+
+
+                if (isStatic)
                 {
-                    foreach (var define in definesDict)
-                    { 
-                        refactorer.RenameDefine(file, define.Key, prefixToAddToAllFilesNames+ define.Key);
-                    } 
+
+                    //change names of ONLY the configuration file
+                    foreach (var File in filesInScopeToRefactorCopy)
+                    {
+                        if (Path.GetFileName(File) == "ConfigurationCG.h")
+                        {
+                            refactorer.ChangeNameOfFile(Path.GetFileName(File),
+                                Path.Combine(pathToOutput, prefixToAddToAllFilesNames + Path.GetFileName(File)), false);
+                        }
+                    }
+                    refactorer.ReloadRefactorer();
                 }
 
-
-                /*
-                //replace the files defines from the configuration folder values. otherwise the define names will conflict with the main program configuration defines.
+                if (!isStatic)
+                {
+                    var definesDict = refactorer.GetAllDefines(clincConfig.Name);
                     foreach (var file in filesInScopeToRefactorCopy)
-                {
-                    string configContents = File.ReadAllText(Path.Combine(LibTop.settings.PATHOfProject, clincConfig.LocationOfFile, clincConfig.Name));
-                    refactorer.ReplaceDefinesWithDefineValueFile(file, configContents);
-                }*/
+                    {
+                        foreach (var define in definesDict)
+                        {
+                            refactorer.RenameDefine(file, define.Key, prefixToAddToAllFilesNames + define.Key);
+                        }
+                    }
 
-                refactorer.ReloadRefactorer();
-                //change names of all imported files 
-                foreach (var File in filesInScopeToRefactorCopy)
-                {
-                    refactorer.ChangeNameOfFile(Path.GetFileName(File), Path.Combine(pathToOutput , prefixToAddToAllFilesNames + Path.GetFileName(File)),false);
 
+                    /*
+                    //replace the files defines from the configuration folder values. otherwise the define names will conflict with the main program configuration defines.
+                        foreach (var file in filesInScopeToRefactorCopy)
+                    {
+                        string configContents = File.ReadAllText(Path.Combine(LibTop.settings.PATHOfProject, clincConfig.LocationOfFile, clincConfig.Name));
+                        refactorer.ReplaceDefinesWithDefineValueFile(file, configContents);
+                    }*/
+
+                    refactorer.ReloadRefactorer();
+                    //change names of all imported files 
+                    foreach (var File in filesInScopeToRefactorCopy)
+                    {
+                        refactorer.ChangeNameOfFile(Path.GetFileName(File),
+                            Path.Combine(pathToOutput, prefixToAddToAllFilesNames + Path.GetFileName(File)), false);
+
+                    }
+
+
+                    refactorer.ReloadRefactorer();
+
+
+
+                    //add the prefix as a namespace to all files as well. however remove the last character if it is a "_" 
+                    string namespaceprefix = prefixToAddToAllFilesNames.Last().Equals('_')
+                        ? prefixToAddToAllFilesNames.Remove(prefixToAddToAllFilesNames.Length - 1, 1)
+                        : prefixToAddToAllFilesNames;
+                    refactorer.InsertNamespaceIntoAllFiles(namespaceprefix);
+                    refactorer.ReloadRefactorer();
                 }
 
-
-                refactorer.ReloadRefactorer();
-
-
-
-                //add the prefix as a namespace to all files as well. however remove the last character if it is a "_" 
-                string namespaceprefix = prefixToAddToAllFilesNames.Last().Equals('_')
-                    ? prefixToAddToAllFilesNames.Remove(prefixToAddToAllFilesNames.Length-1, 1)
-                    : prefixToAddToAllFilesNames;
-                refactorer.InsertNamespaceIntoAllFiles(namespaceprefix);
-                refactorer.ReloadRefactorer();
 
 
                 //change #include mentions of librarydependencies to have just the file name
                 foreach (var file in refactorer.FilesInScopeToRefactor)
                 {
-                    string fullPath =  refactorer.GetFullFilePathFromFileNameInScope(file);
+                    string fullPath = refactorer.GetFullFilePathFromFileNameInScope(file);
                     string[] contents = File.ReadAllLines(fullPath);
                     string[] contentsNew = File.ReadAllLines(fullPath);
                     int index = 0;
+
                     foreach (var line in contents)
                     {
+
+
                         if (Regex.IsMatch(line, @"#include.*LibraryDependencies"))
                         {
-                            //get the include and replace it with just the file name
-                            Match m = Regex.Match(line, @"#include\s*""(.*)""");
-                            contentsNew[index] =contentsNew[index].Remove(m.Groups[1].Index, m.Groups[1].Length);
-                            contentsNew[index] = contentsNew[index].Insert(m.Groups[1].Index,Path.GetFileName(m.Groups[1].Value));
-                        }
+                            if (!isStatic)
+                            {
+                                //get the include and replace it with just the file name
+                                Match m = Regex.Match(line, @"#include\s*""(.*)""");
+                                contentsNew[index] =
+                                    contentsNew[index].Remove(m.Groups[1].Index, m.Groups[1].Length);
+                                contentsNew[index] = contentsNew[index].Insert(m.Groups[1].Index,
+                                    Path.GetFileName(m.Groups[1].Value));
+                            }
+                            else
+                            {
+                                //if it is a static, then only change  ConfigurationCG.h
+                                if (line.Contains("ConfigurationCG.h"))
+                                {
+                                    Match m = Regex.Match(line, @"#include\s*""(.*)""");
+                                    contentsNew[index] =
+                                        contentsNew[index].Remove(m.Groups[1].Index, m.Groups[1].Length);
+                                    contentsNew[index] = contentsNew[index].Insert(m.Groups[1].Index,
+                                        Path.GetFileName(m.Groups[1].Value));
+                                }
+
+                            }
+                        } 
+
 
                         index++;
                     }
 
+
+
                     File.WriteAllLines(fullPath, contentsNew);
                 }
+
+
 
                 /* DONT
                 //remove contents of configuration
@@ -283,11 +334,17 @@ namespace CodeGenerator.ProjectBuilders
                     } 
                 }*/
 
-
-                //finally change the names of all the myincludes and myccompiles
-                libraryToImp.SetPrefixToCLCompileFiles(prefixToAddToAllFilesNames);
-                libraryToImp.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames);
-
+                if (!isStatic)
+                {
+                    //finally change the names of all the myincludes and myccompiles
+                    libraryToImp.SetPrefixToCLCompileFiles(prefixToAddToAllFilesNames);
+                    libraryToImp.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames);
+                }
+                else
+                {
+                    //if it is not static, just set prefix to configurationfile
+                    libraryToImp.SetPrefixToCLIncFiles(prefixToAddToAllFilesNames,"ConfigurationCG.h");
+                }
 
                 //5. --------------------- 
                 //revert it back to its previous state
@@ -304,7 +361,7 @@ namespace CodeGenerator.ProjectBuilders
         }
 
         public void ImportConfigFiles(bool usingGit)
-        { 
+        {
             //steps 
             //1. check out git tags for ALL dependent libraries
             //2. build configuration for that dependent library in temp folder
@@ -322,7 +379,7 @@ namespace CodeGenerator.ProjectBuilders
                 {
                     CheckoutLibraryToCorrectMajor(libraryToImp);
                 }
-                
+
 
                 //2. ---------------------
                 //create Configuration.h in temporary folder but dont put it in project so to not change anything 
@@ -339,7 +396,7 @@ namespace CodeGenerator.ProjectBuilders
                 string e = libraryToImp.GetPathToProjectAsADependent();
                 MyCLIncludeFile clincConfig = new MyCLIncludeFile(filtForConfiguration_h, "Configuration.h", Program.CGCONFCOMPILATOINSBASEDIRECTORY);
 
-                 
+
 
                 //2.5 send that configurationCG.h file to final librarydependencies/xx/xx folder. but first inherit values
                 configFileBuilder.InheritFromTopConfig(libraryToImp.config);
@@ -362,7 +419,7 @@ namespace CodeGenerator.ProjectBuilders
                     }
                 }
 
-                configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent(), prefixToAddToAllFilesNames+ "ConfigurationCG.h"));
+                configFileBuilder.WriteTempConfigurationToFinalFile(Path.Combine(LibTop.settings.PATHOfProject, "LibraryDependencies", libraryToImp.GetPathToProjectAsADependent(), prefixToAddToAllFilesNames + "ConfigurationCG.h"));
 
                 //5. --------------------- 
                 //revert it back to its previous state
@@ -385,7 +442,7 @@ namespace CodeGenerator.ProjectBuilders
                 if (library.config.ClassName != "GlobalBuildConfig")
                 {
                     cgenProjectGlobal projG = saveFilecgenProjectGlobal.CgenProjects.Projects.First(p => p.PathOfProject == library.settings.PATHOfProject);
-                    var anyInScope = projG.PlatFormsInScope.PlatForms.FirstOrDefault(plat=> plat.PlatFormName == platformsetup);
+                    var anyInScope = projG.PlatFormsInScope.PlatForms.FirstOrDefault(plat => plat.PlatFormName == platformsetup);
                     if (anyInScope == null)
                     {
                         return projG.NameOfProject;

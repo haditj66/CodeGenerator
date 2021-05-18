@@ -1,0 +1,2 @@
+CALL "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+ SET > "C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AESim\AESim\AEHubCompiler\AEHubCompiler\EnironVariables.txt"

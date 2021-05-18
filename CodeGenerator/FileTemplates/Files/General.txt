@@ -1,27 +1,12 @@
-//generated file: testForGeneral.cpp
+//generated file: BoardVendorSetup.cpp
 
 
-##UserCode
+// this is for board X64 for the
+// PC part of it
 
-##LOOP_1##  
-##UserCode
- <#Macro1#><#i#>  
- ##UserCode
-##END##
+#include "BoardVendorSetup.h"
 
-##UserCode
-
-##LOOP_2##  
-##UserCode
-USING_<#i#>  
-##END##
-
-##UserCode
-
-##LOOP_3##  
-USING_<#i#>  
-##END##
- 
+##UserCode_a
 
 
- 
+##UserCode_b
