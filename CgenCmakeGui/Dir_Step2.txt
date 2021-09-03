@@ -1,2 +1,4 @@
-CMAKE_CURRENT_BINARY_DIR: C:/visualgdb_projects/AERTOSCopy/build/Simulation/Debug
+CMAKE_CURRENT_BINARY_DIR: C:/visualgdb_projects/AERTOSCopy/build/VSGDBCmakeNinja_armnoneabiid/Debug
 CMAKE_CURRENT_SOURCE_DIR: C:/visualgdb_projects/AERTOSCopy
+PLATFORM: VSGDBCmakeNinja_armnoneabiid
+CMAKE_BUILD_TYPE: DEBUG

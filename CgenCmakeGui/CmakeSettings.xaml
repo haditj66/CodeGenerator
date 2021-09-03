@@ -5,19 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CgenCmakeGui"
         mc:Ignorable="d"
-        Title="CmakeSettings" Height="250
-        " Width="400">
+        Title="CmakeSettings" Height="340" Width="792">
     <Grid>
         <Canvas>
             <TextBox x:Name="textBox" Canvas.Left="140" Canvas.Top="40" Text="Cmake Location" TextWrapping="Wrap" Width="120" RenderTransformOrigin="0.534,0.733"/>
             <TextBox x:Name="CmakeLocationTextBox" Canvas.Left="10" Canvas.Top="58" TextWrapping="Wrap" Width="380" UndoLimit="101"/>
             <TextBox x:Name="textBox_Copy" Canvas.Left="140" Canvas.Top="99" Text="Generator" TextWrapping="Wrap" Width="120" RenderTransformOrigin="0.534,0.733"/>
-            <TextBox x:Name="textBox_Copy1" Canvas.Left="140" Canvas.Top="155" Text="Options" TextWrapping="Wrap" Width="120" RenderTransformOrigin="0.534,0.733"/>
-            <TextBox x:Name="OptionsTextBox" Canvas.Left="10" Canvas.Top="173" TextWrapping="Wrap" Width="380"/>
-            <Button x:Name="SaveButton" Content="Save" Canvas.Left="101" Canvas.Top="204" Width="192"/>
+            <TextBox x:Name="textBox_Copy1" Canvas.Left="140" Canvas.Top="162" Text="Options" TextWrapping="Wrap" Width="120" RenderTransformOrigin="0.534,0.733"/>
+            <TextBox x:Name="OptionsTextBox" Canvas.Left="10" Canvas.Top="180" TextWrapping="Wrap" Width="380"/>
+            <Button x:Name="SaveButton" Content="Save" Canvas.Left="313" Canvas.Top="274" Width="192"/>
             <ComboBox x:Name="GeneratorComboBox" Canvas.Left="140" Canvas.Top="122" Width="120"/>
+            <CheckBox x:Name="isRemotePCCheckBox" Content="is this for a remote PC" Canvas.Left="569" Canvas.Top="28" Width="159" Height="21" Checked="isRemotePCCheckBox_Checked" Unchecked="isRemotePCCheckBox_Unchecked"/>
+            <Label x:Name="remotelabel1" Content="Directory of remote project equivalent" Canvas.Left="525" Canvas.Top="49" Width="214"/>
+            <TextBox x:Name="RemoteDirectory" Canvas.Left="472" Canvas.Top="75" TextWrapping="Wrap" Width="297"/>
+            <Label x:Name="remotelabel3" Content="remote username" Canvas.Left="525" Canvas.Top="154" Width="214"/>
+            <TextBox x:Name="RemoteUsername" Canvas.Left="472" Canvas.Top="180" TextWrapping="Wrap" Width="297"/>
+            <Label x:Name="remotelabel4" Content="remote password" Canvas.Left="525" Canvas.Top="208" Width="214"/>
+            <TextBox x:Name="RemotePassword" Canvas.Left="472" Canvas.Top="234" TextWrapping="Wrap" Width="297"/>
+            <Label x:Name="remotelabel2" Content="remote IP address" Margin="528,99,50,199"/>
+            <TextBox x:Name="RemoteIPAddress" Canvas.Left="472" Canvas.Top="133" TextWrapping="Wrap" Width="297"/>
+
         </Canvas>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Height="16" Margin="-4268,-49,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Width="4324"/>
+
+
 
     </Grid>
 </Window>

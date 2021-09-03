@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<CmakeSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <CmakeLocation>cmake</CmakeLocation>
+  <Generator>Visual Studio 16 2019</Generator>
+  <CmakeOptions />
+</CmakeSettings>

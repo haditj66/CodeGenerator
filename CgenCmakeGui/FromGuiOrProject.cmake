@@ -1,0 +1,1 @@
+set(CGEN_GUI_SET TRUE)

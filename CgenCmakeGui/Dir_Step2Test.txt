@@ -1,0 +1,2 @@
+CMAKE_CURRENT_BINARY_DIR: C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CgenCmakeGui\TestFiles\build
+CMAKE_CURRENT_SOURCE_DIR: C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CgenCmakeGui\TestFiles

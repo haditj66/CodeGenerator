@@ -30,9 +30,19 @@ function(Cgen_Option )
         return()
     endif ()
 	
+	# 2.	check if the cgengui has been opened yet
+	if(${CGEN_GUI_SET} STREQUAL "TRUE")
+        	execute_process(COMMAND  CgenCmakeGui.exe
+            WORKING_DIRECTORY ${CODEGENGUI_PATH}/CodeGenerator/CodeGenerator/CgenCmakeGui/bin/Debug/net5.0-windows
+            OUTPUT_VARIABLE outVar 
+            ERROR_VARIABLE errorVar
+			)
+			
+			set(CGEN_GUI_SET TRUE)
+    endif ()
 
 
-    # 2.     overwrite the file cgenCmakeConfigNEXT.txt with ...
+    # 3.     overwrite the file cgenCmakeConfigNEXT.txt with ...
 		ListToString(possibleStr " " ${_arg_POSSIBLEVALUES})
     file(WRITE ${CGEN_NEXTFILE} "NAME ${_arg_NAME}
 DESCRIPTION ${_arg_DESCRIPTION}
@@ -40,7 +50,7 @@ POSSIBLEVALUES ${possibleStr}
 CONSTRICTS_LATER_OPTIONS ${_arg_CONSTRICTS_LATER_OPTIONS}
 ")
 
-    # 3.    throw a fatal error to end the execution
+    # 4.    throw a fatal error to end the execution
     message(FATAL_ERROR "cgen: ${_arg_NAME} needs to be set now")
 
 
@@ -63,6 +73,8 @@ macro(Cgen_Start )
     set(CGEN_CACHEFILE "${CGEN_DIRECTORY}/cgenCmakeCache.cmake"  )
     set(CGEN_NEXTFILE "${CGEN_DIRECTORY}/cgenCmakeConfigNEXT.txt"  )
 	set(CGEN_STEP1FILE "${CGEN_DIRECTORY}/Dir_Step1.txt"  )
+	
+	set(CODEGENGUI_PATH "C:/Users/Hadi/OneDrive/Documents/VisualStudioprojects/Projects/cSharp")
 	
     if (NOT EXISTS ${CGEN_DIRECTORY})
         file(MAKE_DIRECTORY ${CGEN_DIRECTORY})

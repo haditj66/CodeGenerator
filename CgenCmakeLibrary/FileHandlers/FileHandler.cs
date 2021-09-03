@@ -41,7 +41,7 @@ namespace CgenCmakeLibrary.FileHandlers
                     ret =  File.ReadAllText(FullFilePath);
                     worked = true;
                 }
-                catch (IOException)
+                catch (IOException e)
                 {
                     Thread.Sleep(800);
                     worked = false;

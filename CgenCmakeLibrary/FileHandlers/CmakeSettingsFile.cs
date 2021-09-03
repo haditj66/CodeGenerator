@@ -20,6 +20,21 @@ namespace CgenCmakeLibrary.FileHandlers
         [XmlElement(ElementName = "CmakeOptions")]
         public string CmakeOptions;
 
+        [XmlElement(ElementName = "IsRemotePC")]
+        public bool IsRemotePC;
+
+        [XmlElement(ElementName = "RemoteWorkingDirectory")]
+        public string RemoteWorkingDirectory;
+
+        [XmlElement(ElementName = "RemoteIPAddress")]
+        public string RemoteIPAddress;
+
+        [XmlElement(ElementName = "RemoteUsername")]
+        public string RemoteUsername;
+
+        [XmlElement(ElementName = "RemotePassword")]
+        public string RemotePassword;
+
 
     }
 
@@ -91,10 +106,10 @@ namespace CgenCmakeLibrary.FileHandlers
                 return cmd;
             }
             cmd =  CmakeSettingsData.CmakeLocation
-            + " -G " + CmakeSettingsData.Generator
+            + " -G \"" + CmakeSettingsData.Generator + "\""
             + " -S " + CMAKE_CURRENT_SOURCE_DIR
             + " -B " + CMAKE_CURRENT_BINARY_DIR
-            + "  " + CmakeSettingsData.CmakeOptions;
+            + "  " + CmakeSettingsData.CmakeOptions; //" -DCGEN_GUI_SET=FALSE" + 
 
             return cmd;
         }

@@ -1,12 +1,20 @@
-//generated file: BoardVendorSetup.cpp
+//generated file: UART_TEST.cpp
 
 
-// this is for board X64 for the
-// PC part of it
-
-#include "BoardVendorSetup.h"
+#if INTEGRATION_TESTS_FOR_AEHal_Tests1 == UART_TEST
+ 
+#include "IntegTestPipeline.h"
 
 ##UserCode_a
 
+void RunSelectedIntegrationTest_UART_TEST()
+{
 
 ##UserCode_b
+
+}
+
+
+##UserCode_c
+
+#endif

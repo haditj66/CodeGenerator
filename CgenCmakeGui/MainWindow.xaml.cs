@@ -1,7 +1,8 @@
-﻿#define TESTING
+﻿//#define TESTING
 
 using CgenCmakeLibrary;
 using CgenCmakeLibrary.FileHandlers;
+using SSHHandler;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,6 +32,9 @@ namespace CgenCmakeGui
 
         GridGeneratorForUI ggForConfigDisplay;
         GridGeneratorForUI ggUI;
+
+        GridGeneratorForUI gridForOptionsView;
+
         Rectangle rect2;
         StatusTextHandler statusTextHandler;
         OutputScrollHandler outputScrollHandler;
@@ -42,205 +46,14 @@ namespace CgenCmakeGui
         SavedOptionsFileHandler savedOptionsFileHandler;
 
         CMDHandler cmdHandler;
-
+        SSH_Handler SSHhandler;
 
         Dispatcher dispatcherForMainWindow;
 
 
-        public enum OptionGuiBoxStates
-        {
-            Hidden,
-            Selected,
-            Unselected
-        }
-        public class OptionsSelectedGuiBox
-        {
-            public void SetState(OptionGuiBoxStates optionGuiBoxStates)
-            {
-                if (optionGuiBoxStates == OptionGuiBoxStates.Selected)
-                {
-                    this.forCombBox.IsEnabled = false;
-                    this.forRectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Aqua);
-                    this.forRectangle.Opacity = .05;
-                    forCombBox.Visibility = Visibility.Visible;
-                    forRectangle.Visibility = Visibility.Visible;
-                    forLabelName.Visibility = Visibility.Visible;
-                    forLabelDesc.Visibility = Visibility.Visible;
-                }
-                else if (optionGuiBoxStates == OptionGuiBoxStates.Hidden)
-                {
-                    this.forCombBox.IsEnabled = false;
-                    //this.forRectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Transparent);
-                    this.forRectangle.Opacity = 0;
-                    forCombBox.Visibility = Visibility.Hidden;
-                    forRectangle.Visibility = Visibility.Hidden;
-                    forLabelName.Visibility = Visibility.Hidden;
-                    forLabelDesc.Visibility = Visibility.Hidden;
-                   
-                }
-                else if (optionGuiBoxStates == OptionGuiBoxStates.Unselected)
-                {
+        OptionsView optionsViewWindow;
 
-                    this.forCombBox.IsEnabled = true;
-                    forCombBox.Visibility = Visibility.Visible;
-                    forRectangle.Visibility = Visibility.Visible;
-                    forLabelName.Visibility = Visibility.Visible;
-                    forLabelDesc.Visibility = Visibility.Visible;
-                    //this.forRectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Transparent);
-                    this.forRectangle.Opacity = 0;
-                }
-            }
-
-
-            public static void Init(GridGeneratorForUI forGrid, Canvas forCanvas, Action callbackPossibleValueSelected)
-            {
-                CallbackPossibleValueSelected = callbackPossibleValueSelected;
-                ForGrid = forGrid;
-                ForCanvas = forCanvas;
-
-                AllOptionsSelectedGui = new List<OptionsSelectedGuiBox>();
-                optionsSelected = new List<OptionsSelected>();
-
-                OptionsSelectedGuiBox optSel;
-
-                int ii = 1;
-                int jj = 1;
-                for (int ind = 0; ind < forGrid.Rows * forGrid.Columns; ind++)
-                {
-
-                    optSel = new OptionsSelectedGuiBox(jj, ii);
-                    optSel.forRectangle = ForGrid.DrawRectangleAroundGrid(jj, ii);
-                    ForCanvas.Children.Add(optSel.forRectangle);
-
-                    AllOptionsSelectedGui.Add(optSel);
-                    optSel.SetState(OptionGuiBoxStates.Hidden);
-
-                    jj = jj >= forGrid.Rows ? 1 : jj + 1;
-                    ii = jj == 1 ? ii + 1 : ii;
-
-                     
-                }
-            }
-
-            public static void AddOptionSelectedToGui(Option optToAdd, int GuiNumberToAdd)
-            {
-
-                OptionsSelected optSelToAdd = new OptionsSelected();
-                optSelToAdd.option = optToAdd;
-
-                var allOpt = OptionsSelectedGuiBox.AllOptionsSelectedGui[GuiNumberToAdd];
-                allOpt.ForOptionSelected = optSelToAdd;
-
-                allOpt.forLabelName.Content = optSelToAdd.option.Name;
-
-                allOpt.forLabelDesc.Content = optSelToAdd.option.Description;
-
-                allOpt.forCombBox.SelectionChanged += allOpt.OptionPossibleValueSelected;
-                allOpt.forCombBox.Width = 120;
-                allOpt.forCombBox.Visibility = Visibility.Visible;
-                foreach (var item in optSelToAdd.option.MyPossibleValues)
-                {
-                    allOpt.forCombBox.Items.Add(item.Name);
-                }
-
-                optionsSelected.Add(optSelToAdd);
-
-                allOpt.SetState(OptionGuiBoxStates.Unselected);
-            }
-
-            private void OptionPossibleValueSelected(object sender, SelectionChangedEventArgs e)
-            {
-                ForOptionSelected.possibleValueSelection = (string)e.AddedItems[0];
-
-                //fill rectangle and turn off combobox
-                this.SetState(OptionGuiBoxStates.Selected);
-
-
-                if (CallbackPossibleValueSelected != null)
-                {
-                    CallbackPossibleValueSelected();
-                }
-
-            }
-
-            private OptionsSelectedGuiBox(int forGridRow, int forGridCol)
-            {
-                ForGridRow = forGridRow;
-                ForGridCol = forGridCol;
-
-                forLabelName = new Label();
-                forLabelDesc = new Label();
-                forCombBox = new ComboBox();
-
-                //set positions
-                ForGrid.SetPositionInGrid(forLabelName, ForGridRow, ForGridCol, 0, -25);
-                ForGrid.SetPositionInGrid(forLabelDesc, ForGridRow, ForGridCol, -100, 17);
-                ForGrid.SetPositionInGrid(forCombBox, ForGridRow, ForGridCol);
-
-
-                ForCanvas.Children.Add(forCombBox);
-                ForCanvas.Children.Add(forLabelName);
-                ForCanvas.Children.Add(forLabelDesc);
-            }
-
-            public ComboBox forCombBox;
-            public Rectangle forRectangle;
-            public Label forLabelName;
-            public Label forLabelDesc;
-
-            private static GridGeneratorForUI ForGrid;
-            private static Canvas ForCanvas; 
-            private static Action CallbackPossibleValueSelected;
-            
-
-            public static List<OptionsSelectedGuiBox> AllOptionsSelectedGui;
-            public static List<OptionsSelected> optionsSelected;
-             
-            public int ForGridRow { get; }
-            public int ForGridCol { get; }
-            private OptionsSelected ForOptionSelected;
-        }
-
-
-
-
-
-        //private void CreateOptionBox(int row, int col, Option forOption)
-        //{
-
-        //    Label optionNamelabel = new Label();
-        //    optionNamelabel.Content = forOption.Name;
-
-        //    Label optionDescriptionlabel = new Label();
-        //    optionDescriptionlabel.Content = forOption.Description;
-
-        //    ComboBox com = new ComboBox();
-        //    com.SelectionChanged += OptionPossibleValueSelected;
-        //    com.Width = 120;
-        //    com.Visibility = Visibility.Visible;
-        //    foreach (var item in forOption.MyPossibleValues)
-        //    {
-        //        com.Items.Add(item.Name);
-        //    }
-
-        //    ggForConfigDisplay.SetPositionInGrid(optionNamelabel, row, col, 0, -25);
-        //    ggForConfigDisplay.SetPositionInGrid(optionDescriptionlabel, row, col, -100, 17);
-        //    ggForConfigDisplay.SetPositionInGrid(com, row, col);
-        //    rect2 = ggForConfigDisplay.DrawRectangleAroundGrid(row, col);
-
-        //    mypanel.Children.Add(com);
-        //    mypanel.Children.Add(rect2);
-        //    mypanel.Children.Add(optionNamelabel);
-        //    mypanel.Children.Add(optionDescriptionlabel);
-
-
-        //    //set in options selected list
-        //    optionsSelected.Add(new OptionsSelectedGuiBox() { option = forOption, forCombBox = com, forRectangle = rect2 });
-        //}
-
-
-
-
+        
 
         //step 1:
         //Dir_Step1.txt:
@@ -256,10 +69,13 @@ namespace CgenCmakeGui
 
         public static string CMAKE_CURRENT_BINARY_DIR;
         public static string CMAKE_CURRENT_SOURCE_DIR;
+        public static string PLATFORM;
+        public static string CMAKE_BUILD_TYPE;
+        
         public static string CGensaveFilesDir;
 
 #if TESTING
-        string Dir_Step2 = Environment.CurrentDirectory + "\\..\\..\\..\\..\\CgenCmakeGui\\Dir_Step2.txt";
+        string Dir_Step2 = Environment.CurrentDirectory + "\\..\\..\\..\\..\\CgenCmakeGui\\Dir_Step2Test.txt";
 #else
         string Dir_Step2 = Environment.CurrentDirectory + "\\..\\..\\..\\..\\CgenCmakeGui\\Dir_Step2.txt";
 #endif
@@ -288,13 +104,28 @@ namespace CgenCmakeGui
                 CMAKE_CURRENT_SOURCE_DIR = match.Groups[1].Value.Trim();
             }
 
+            regex = new Regex(@"PLATFORM: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                PLATFORM = match.Groups[1].Value.Trim();
+            }
+
+            regex = new Regex(@"CMAKE_BUILD_TYPE: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                CMAKE_BUILD_TYPE = match.Groups[1].Value.Trim();
+            }
+
             dispatcherForMainWindow = this.Dispatcher;
 
 
             //load all options from the save file
             //string saveFile = File.ReadAllText(Environment.CurrentDirectory+ "../../../../TestFiles/CGensaveFiles/cgenCmakeGuiSaveFile.txt");
             //string saveFile = File.ReadAllText(CMAKE_CURRENT_BINARY_DIR + "/CGensaveFiles/cgenCmakeGuiSaveFile.txt");
-            CGensaveFilesDir = CMAKE_CURRENT_BINARY_DIR + "\\CGensaveFiles";
+            
+            CGensaveFilesDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles\\cmakeGui\\" + PLATFORM + "\\" + CMAKE_BUILD_TYPE; //CMAKE_CURRENT_BINARY_DIR + "\\CGensaveFiles";
             string CGensaveFilesRootDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles";
             nextfile = new NEXTFileParser(new DirectoryInfo(CGensaveFilesDir));//( Environment.CurrentDirectory + "../../../../TestFiles/CGensaveFiles"));
             cmakecachefile = new CmakeCacheFileParser(new DirectoryInfo(CGensaveFilesDir));
@@ -302,45 +133,22 @@ namespace CgenCmakeGui
             savedOptionsFileHandler = new SavedOptionsFileHandler(new DirectoryInfo(CGensaveFilesRootDir));
 
 
-            ggForConfigDisplay = new GridGeneratorForUI(10, 3, mainWindow);
-            OptionsSelectedGuiBox.Init(ggForConfigDisplay, mypanel, ()=> {
-                //write option to the cgenCmakeCache.cmake
-                cmakecachefile.WriteOptionsToFile(OptionsSelectedGuiBox.optionsSelected);
-
-                //run the cmake command to get the next config option.
-                runCmakeCmd(); 
-
-                //save/update all options so far
-                savedOptionsFileHandler.SaveAllOptions();
-            }); 
 
 
-            cmakeSettingsFile.LoadData();
-            savedOptionsFileHandler.LoadAllOptions();
-            OptionsSelectedGuiBox.optionsSelected.Clear();
-            OptionsSelectedGuiBox.optionsSelected.AddRange(cmakecachefile.LoadOptionsSelected());
-            //cmakecachefile.WriteOptionsToFile(optionsSelected.Cast<OptionsSelected>().ToList());
-            //optionsSelected.AddRange(cmakecachefile.LoadOptionsSelected());
-
-            //OptionsSelectedGuiBox.AddOptionSelectedToGui(OptionsSelectedGuiBox.optionsSelected[0], 0);
-
-
-            cmdHandler = new CMDHandler(CMAKE_CURRENT_SOURCE_DIR);//(AppDomain.CurrentDomain.BaseDirectory + "..\\..\\..\\TestFiles");
-
-
-
-            // var opt = Option.Deserialize(saveFile);
 
             int ggui1Row = 6; int ggui1Col = 6;
-            GridGeneratorForUI ggUI1 = new GridGeneratorForUI(ggui1Row, ggui1Col, mainWindow);//, mypanel);
-                                                                                              //ggUI = ggUI1.CreateGridFromGridUI(1, 2, 8, 1);
+            GridGeneratorForUI ggUI1 = new GridGeneratorForUI(ggui1Row, ggui1Col, mainWindow);
 
-            //, mypanel);
-            //System.Windows.Controls.ListBox lsbox = new ListBox();
-
-            //outputScroll.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-
-
+            //#################
+            //status and output handlers
+            //#################
+            //TextBlock txtBlock = new TextBlock();
+            //txtBlock.Foreground = new SolidColorBrush(System.Windows.Media.Colors.Blue);
+            //statusTextHandler = new StatusTextHandler(txtBlock, this.Dispatcher);
+            //ggUI1.SetPositionInGrid(txtBlock, 4, ggui1Col, -60);
+            //Rectangle rect4 = ggUI1.DrawRectangleAroundGrid(4, ggui1Col);
+            //mypanel.Children.Add(txtBlock);
+            //mypanel.Children.Add(rect4);
 
             guiOutput.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             guiOutput.ScrollToEnd();
@@ -353,17 +161,54 @@ namespace CgenCmakeGui
             outputScroll.ScrollToEnd();
             outputScroll.Content = "ss";
             outputScrollHandler = new OutputScrollHandler(outputScroll, this.Dispatcher, true);
-            outputScroll.Visibility = Visibility.Visible;
-            //GridGeneratorForUI ggUIFortextBlock = new GridGeneratorForUI(3,1,mainWindow);
+            outputScroll.Visibility = Visibility.Visible; 
 
 
+
+            //#################
+            //OptionsSelectedGuiBox
+            //#################
+            ggForConfigDisplay = new GridGeneratorForUI(10, 3, mainWindow);
+            OptionsSelectedGuiBox.Init(ggForConfigDisplay, mypanel, 6, guioutputScrollHandler, ()=> {
+                //write option to the cgenCmakeCache.cmake
+                cmakecachefile.WriteOptionsToFile(OptionsSelectedGuiBox.optionsSelected);
+
+                //run the cmake command to get the next config option.
+                runCmakeCmd(); 
+
+                //save/update all options so far
+                savedOptionsFileHandler.SaveAllOptions();
+            });
+
+
+
+            cmakeSettingsFile.LoadData();
+            savedOptionsFileHandler.LoadAllOptions();
+            OptionsSelectedGuiBox.optionsSelected.Clear();
+            var optsionssel = cmakecachefile.LoadOptionsSelected();
+            foreach (var item in optsionssel)
+            {
+                OptionsSelectedGuiBox.AddOptionSelectedToGui(item);
+                
+            }
+
+             
+ 
+
+            cmdHandler = new CMDHandler(CMAKE_CURRENT_SOURCE_DIR);//(AppDomain.CurrentDomain.BaseDirectory + "..\\..\\..\\TestFiles");
+             
+
+
+
+
+            int ggui1Col2 = ggui1Col+1;
             Button newBtn = new Button();
             newBtn.Content = "Go To Options";
             newBtn.Click += button_Click;
             newBtn.Width = 150;
             newBtn.Height = 100;
-            ggUI1.SetPositionInGrid(newBtn, 1, ggui1Col);
-            Rectangle rect = ggUI1.DrawRectangleAroundGrid(1, ggui1Col);
+            ggUI1.SetPositionInGrid(newBtn, 1, ggui1Col2);
+            Rectangle rect = ggUI1.DrawRectangleAroundGrid(1, ggui1Col2);
             mypanel.Children.Add(newBtn);
             mypanel.Children.Add(rect);
 
@@ -372,8 +217,8 @@ namespace CgenCmakeGui
             btnCmakeConfigSettings.Click += button_Click_CmakeSettings;
             btnCmakeConfigSettings.Width = 150;
             btnCmakeConfigSettings.Height = 100;
-            ggUI1.SetPositionInGrid(btnCmakeConfigSettings, 2, ggui1Col);
-            Rectangle rect2 = ggUI1.DrawRectangleAroundGrid(2, ggui1Col);
+            ggUI1.SetPositionInGrid(btnCmakeConfigSettings, 2, ggui1Col2);
+            Rectangle rect2 = ggUI1.DrawRectangleAroundGrid(2, ggui1Col2);
             mypanel.Children.Add(btnCmakeConfigSettings);
             mypanel.Children.Add(rect2);
 
@@ -382,142 +227,36 @@ namespace CgenCmakeGui
             btnOptionsConfig.Click += button_Click_ConfigOptions;
             btnOptionsConfig.Width = 150;
             btnOptionsConfig.Height = 100;
-            ggUI1.SetPositionInGrid(btnOptionsConfig, 3, ggui1Col);
-            Rectangle rect3 = ggUI1.DrawRectangleAroundGrid(3, ggui1Col);
+            ggUI1.SetPositionInGrid(btnOptionsConfig, 3, ggui1Col2);
+            Rectangle rect3 = ggUI1.DrawRectangleAroundGrid(3, ggui1Col2);
             mypanel.Children.Add(btnOptionsConfig);
             mypanel.Children.Add(rect3);
 
-            TextBlock statusLabel = new TextBlock();
-            statusLabel.FontSize = 20;
-            statusLabel.Text = "Status";
-            ggUI1.SetPositionInGrid(statusLabel, 4, ggui1Col, -60, -60);
-            mypanel.Children.Add(statusLabel);
+            Button btnStartOver = new Button();
+            btnStartOver.Content = "Reset config options";
+            btnStartOver.Click += StartOver_Click;
+            btnStartOver.Width = 150;
+            btnStartOver.Height = 100;
+            ggUI1.SetPositionInGrid(btnStartOver, 4, ggui1Col2);
+            Rectangle rect44 = ggUI1.DrawRectangleAroundGrid(4, ggui1Col2);
+            mypanel.Children.Add(btnStartOver);
+            mypanel.Children.Add(rect44);
 
-            TextBlock txtBlock = new TextBlock();
-            txtBlock.Foreground = new SolidColorBrush(System.Windows.Media.Colors.Blue);
-            statusTextHandler = new StatusTextHandler(txtBlock, this.Dispatcher);
-            ggUI1.SetPositionInGrid(txtBlock, 4, ggui1Col, -60);
-            Rectangle rect4 = ggUI1.DrawRectangleAroundGrid(4, ggui1Col);
-            mypanel.Children.Add(txtBlock);
-            mypanel.Children.Add(rect4);
+            //TextBlock statusLabel = new TextBlock();
+            //statusLabel.FontSize = 20;
+            //statusLabel.Text = "Status";
+            //ggUI1.SetPositionInGrid(statusLabel, 4, ggui1Col, -60, -60);
+            //mypanel.Children.Add(statusLabel);
 
-            statusTextHandler.display("Initialized", MessageLevel.Normal);
+
+
+            //statusTextHandler.display("Initialized", MessageLevel.Normal);
+
+
 
 
 
         }
-
-
-
-        private void CheckForNextOptionThread()
-        {
-            int ii = 0; 
-
-            //run cmake at least once if the next file is empty
-            if (nextfile.IsFileContentsFilled() == false)
-            {
-                runCmakeCmd();
-            }
-
-            while (true)
-            {
-                Thread.Sleep(500);
-
-                NextStatus nextStatus = nextfile.ParseNextFile();
-
-                if (nextStatus != NextStatus.Empty)
-                {
-
-                    //if it is done then display a done on the output
-                    if (nextStatus == NextStatus.Done)
-                    {
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            guioutputScrollHandler.display("Options configuring Done", OutputLevel.Normal);
-                            //statusTextHandler.display("Options configuring Done", MessageLevel.Normal);
-                        });
-
-                    }
-                    else if (nextStatus == NextStatus.OptionFound)
-                    {
-                        //option must have been found 
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            OptionsSelectedGuiBox.AddOptionSelectedToGui(nextfile.NextOption,ii);
-
-                           // CreateOptionBox(jj, ii, nextfile.NextOption);
-                        });
-
-                        ii++;
-                    }
-                }
-            }
-        }
-
-
-
-        private void CreateOptionBox(int row, int col, Option forOption)
-        {
-
-            Label optionNamelabel = new Label();
-            optionNamelabel.Content = forOption.Name;
-
-            Label optionDescriptionlabel = new Label();
-            optionDescriptionlabel.Content = forOption.Description;
-
-            ComboBox com = new ComboBox();
-            com.SelectionChanged += OptionPossibleValueSelected;
-            com.Width = 120;
-            com.Visibility = Visibility.Visible;
-            foreach (var item in forOption.MyPossibleValues)
-            {
-                com.Items.Add(item.Name);
-            }
-
-            ggForConfigDisplay.SetPositionInGrid(optionNamelabel, row, col, 0, -25);
-            ggForConfigDisplay.SetPositionInGrid(optionDescriptionlabel, row, col, -100, 17);
-            ggForConfigDisplay.SetPositionInGrid(com, row, col);
-            rect2 = ggForConfigDisplay.DrawRectangleAroundGrid(row, col);
-
-            mypanel.Children.Add(com);
-            mypanel.Children.Add(rect2);
-            mypanel.Children.Add(optionNamelabel);
-            mypanel.Children.Add(optionDescriptionlabel);
-
-
-            //set in options selected list
-            //optionsSelected.Add(new OptionsSelectedGuiBox() { option = forOption, forCombBox = com, forRectangle = rect2 });
-        }
-
-
-
-
-        private void OptionPossibleValueSelected(object sender, SelectionChangedEventArgs e)
-        {
-            //optionsSelected[optionsSelected.Count - 1].possibleValueSelection = (string)e.AddedItems[0];
-
-            ////fill rectangle and turn off combobox
-            //optionsSelected[optionsSelected.Count - 1].forCombBox.IsEnabled = false;
-            //optionsSelected[optionsSelected.Count - 1].forRectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Aqua);
-            //optionsSelected[optionsSelected.Count - 1].forRectangle.Opacity = .05;
-
-
-            ////write option to the cgenCmakeCache.cmake 
-            //cmakecachefile.WriteOptionsToFile(optionsSelected.Cast<OptionsSelected>().ToList());
-
-            ////run the cmake command to get the next config option.
-            //runCmakeCmd();
-
-
-            ////save/update all options so far
-            //savedOptionsFileHandler.SaveAllOptions();
-
-        }
-
-
-
-
-
 
 
 
@@ -539,7 +278,8 @@ namespace CgenCmakeGui
             win.GeneratorComboBox.Items.Add("Unix Makefiles");
             win.GeneratorComboBox.Items.Add("Visual Studio 15 2017");
             win.GeneratorComboBox.Items.Add("Visual Studio 16 2019");
-
+            win.GeneratorComboBox.Items.Add("CodeBlocks - Unix Makefiles");
+            
             if (cmakeSettingsFile.IsDataLoaded == true)
             {
                 CgenCmakeLibrary.FileHandlers.CmakeSettings cm = cmakeSettingsFile.CmakeSettingsData;
@@ -586,10 +326,83 @@ namespace CgenCmakeGui
             cm.CmakeLocation = win.CmakeLocationTextBox.Text;
             cm.Generator = (string)win.GeneratorComboBox.SelectedItem;
             cm.CmakeOptions = (string)win.OptionsTextBox.Text;
+
+            if (win.isRemotePCCheckBox.IsChecked == true)
+            {
+                cm.IsRemotePC = true;
+                cm.RemoteWorkingDirectory = win.RemoteDirectory.Text;
+                cm.RemoteIPAddress = win.RemoteIPAddress.Text;
+                cm.RemoteUsername = win.RemoteUsername.Text;
+                cm.RemotePassword= win.RemotePassword.Text; 
+            }
+            else
+            {
+                cm.IsRemotePC = false;
+                cm.RemoteWorkingDirectory = "";
+                cm.RemoteIPAddress = "";
+                cm.RemoteUsername = "";
+                cm.RemotePassword = "";
+            }
             cmakeSettingsFile.SaveData(cm);
 
         }
 
+        private void WhenOptionDoneAction()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                guioutputScrollHandler.display("Options configuring Done", OutputLevel.Normal);
+            });
+        }
+
+        private void WhenOptionFoundAction()
+        {
+            //first update any options that are already saved of this next option. 
+            if (AllOptions.Instance.OptionExists(nextfile.NextOption.Name) == true)
+            {
+                AllOptions.Instance.SetOption(nextfile.NextOption);
+
+                nextfile._SetNextOption(AllOptions.Instance.GetOption(nextfile.NextOption.Name));
+
+                savedOptionsFileHandler.SaveAllOptions();
+            }
+
+            //make sure the previous option has been selected yet
+            bool isPrevOptionSelectedYet = true;
+            if (OptionsSelectedGuiBox.optionsSelected.Count > 0)
+            {
+                isPrevOptionSelectedYet = !string.IsNullOrEmpty(OptionsSelectedGuiBox.optionsSelected[OptionsSelectedGuiBox.optionsSelected.Count - 1].possibleValueSelection);
+            }
+
+            //option must have been found 
+            if (isPrevOptionSelectedYet == true)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    //var allowablevalues = AllOptions.GetAllowableOptions(nextfile.NextOption, OptionsSelectedGuiBox.optionsSelected);
+                    //if (allowablevalues.Count == 1)
+                    //{
+                    //    OptionsSelectedGuiBox._OptionSelected(allowablevalues[0].Name, OptionsSelectedGuiBox);
+                    //}
+
+                    OptionsSelectedGuiBox.AddOptionSelectedToGui(nextfile.NextOption, true);
+
+                    // CreateOptionBox(jj, ii, nextfile.NextOption);
+                });
+                 
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    guioutputScrollHandler.display("You need to select the previous option", OutputLevel.Problem);
+                });
+            }
+        }
+
+
+        Thread ConfigOptThread;
+        bool rancmakeAtLeastOnce = false;
         private void button_Click_ConfigOptions(object sender, RoutedEventArgs e)
         {
             if (cmakeSettingsFile.IsDataLoaded == false)
@@ -598,39 +411,90 @@ namespace CgenCmakeGui
                 guioutputScrollHandler.display("you need to set \n the cmake settings", OutputLevel.Problem);
                 return;
             }
-            new Thread(CheckForNextOptionThread).Start();
+
+
+            //run cmake at least once if the next file is empty
+            //if (rancmakeAtLeastOnce == false)
+            //{
+                if (nextfile.IsFileContentsFilled() == false)
+                {
+                    runCmakeCmd();
+                } 
+            //    rancmakeAtLeastOnce = true;
+            //}
+
+
+            //ConfigOptThread = new Thread(CheckForNextOptionThread);
+            //ConfigOptThread.Start();
+            
+            nextfile.StartNextFileUpdater(()=> {
+                WhenOptionDoneAction();
+            }, () => {
+                WhenOptionFoundAction();
+            }
+            );
+
+
         }
+
+        private void StartOver_Click(object sender, RoutedEventArgs e)
+        {
+            cmakecachefile.RemoveContents();
+            var optsionssel = cmakecachefile.LoadOptionsSelected();
+            OptionsSelectedGuiBox.Reset();
+
+            runCmakeCmd();
+            
+        }
+
+         
+
 
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
+            //############################
+            //optionsview window stuff
+            //############################
 
 
-            OptionsView win = new OptionsView();
 
-            int index = 1;
-            int translation = 30;
-            AllOptions.Instance.Options.ForEach(op =>
-            {
+            this.Dispatcher.Invoke(() =>
+            {  
+                optionsViewWindow = new OptionsView();
 
-                ComboBox com = new ComboBox();
-                com.Width = 180;
-                TranslateTransform translateTransform1 =
-                new TranslateTransform(50, 20 + (index * translation));
+                //List<Button> buttons = new List<Button>();
+                //buttons.Add(optionsViewWindow.button1);
+                //buttons.Add(optionsViewWindow.button2);
+                //buttons.Add(optionsViewWindow.button3);
+                //buttons.Add(optionsViewWindow.button4);
+                //buttons.Add(optionsViewWindow.button5);
+                //buttons.Add(optionsViewWindow.button6);
+                //buttons.Add(optionsViewWindow.button7);
+                //buttons.Add(optionsViewWindow.button8);
+                //buttons.Add(optionsViewWindow.button9);
+                //buttons.Add(optionsViewWindow.button10);
 
-                com.RenderTransform = translateTransform1;
-                com.Items.Add(op.Name);
-                com.IsEditable = false;
-                com.Text = op.Name;
-                op.MyPossibleValues.ForEach(pv =>
-                { com.Items.Add(pv.Name); });
+        //                <Button x:Name="button1" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button2" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button3" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button4" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button5" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button6" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button7" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button8" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button9" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+        //<Button x:Name="button10" Content="edit Option" Canvas.Left="218" Canvas.Top="118"/>
 
-                win.propCanvas.Children.Add(com);
+                gridForOptionsView = new GridGeneratorForUI(8, 3, optionsViewWindow);
+                OptionsViewGuiBox.Init(gridForOptionsView, optionsViewWindow.mypanel, 7, savedOptionsFileHandler);
 
-                index++;
-            });
-
-            win.Show();
+                foreach (var item in AllOptions.Instance.Options)
+                {
+                    OptionsViewGuiBox.AddOptionToGui(item);
+                }
+           
+            optionsViewWindow.Show(); });
         }
 
 
@@ -641,7 +505,12 @@ namespace CgenCmakeGui
                 //statusTextHandler.display("running cmake command", MessageLevel.Normal);
                 guioutputScrollHandler.display("running cmake command", OutputLevel.Normal);
                 string cmd = cmakeSettingsFile.getCmakeCmd();
-                cmdHandler.ExecuteCommand(cmd);// ("cmake -S . "); 
+
+                //write contents of set(CGEN_GUI_SET FALSE) in file FromGuiOrProject.cmake
+                File.WriteAllText(Environment.CurrentDirectory + "\\..\\..\\..\\..\\CgenCmakeGui\\FromGuiOrProject.cmake", "set(CGEN_GUI_SET FALSE)");
+                cmdHandler.ExecuteCommand(cmd);
+                //write contents of set(CGEN_GUI_SET TRUE) in file FromGuiOrProject.cmake
+                File.WriteAllText(Environment.CurrentDirectory + "\\..\\..\\..\\..\\CgenCmakeGui\\FromGuiOrProject.cmake", "set(CGEN_GUI_SET TRUE)");
 
                 outputScrollHandler.display("\n\n\n\n ###########################################\n###########################################", OutputLevel.Normal);
                 outputScrollHandler.display(cmdHandler.Output, OutputLevel.Normal);
@@ -652,6 +521,24 @@ namespace CgenCmakeGui
             });
 
 
+        }
+
+
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            if (SSHhandler != null)
+            {
+                SSHhandler.Dispose();
+            }
+
+            nextfile.StopNextFileUpdater();
+
+            ConfigOptThread.Abort();
+
+            Application.Current.Shutdown();
         }
 
     }

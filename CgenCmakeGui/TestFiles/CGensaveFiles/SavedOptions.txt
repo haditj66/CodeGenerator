@@ -1,0 +1,11 @@
+
+
+NAME Build_System
+DESCRIPTION what kind of build environment are you using
+POSSIBLEVALUES VSGDBCmake_Ninja AmentCmake_colcon cmake_mingw cmake_make
+CONSTRICTS_LATER_OPTIONS 
+
+NAME AERTOS_ENVIRONMENT
+DESCRIPTION what environment is this AE application set in
+POSSIBLEVALUES RTOS_MICRO RTOS_PC
+CONSTRICTS_LATER_OPTIONS RTOS_MICRO@Build_System@cmake_make;RTOS_MICRO@Build_System@VSGDBCmake_Ninja;RTOS_MICRO@Build_System@AmentCmake_colcon;RTOS_PC@Build_System@cmake_mingw;

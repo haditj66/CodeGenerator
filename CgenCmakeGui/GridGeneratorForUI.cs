@@ -54,8 +54,11 @@ namespace CgenCmakeGui
 
 
         public void SetPositionInGrid(ContentControl element, int row, int column, int offsetx = 0, int offsety = 0)
-        { 
-            _SetPositionInGrid(element, row, column, offsetx - (int)element.Width, offsety- (int)(element.Height*.5)); 
+        {
+            int adjx = double.IsNaN(element.Width) ? 0 : (int)element.Width;
+            int adjy = double.IsNaN(element.Height) ? 0 : (int)element.Height;
+
+            _SetPositionInGrid(element, row, column, offsetx - adjx, offsety- (int)(adjy * .5)); 
         } 
         public void SetPositionInGrid(Rectangle element, int row, int column, int offsetx = 0, int offsety = 0)
         {
@@ -73,8 +76,6 @@ namespace CgenCmakeGui
 
         public void SetPositionInGrid(Label element, int row, int column, int offsetx = 0, int offsety = 0)
         {
-            //_elements.Add(element);
-
             var point = this.GetLocation(row, column);
             TranslateTransform translateTransform1 = //60
                 new TranslateTransform(offsetx + point.XLocation - 60, offsety + point.YLocation);//(_windowThatTheGridIsFor.Width* / 2)
@@ -83,11 +84,23 @@ namespace CgenCmakeGui
 
         }
 
+        //public void SetPositionInGrid(Button element, int row, int column, int offsetx = 0, int offsety = 0)
+        //{
+        //    int adjx = double.IsNaN(element.Width) ? 0 : (int)element.Width;
+        //    int adjy = double.IsNaN(element.Height) ? 0 : (int)element.Height;
+
+        //    var point = this.GetLocation(row, column);
+        //    TranslateTransform translateTransform1 =  
+        //        new TranslateTransform(point.XLocation+ offsetx - adjx, point.YLocation + offsety - (int)(adjy * .5));//(_windowThatTheGridIsFor.Width* / 2)
+        //    element.RenderTransform = translateTransform1;
+
+
+        //}
+
 
 
         private void _SetPositionInGrid(UIElement element, int row, int column, int offsetx = 0, int offsety = 0)
-        {
-            //_elements.Add(element);
+        { 
 
             var point = this.GetLocation(row, column);
             TranslateTransform translateTransform1 = //60

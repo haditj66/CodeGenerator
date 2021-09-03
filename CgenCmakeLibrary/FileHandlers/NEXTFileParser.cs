@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CgenCmakeLibrary.FileHandlers
 {
@@ -18,11 +19,121 @@ namespace CgenCmakeLibrary.FileHandlers
     public class NEXTFileParser : FileHandler
     {
 
-        //from base
-        //public bool IsFileContentsFilled(); 
-        //public string GetContents();
-        //public void RemoveContents(); 
-        public NEXTFileParser(DirectoryInfo dir) : base(dir, "cgenCmakeConfigNEXT.txt")
+        private Task _NextFileThread;
+        private Action OptionDoneAction;
+        private Action OptionFoundAction;
+        private CancellationTokenSource ts;
+        private CancellationToken ct;
+
+        public void StartNextFileUpdater(Action optionDoneAction, Action optionFoundAction)
+        {
+            OptionDoneAction = optionDoneAction;
+            OptionFoundAction = optionFoundAction;
+
+            //_NextFileThread = new Thread(this._NextFileUpdater);
+            //_NextFileThread.Start();
+
+            ts = new CancellationTokenSource();
+            ct = ts.Token;
+            _NextFileThread = Task.Factory.StartNew(() =>
+            {
+                this._NextFileUpdater();
+            });
+        }
+
+        public void StopNextFileUpdater()
+        {
+            ts.Cancel();
+            _NextFileThread.Wait();
+            _NextFileThread.Dispose();
+        }
+
+        private void _NextFileUpdater()
+        {
+
+
+            while (true)
+            {
+                Thread.Sleep(500);
+
+                if (ct.IsCancellationRequested)
+                {
+                    break;
+                }
+
+
+
+                NextStatus nextStatus = this.ParseNextFile();
+                
+                if (nextStatus != NextStatus.Empty)
+                {
+
+                    //if it is done then display a done on the output
+                    if (nextStatus == NextStatus.Done)
+                    {
+                        OptionDoneAction();
+                        //this.Dispatcher.Invoke(() =>
+                        //{
+                        //    guioutputScrollHandler.display("Options configuring Done", OutputLevel.Normal); 
+                        //});
+
+                    }
+                    else if (nextStatus == NextStatus.OptionFound)
+                    {
+
+                        OptionFoundAction();
+
+                        ////first update any options that are already saved of this next option. 
+                        //if (AllOptions.Instance.OptionExists(this.NextOption.Name) == true)
+                        //{
+                        //    AllOptions.Instance.SetOption(this.NextOption);
+
+                        //    this._SetNextOption(AllOptions.Instance.GetOption(this.NextOption.Name));
+
+                        //    savedOptionsFileHandler.SaveAllOptions();
+                        //}
+
+                        ////make sure the previous option has been selected yet
+                        //bool isPrevOptionSelectedYet = true;
+                        //if (OptionsSelectedGuiBox.optionsSelected.Count > 0)
+                        //{
+                        //    isPrevOptionSelectedYet = !string.IsNullOrEmpty(OptionsSelectedGuiBox.optionsSelected[OptionsSelectedGuiBox.optionsSelected.Count - 1].possibleValueSelection);
+                        //}
+
+                        ////option must have been found 
+                        //if (isPrevOptionSelectedYet == true)
+                        //{
+                        //    this.Dispatcher.Invoke(() =>
+                        //    {  
+                        //        OptionsSelectedGuiBox.AddOptionSelectedToGui(this.NextOption, true); 
+                        //    });
+
+                        //    ii++;
+                        //}
+                        //else
+                        //{
+                        //    this.Dispatcher.Invoke(() =>
+                        //    {
+                        //        guioutputScrollHandler.display("You need to select the previous option", OutputLevel.Problem);
+                        //    });
+                        //}
+
+
+
+                    }
+                }
+            }
+        }
+
+
+
+    
+
+    //from base
+    //public bool IsFileContentsFilled(); 
+    //public string GetContents();
+    //public void RemoveContents(); 
+    public NEXTFileParser(DirectoryInfo dir) : base(dir, "cgenCmakeConfigNEXT.txt")
         {
             mutex = new Mutex();
         }
@@ -55,6 +166,8 @@ namespace CgenCmakeLibrary.FileHandlers
 
             return NextStatus.Empty;
         }
+
+        public void _SetNextOption(Option nextOption) { NextOption = nextOption; }
 
 
         public Option NextOption { get; private set; }

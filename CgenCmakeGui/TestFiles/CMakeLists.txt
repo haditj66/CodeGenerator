@@ -23,13 +23,17 @@ Cgen_Option(
         NAME AERTOS_ENVIRONMENT
         DESCRIPTION "what environment is this AE application set in"
 	POSSIBLEVALUES RTOS_MICRO RTOS_PC
-	CONSTRICTS_LATER_OPTIONS RTOS_MICRO@Build_System@VSGDBCmake_Ninja@AmentCmake_colcon;RTOS_PC@Build_System@mingw;
+	CONSTRICTS_LATER_OPTIONS RTOS_MICRO@Build_System@VSGDBCmake_Ninja@AmentCmake_colcon;RTOS_PC@Build_System@cmake_mingw;
 )
 
-#AERTOS_ENVIRONMENT
-#POSSIBLE_VALUES RTOS_MICRO ROS_MICRO RTOS_PC ROS_PC AECorePC
-set(AERTOS_ENVIRONMENT RTOS_PC)
-add_compile_definitions(AERTOS_ENVIRONMENT=${AERTOS_ENVIRONMENT})
+
+Cgen_Option(
+        NAME Build_System
+        DESCRIPTION "what kind of build environment are you using"
+	POSSIBLEVALUES VSGDBCmake_Ninja AmentCmake_colcon cmake_mingw cmake_make
+	CONSTRICTS_LATER_OPTIONS 
+)
+
 
 #RTOS_USED
 #POSSIBLE_VALUES FREERTOS NONE
