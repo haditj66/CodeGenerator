@@ -24,11 +24,18 @@ using System.Windows.Threading;
 
 namespace CgenCmakeGui
 {
+
+
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+
+  
+
+
 
         GridGeneratorForUI ggForConfigDisplay;
         GridGeneratorForUI ggUI;
@@ -85,6 +92,9 @@ namespace CgenCmakeGui
         public MainWindow()
         {
             InitializeComponent();
+
+            //test aaa = new test();
+            //aaa.grow();
 
             //##############
             //get the cmake project build and source directory

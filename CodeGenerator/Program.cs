@@ -214,7 +214,8 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\UMasterToArduino\UMasterToArduino";
         //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\blinds\WaveletTransformSPB";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CgenCmakeGui\TestFiles";
-        public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
+        //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
+        public static string envIronDirectory = @"C:\QR_Core\build\win";
 
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
@@ -265,10 +266,28 @@ namespace CodeGenerator
 
 
 
+        public class test
+        {
+            int[] arr;
+            public test()
+            {
+                arr = new int[10];
+                arr[0] = 4;
+            }
+            public void grow()
+            {
+                int[] arr2 = new int[10 * 2];
+                Array.Copy(arr, arr2, 10);
+                arr = arr2;
+            }
+        }
+
+
         static void Main(string[] args)
         {
 
-
+            test aaa = new test();
+            aaa.grow();
 
             //string e = Environment.CurrentDirectory;
             //Console.WriteLine(e);

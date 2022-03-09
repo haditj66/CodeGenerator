@@ -71,11 +71,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\Downloads\ClangSharp-main\sources\ClangSharpPInvokeGenerator\ClangSharpPInvokeGenerator.csproj">
+    <ProjectReference Include="..\ClangSharp-main\sources\ClangSharpPInvokeGenerator\ClangSharpPInvokeGenerator.csproj">
       <Project>{e39c23b4-5850-4b64-a800-dceacdd13e2e}</Project>
       <Name>ClangSharpPInvokeGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\Downloads\ClangSharp-main\sources\ClangSharp\ClangSharp.csproj">
+    <ProjectReference Include="..\ClangSharp-main\sources\ClangSharp\ClangSharp.csproj">
       <Project>{e8c58702-ec41-4b9f-a293-d4b6df43652f}</Project>
       <Name>ClangSharp</Name>
     </ProjectReference>

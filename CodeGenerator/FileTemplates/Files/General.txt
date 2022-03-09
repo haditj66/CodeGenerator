@@ -1,20 +1,11 @@
-//generated file: UART_TEST.cpp
+//generated file: IntegTestPipeline.h
 
 
-#if INTEGRATION_TESTS_FOR_AEHal_Tests1 == UART_TEST
- 
-#include "IntegTestPipeline.h"
+#pragma once
 
-##UserCode_a
+void RunSelectedIntegrationTest_defaultTest();
 
-void RunSelectedIntegrationTest_UART_TEST()
+static void RunSelectedIntegrationTest()
 {
-
-##UserCode_b
-
+    RunSelectedIntegrationTest_defaultTest();
 }
-
-
-##UserCode_c
-
-#endif

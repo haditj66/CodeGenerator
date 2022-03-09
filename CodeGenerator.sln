@@ -15,11 +15,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPPParserTest", "CPPParserT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCPPParser", "MyCPPParser\MyCPPParser.csproj", "{49FC3374-D932-4516-8DC1-DD2B06FAE71E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClangSharp", "..\..\..\..\..\..\..\Downloads\ClangSharp-main\sources\ClangSharp\ClangSharp.csproj", "{E8C58702-EC41-4B9F-A293-D4B6DF43652F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClangSharp", "ClangSharp-main\sources\ClangSharp\ClangSharp.csproj", "{E8C58702-EC41-4B9F-A293-D4B6DF43652F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClangSharp.PInvokeGenerator", "..\..\..\..\..\..\..\Downloads\ClangSharp-main\sources\ClangSharp.PInvokeGenerator\ClangSharp.PInvokeGenerator.csproj", "{9C157A13-4B54-4F46-9272-195A60FB94C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClangSharp.PInvokeGenerator", "ClangSharp-main\sources\ClangSharp.PInvokeGenerator\ClangSharp.PInvokeGenerator.csproj", "{9C157A13-4B54-4F46-9272-195A60FB94C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClangSharpPInvokeGenerator", "..\..\..\..\..\..\..\Downloads\ClangSharp-main\sources\ClangSharpPInvokeGenerator\ClangSharpPInvokeGenerator.csproj", "{E39C23B4-5850-4B64-A800-DCEACDD13E2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClangSharpPInvokeGenerator", "ClangSharp-main\sources\ClangSharpPInvokeGenerator\ClangSharpPInvokeGenerator.csproj", "{E39C23B4-5850-4B64-A800-DCEACDD13E2E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CgenCmakeGui", "CgenCmakeGui\CgenCmakeGui.csproj", "{43A1AAFE-5E06-4194-A819-DB173E8C56A1}"
 EndProject
@@ -33,9 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEIntegrationTestRunningLib
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEIntegrationTestRunningTests", "AEIntegrationTestRunningTests\AEIntegrationTestRunningTests.csproj", "{4944C400-36A4-4C13-BFA6-A3A24453F13B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CgenCompileLibrary", "CgenCompileLibrary\CgenCompileLibrary.csproj", "{CFFA752F-42CC-422C-9AF7-4B090795A8FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CgenCompileLibrary", "CgenCompileLibrary\CgenCompileLibrary.csproj", "{CFFA752F-42CC-422C-9AF7-4B090795A8FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CgenCompileTests", "CgenCompileTests\CgenCompileTests.csproj", "{ECAF459C-9235-4384-A6C7-2B60125B7834}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CgenCompileTests", "CgenCompileTests\CgenCompileTests.csproj", "{ECAF459C-9235-4384-A6C7-2B60125B7834}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

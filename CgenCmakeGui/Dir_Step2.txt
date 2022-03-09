@@ -1,4 +1,4 @@
-CMAKE_CURRENT_BINARY_DIR: C:/visualgdb_projects/AERTOSCopy/build/VSGDBCmakeNinja_armnoneabiid/Debug
-CMAKE_CURRENT_SOURCE_DIR: C:/visualgdb_projects/AERTOSCopy
-PLATFORM: VSGDBCmakeNinja_armnoneabiid
-CMAKE_BUILD_TYPE: DEBUG
+CMAKE_CURRENT_BINARY_DIR: C:/QR_Core/build/win
+CMAKE_CURRENT_SOURCE_DIR: C:/QR_Core
+PLATFORM: 
+CMAKE_BUILD_TYPE: 

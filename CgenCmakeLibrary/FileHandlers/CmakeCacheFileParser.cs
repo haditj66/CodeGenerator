@@ -26,7 +26,8 @@ namespace CgenCmakeLibrary.FileHandlers
             string allOptions = "add_compile_definitions(CGEN_ALLOPTIONS=\"";
             foreach (var opt in optionsToWrite)
             {
-                File.AppendAllText(FullFilePath, "set(" + opt.option.Name + " " + opt.possibleValueSelection + ")\nadd_compile_definitions(" + opt.option.Name + " \"${" + opt.option.Name + "}\")\n");
+                //File.AppendAllText(FullFilePath, "set(" + opt.option.Name + " " + opt.possibleValueSelection + ")\nadd_compile_definitions(" + opt.option.Name + " \"${" + opt.option.Name + "}\")\n");
+                File.AppendAllText(FullFilePath, "set(" + opt.option.Name + " " + opt.possibleValueSelection + ")\nadd_compile_definitions(" + opt.option.Name + "__${" + opt.option.Name + "})\n");
 
                 //if this is the INTEGRATION_TESTS option, do some extra stuff
 
