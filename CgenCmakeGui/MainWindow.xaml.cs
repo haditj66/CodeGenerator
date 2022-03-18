@@ -78,7 +78,8 @@ namespace CgenCmakeGui
         public static string CMAKE_CURRENT_SOURCE_DIR;
         public static string PLATFORM;
         public static string CMAKE_BUILD_TYPE;
-        
+        public static string CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES;
+
         public static string CGensaveFilesDir;
 
 #if TESTING
@@ -128,14 +129,28 @@ namespace CgenCmakeGui
                 CMAKE_BUILD_TYPE = match.Groups[1].Value.Trim();
             }
 
+            regex = new Regex(@"CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES = match.Groups[1].Value.Trim();
+                //make back slashes forward slashes
+                //CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES.Replace("\\", "/");
+                //if NOT empty, put forward slash in beginning
+                CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES = CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES != "" ?
+                    "\\" + CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES :
+                    CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES;
+
+            }
+
             dispatcherForMainWindow = this.Dispatcher;
 
 
             //load all options from the save file
             //string saveFile = File.ReadAllText(Environment.CurrentDirectory+ "../../../../TestFiles/CGensaveFiles/cgenCmakeGuiSaveFile.txt");
             //string saveFile = File.ReadAllText(CMAKE_CURRENT_BINARY_DIR + "/CGensaveFiles/cgenCmakeGuiSaveFile.txt");
-            
-            CGensaveFilesDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles\\cmakeGui\\" + PLATFORM + "\\" + CMAKE_BUILD_TYPE; //CMAKE_CURRENT_BINARY_DIR + "\\CGensaveFiles";
+
+            CGensaveFilesDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles\\cmakeGui" + CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES;//PLATFORM + "\\" + CMAKE_BUILD_TYPE; //CMAKE_CURRENT_BINARY_DIR + "\\CGensaveFiles";
             string CGensaveFilesRootDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles";
             nextfile = new NEXTFileParser(new DirectoryInfo(CGensaveFilesDir));//( Environment.CurrentDirectory + "../../../../TestFiles/CGensaveFiles"));
             cmakecachefile = new CmakeCacheFileParser(new DirectoryInfo(CGensaveFilesDir));

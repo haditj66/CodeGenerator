@@ -70,9 +70,15 @@ endfunction()
 
 
 
+
+#*************************************************************
+#start cgen
+#CGEN_DIRECTORY_OF_CACHE: use this to specify the RELATIVE DIRECTORY where all cgen related files such as the cache will be placed. you can set different cgen directory configs for different configurations.
+#						  the base directory is always ${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/cmakeGui/
+#                         the default value, if not specified, for this is the directory  ${PLATFORM}/${CMAKE_BUILD_TYPE}
 macro(Cgen_Start )
     set(options)
-    set(oneValueArgs   )
+    set(oneValueArgs  CGEN_DIRECTORY_OF_CACHE )
     set(multiValueArgs )
     cmake_parse_arguments(_arg "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 	
@@ -102,10 +108,31 @@ macro(Cgen_Start )
 	add_compile_definitions(CGEN_CMAKE_CURRENT_SOURCE_DIR="${CGEN_CMAKE_CURRENT_SOURCE_DIR}")
 	add_compile_definitions(CGEN_CMAKE_CURRENT_BINARY_DIR="${CGEN_CMAKE_CURRENT_BINARY_DIR}")
 	
+
+	message("PLATFORM----------------${PLATFORM}")
+    message("CMAKE_BUILD_TYPE----------------${CMAKE_BUILD_TYPE}")
+
+	    #if this cmake CMAKE_BUILD_TYPE is not defined, make it so that the user MUST define it. 
+    #this is because of the various ways different IDE's might set this variable, causing inconsistent 
+    #behaviour when moving from one ide to another.
+    if(NOT DEFINED CMAKE_BUILD_TYPE)
+        message("PLATFORM----------------${PLATFORM}")
+        message("CMAKE_BUILD_TYPE----------------${CMAKE_BUILD_TYPE}")
+        message( "CGEN_DIRECTORY  -----  ${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/cmakeGui/PLATFORM/CMAKE_BUILD_TYPE" )
+        message(WARNING "HADI: You need to have set the cmake variable CMAKE_BUILD_TYPE. Usually this is \"Debug\". check that if you moved to a 
+            different ide that they two ide's dont set CMAKE_BUILD_TYPE differently")
+    endif()
 	
     # 1.    first check that the cgenCmakeCache.cmake and cgenCmakeConfigNEXT.txt
     #       file exists in location ${CMAKE_SOURCE_DIR}/CGensaveFiles
-    set(CGEN_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/cmakeGui/${PLATFORM}/${CMAKE_BUILD_TYPE}" )
+	if(NOT DEFINED _arg_CGEN_DIRECTORY_OF_CACHE)
+		set(CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES "${PLATFORM}/${CMAKE_BUILD_TYPE}")
+		set(CGEN_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/cmakeGui/${PLATFORM}/${CMAKE_BUILD_TYPE}" )
+	else()
+		set(CGEN_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/cmakeGui/${_arg_CGEN_DIRECTORY_OF_CACHE}" )
+		set(CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES "${_arg_CGEN_DIRECTORY_OF_CACHE}")
+	endif() 
+
 	#set(CGEN_DIRECTORY2 "${CMAKE_CURRENT_BINARY_DIR}/CGensaveFiles" )
     set(CGEN_CACHEFILE "${CGEN_DIRECTORY}/cgenCmakeCache.cmake"  )
     set(CGEN_NEXTFILE "${CGEN_DIRECTORY}/cgenCmakeConfigNEXT.txt"  )
@@ -135,7 +162,7 @@ macro(Cgen_Start )
                 message("CGEN_STEP1FILE----------------${CGEN_STEP1FILE}")
 		
 		#write to the step1 file the directories that the cgencmagui will need
-		file(WRITE ${CGEN_STEP1FILE} "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}\nCMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}\nPLATFORM: ${PLATFORM}\nCMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+		file(WRITE ${CGEN_STEP1FILE} "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}\nCMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}\nPLATFORM: ${PLATFORM}\nCMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}\nCGEN_DIRECTORY_OF_CACHE_PROJECT_FILES: ${CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES}")
 		
 			 execute_process(COMMAND  cgen cmakegui
 				WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -144,6 +171,7 @@ macro(Cgen_Start )
 				)
 	endif ()	
 	
+	    message("CGEN_CACHEFILE----------------${CGEN_CACHEFILE}")
 			
 	#read fromt the options save file cgenCmakeCache.cmake
 	include(${CGEN_CACHEFILE})

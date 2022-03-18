@@ -1,4 +1,4 @@
-﻿#define TESTING 
+﻿//#define TESTING 
 
 using System;
 using System.Collections.Generic;
@@ -215,8 +215,9 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\Documents\Visual Studio 2017\Projects\AO Projects\blinds\WaveletTransformSPB";
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CgenCmakeGui\TestFiles";
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
-        public static string envIronDirectory = @"C:\QR_Core\build\win";
-
+        //public static string envIronDirectory = @"C:\QR_Core\build\win";
+        public static string envIronDirectory = @"C:\VMShared1\ros2_template2\src";
+        
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
@@ -249,9 +250,9 @@ namespace CodeGenerator
         //static string[] command = "init ModB".Split(' ');
         //static string[] command = "init UUartDriver".Split(' ');
         //static string[] command = "sync iar".Split(' ');
-        //static string[] command = "macro".Split(' ');
+        static string[] command = "macro".Split(' ');
         //static string[] command = "projects".Split(' ');
-        static string[] command = "cmakegui".Split(' ');
+        //static string[] command = "cmakegui".Split(' ');
         //static string[] command = "post_compile".Split(' ');
 
 #else

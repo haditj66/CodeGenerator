@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -35,7 +36,7 @@ namespace CodeGenerator.FileTemplates
             MacroLoopGroups = new List<MacroGroupLoop>();//new List<List<Macro>>();
             UserCodes = new List<UserCode>();
 
-            PathTOFileTemplate = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGenerator\FileTemplates\Files";
+            PathTOFileTemplate = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\..\\..\\FileTemplates\\Files"; //@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGenerator\FileTemplates\Files";
             TemplateOutputDestination = templateOutputDestination;
             Debug.Assert(nameOfTemplateFile.Contains("."), "name of file needs an extension");
             NameOfTemplateFile = nameOfTemplateFile;
@@ -217,15 +218,37 @@ namespace CodeGenerator.FileTemplates
             //replace all UserCode macros with a comment and a prefix for the sextion of usercode
 
             //replace user codes that have a user given subscript first
-            string patternForUserCode_ = @"##UserCode_(\w)";
-            var mm_ = Regex.Match(strToReturn, patternForUserCode_, RegexOptions.Multiline); 
-            while (mm_.Success)
-            {
-                strToReturn = strToReturn.Remove(mm_.Index, mm_.Length);
-                strToReturn = strToReturn.Insert(mm_.Index, "//UserCode_Section" + mm_.Groups[1].Value + "\n" + "//UserCode_Section" + mm_.Groups[1].Value + "_end");
-                mm_ = Regex.Match(strToReturn, patternForUserCode_, RegexOptions.Multiline);
+            List<string> patternsForUserCode_ = new List<string>() {
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w\w)",
+                @"##UserCode_(\w\w\w\w)",
+                @"##UserCode_(\w\w\w)",
+                @"##UserCode_(\w\w)", @"##UserCode_(\w)" };
 
+            foreach (var patternForUserCode_ in patternsForUserCode_)
+            {
+                var mm_ = Regex.Match(strToReturn, patternForUserCode_, RegexOptions.Multiline);
+                while (mm_.Success)
+                {
+                    strToReturn = strToReturn.Remove(mm_.Index, mm_.Length);
+                    strToReturn = strToReturn.Insert(mm_.Index, "//UserCode_Section" + mm_.Groups[1].Value + "\n" + "//UserCode_Section" + mm_.Groups[1].Value + "_end");
+                    mm_ = Regex.Match(strToReturn, patternForUserCode_, RegexOptions.Multiline);
+
+                }
             }
+
 
 
             string patternForUserCode = @"##UserCode";

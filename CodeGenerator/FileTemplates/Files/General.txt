@@ -1,11 +1,125 @@
-//generated file: IntegTestPipeline.h
+//generated file: MyNode3.hpp
 
+/*****************************************************************************
+ MyNode3  is an auto-generated file using the template file located in the QR_core directory of
+ C:/VMShared1/QR_Core/GeneratedFiles/MyNode3.in
 
+ ONLY WRITE CODE IN THE UserCode_Section BLOCKS
+ If you write code anywhere else,  it will be overwritten. modify the actual template file if needing to modify code outside usersection blocks.
+*****************************************************************************/
 #pragma once
 
-void RunSelectedIntegrationTest_defaultTest();
 
-static void RunSelectedIntegrationTest()
-{
-    RunSelectedIntegrationTest_defaultTest();
-}
+/*****************************************************************************
+** Includes a
+*****************************************************************************/
+
+#ifdef ISForQT__ON
+//*******DONT INCLUDE THIS!! this will cause some circular dependency with undefined behaviours and bugs
+//#include "../include/MyQtHeaders/main_window.hpp"
+#include "ui_main_window.h"
+#include <QMainWindow>
+#endif
+
+#include "Config.hpp"
+
+//ROS2
+#include "rclcpp/rclcpp.hpp"
+//#include "nav_msgs/msg/odometry.hpp"
+//#include "image_transport/image_transport.hpp"
+//#include "geometry_msgs/msg/twist.hpp"
+#include "std_msgs/msg/string.hpp"
+
+//*********************
+//** Type headers
+//**********************
+          #include "my_composable_node_i/msg/test.hpp" 
+         
+
+          #include "std_msgs/msg/string.hpp" 
+ #include "std_msgs/msg/string.hpp" 
+        
+
+//CPP
+#include <chrono>
+#include <memory>
+#include <functional>
+#include <string>
+
+
+//place any of your headers here
+##UserCode_a
+
+
+
+/*****************************************************************************
+** Namespaces
+*****************************************************************************/
+
+namespace PROJECT_NAME {
+using std::placeholders::_1;
+
+
+  /*****************************************************************************
+  ** Class
+  *****************************************************************************/
+  class MyNode3 : public rclcpp::Node
+  {
+  public:
+
+
+      COMPOSITION_PUBLIC
+      explicit MyNode3 (const rclcpp::NodeOptions & options);
+
+      //MyNode();
+      virtual ~MyNode3 ();
+
+
+      //place any public member variables/functions here
+      ##UserCode_b
+
+
+  private:
+
+
+      /*********************
+      ** Publishers
+      **********************/
+                rclcpp::Publisher<my_composable_node_i::msg::Test>::SharedPtr pub1_;
+         
+
+      /*********************
+      ** Subscribers
+      **********************/
+                rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_nodesu;
+ rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_nodessu;
+        
+
+
+      //*********************
+
+
+      /*********************
+      ** Subscriber callback declarations
+      **********************/
+                 void nodesu_Callback(const std_msgs::msg::String::SharedPtr msg) const;
+ void nodessu_Callback(const std_msgs::msg::String::SharedPtr msg) const;
+        
+
+       //*********************
+
+
+       //place any private  member variables/functions here
+       ##UserCode_c
+
+  };
+
+
+
+
+      ##UserCode_d
+
+
+} // namespace
+
+
