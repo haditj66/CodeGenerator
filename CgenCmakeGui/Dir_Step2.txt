@@ -1,5 +1,5 @@
-CMAKE_CURRENT_BINARY_DIR: Z:/Documents/QR_stuff2/ros2_template2/build/win
-CMAKE_CURRENT_SOURCE_DIR: Z:/Documents/QR_stuff2/ros2_template2
+CMAKE_CURRENT_BINARY_DIR: C:/QR_sync/QR_Core/build/wincol/qr_core
+CMAKE_CURRENT_SOURCE_DIR: C:/QR_sync/QR_Core
 PLATFORM: 
 CMAKE_BUILD_TYPE: Debug
 CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES: GenericConfig

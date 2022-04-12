@@ -52,10 +52,48 @@ namespace CodeGenerator.FileTemplates.GeneralMacoTemplate
                 //get all contents after the ##ToFile stuff
                 string macroContents = contents.Substring(mm.Index + mm.Length, contents.Length - (mm.Index + mm.Length));
 
+                //get extension and change the comment based on the file type
+                string ext = Path.GetExtension(GeneralTemplate.NameOfOutputTemplateFile);
+                string COMMENT_CGEN = "";
+                string COMMENT_CGEN_END = "";
+                if (ext == ".xml")
+                {
+                    COMMENT_CGEN = "<!--";
+                    COMMENT_CGEN_END = "-->";
+                }
+                else if (ext == ".cmake")
+                {
+                    COMMENT_CGEN = "#";
+                    COMMENT_CGEN_END = "";
+                }
+                else
+                {
+                    COMMENT_CGEN = "//";
+                    COMMENT_CGEN_END = "";
+                }
+
+
                 //write that in General.txt  
                 string pathToGeneraltxt = Path.Combine(GeneralTemplate.PathTOFileTemplate, GeneralTemplate.NameOfTemplateFile);
-                string macroContents_gen = "//generated file: " + GeneralTemplate.NameOfOutputTemplateFile + "\n" + macroContents;
+                //if an xml file, put a header
+                string macroContents_gen = "";
+                if (ext == ".xml")
+                {
+                    macroContents_gen =  macroContents;
+                    macroContents.TrimStart();
+                }
+                else
+                {
+                    macroContents_gen = COMMENT_CGEN + "generated file: " + GeneralTemplate.NameOfOutputTemplateFile + COMMENT_CGEN_END + "\n"
+                        + COMMENT_CGEN  + "**********************************************************************" + COMMENT_CGEN_END  + "\n" 
+                        + COMMENT_CGEN + "this is an auto-generated file using the template file located in the directory of " + GeneralTemplate.PathTOFileTemplate + COMMENT_CGEN_END  +  "\n" 
+                        + COMMENT_CGEN + "ONLY WRITE CODE IN THE UserCode_Section BLOCKS" + COMMENT_CGEN_END + "\n" 
+                        + COMMENT_CGEN + "If you write code anywhere else,  it will be overwritten. modify the actual template file if needing to modify code outside usersection blocks." + COMMENT_CGEN_END + "\n"
+                        + macroContents;
+                }
+                
                 File.WriteAllText(pathToGeneraltxt, macroContents_gen);
+
 
                 //generate template
                 GeneralTemplate.CreateTemplate();
