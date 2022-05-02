@@ -1,0 +1,11 @@
+call c:\opt\ros\foxy\x64\setup.bat
+cd C:\QR_sync\QR_core
+call oursource
+cd C:\QR_sync\testmo/rosqt/IF
+call ourcolcon
+call oursource
+cd ../..
+call oursource
+cd rosqt
+call ourcolcon
+call oursource

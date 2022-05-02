@@ -183,6 +183,19 @@ namespace CodeGenerator
             public string PlatformToAdd { get; set; }
 
         }
+
+
+        [Verb("QRinit", HelpText = "create a new QR project")]
+        public class QRInitOptions
+        {
+            //[CommandLine.Value(1), help]
+            [Value(0, HelpText = "name of the module you want to create")]
+            public string name { get; set; }
+
+            [Option('r', HelpText = "rename an existing project. (dunno if this works)")]
+            public bool isToRename { get; set; }
+
+        }
         #endregion
 
         // C:\\Users\\Hadi\\OneDrive\\Documents\\VisualStudioprojects\\Projects\\cSharp\\CodeGenerator\\CodeGenerator\\CodeGenerator\\bin\\Debug"
@@ -216,7 +229,7 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CgenCmakeGui\TestFiles";
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
         //public static string envIronDirectory = @"C:\QR_Core\build\win";
-        public static string envIronDirectory = @"C:\VMShared1\ros2_template2\src";
+        public static string envIronDirectory = @"C:\QR_sync";
         
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
@@ -250,10 +263,11 @@ namespace CodeGenerator
         //static string[] command = "init ModB".Split(' ');
         //static string[] command = "init UUartDriver".Split(' ');
         //static string[] command = "sync iar".Split(' ');
-        static string[] command = "macro".Split(' ');
+        //static string[] command = "macro".Split(' ');
         //static string[] command = "projects".Split(' ');
         //static string[] command = "cmakegui".Split(' ');
         //static string[] command = "post_compile".Split(' ');
+        static string[] command = "QRinit testmo".Split(' '); 
 
 #else
         static string[] command;
@@ -298,11 +312,12 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, SyncOptions, ConfigOptions,ProjectsOptions, MacroOptions, ProjConfigOptions,post_compileOptions, cmakeguiOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, QRInitOptions, SyncOptions, ConfigOptions,ProjectsOptions, MacroOptions, ProjConfigOptions,post_compileOptions, cmakeguiOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
 .WithParsed<InitOptions>(opts => Init(opts))
+.WithParsed<QRInitOptions>(opts => QRInit(opts))
 .WithParsed<ConfigOptions>(opts => Config(opts))
 .WithParsed<ProjectsOptions>(opts => Projects(opts))
 .WithParsed<MacroOptions>(opts => Macro(opts))
@@ -1374,6 +1389,296 @@ namespace CodeGenerator
         #endregion
 
 
+
+
+
+        #region QRInit command ***************************************************************************
+        //***************************************************************************************************  
+
+        // copy directory from cpp template to new directory
+        // -delete the git directory, build, install directories
+        //-change the module name in CMakeLists.txt, while keeping the old name in memory
+        //- change the include directory name to ${MODULE_NAME}_cp.
+        //- go through all files in src and include/${MODULE_NAME}_cp
+        //replace all instances of the old module name that you find
+        //-ourcolcon
+        //- make sure everything built
+
+
+
+        //-cd rqt
+        //- change the include directory name to ${MODULE_NAME}_rqt.
+        //- go through all files in src and include/${MODULE_NAME}_rqt
+        //    replace all instances of the old module name that you find
+        //- delete the install_win and install_lin folders
+
+        //-cd IF
+        //- delete the install_win and install_lin folders
+
+
+        //finally time to build and source everything. do this all in one bash file to keep environment
+        //variables
+
+        //- call c:\opt\ros\foxy\x64\setup.bat
+        //- cd base directory of your module
+        //- call ourcolcon
+        //- call oursource
+
+        //- cd rqt/IF
+        //- call ourcolcon
+        //- call oursource
+
+        //- cd ..
+        //- call ourcolcon
+        //- call oursource
+
+
+        private static void CloneDirectory(string root, string dest)
+        {
+            foreach (var directory in Directory.GetDirectories(root))
+            {
+                string dirName = Path.GetFileName(directory);
+                if (!Directory.Exists(Path.Combine(dest, dirName)))
+                {
+                    Directory.CreateDirectory(Path.Combine(dest, dirName));
+                }
+                CloneDirectory(directory, Path.Combine(dest, dirName));
+            }
+
+            foreach (var file in Directory.GetFiles(root))
+            {
+                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)));
+            }
+        }
+
+        private static void SetAttributesNormal(DirectoryInfo dir)
+        {
+            
+            foreach (var subDir in dir.GetDirectories())
+                SetAttributesNormal(subDir);
+            foreach (var file in dir.GetFiles())
+            {
+                file.Attributes = FileAttributes.Normal;
+            }
+        }
+
+
+        private static void DeleteDirectoryIfExists_RemoveReadonly(string dir)
+        {
+
+            if (Directory.Exists(dir))
+            {
+                //remove readonly crap
+                SetAttributesNormal(new System.IO.DirectoryInfo(dir));
+
+                //delete directory recursively
+                Directory.Delete(dir, true);
+            }
+             
+        }
+
+
+        static ParserResult<object> QRInit(QRInitOptions opts)
+        {
+            Console.WriteLine(envIronDirectory);
+
+           
+            //if they didnt provide a name for the module
+            if (opts.name == null)
+            {
+                ProblemHandle p = new ProblemHandle();
+                p.ThereisAProblem("you did not provide a name for the module. do that with QRinit <name>");
+                return null;
+            }
+
+            string pathToBaseMod = $"{envIronDirectory}\\{opts.name}";
+
+
+            //if they tried to init the project in a directory that already exists
+            if (Directory.Exists($"{envIronDirectory}\\{opts.name}") && (opts.isToRename == false))
+            {
+                ProblemHandle p = new ProblemHandle();
+                p.ThereisAProblem($"you tried to initialize a module named {opts.name} that already exists");
+                return null;
+            }
+
+            if (opts.isToRename == false)
+            {
+
+                //----------------------------------------------------------------------------------------
+                Console.WriteLine("---cloning base template from the QR_sync/cpp_template directory");
+                CloneDirectory(@"C:/QR_sync/cpp_template", $"{envIronDirectory}\\{opts.name}");
+                Console.WriteLine("---finished cloning");
+
+                Console.WriteLine("---deleting the git repo."); 
+                DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/.git");
+
+            }
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---deleting build and install directories"); 
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build"); 
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win"); 
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---changing the module name in CMakeLists.txt, while keeping the old name in memory");
+            //get old name
+            string contents = File.ReadAllText(pathToBaseMod + @"/CMakeLists.txt");
+            var maches = Regex.Matches(contents, @"QR_module\((.*)\)");
+            string oldName = "qwertasd_module";//maches[0].Groups[1].Value;
+            string contentsReplace = Regex.Replace(contents, oldName, opts.name);
+            File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---change the include directory name to ${MODULE_NAME}_cp.");
+            if (!Directory.Exists(pathToBaseMod+@"/include/" + oldName + "_cp"))
+            {
+                Console.WriteLine("WARNING: could not find directory include/" + oldName+"");
+            }
+            else
+            {
+                Directory.Move(pathToBaseMod + @"/include/" + oldName + "_cp", pathToBaseMod + @"/include/" + opts.name + "_cp");
+            }
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
+                " replacing all instances of the old module name that you find");
+            var filesInSrc = Directory.GetFiles(pathToBaseMod + "/src").ToList();
+            var filesInInc = Directory.GetFiles(pathToBaseMod + "/include/"+opts.name+"_cp").ToList();
+            var filesInSrcUnit = Directory.GetFiles(pathToBaseMod + "/unit_tests/src").ToList();
+            var filesInIncUnit = Directory.GetFiles(pathToBaseMod + "/unit_tests/include").ToList();
+            List<string> allFilesToChange = new List<string>(); 
+            allFilesToChange.AddRange(filesInSrc); allFilesToChange.AddRange(filesInInc); allFilesToChange.AddRange(filesInSrcUnit); allFilesToChange.AddRange(filesInIncUnit);
+            foreach (var filetochange in allFilesToChange)
+            {
+                Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
+                contents = File.ReadAllText(filetochange); 
+                string contentrp = Regex.Replace(contents, oldName, opts.name);
+                File.WriteAllText(filetochange, contentrp); 
+            }
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("--- running ourcolcon for the cpp project portion of your module");
+            CMDHandlerVSDev cmdvs = new CMDHandlerVSDev(pathToBaseMod , pathToBaseMod);
+            //first source QR_core
+            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+            cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
+            cmdvs.SetMultipleCommands("call oursource");
+            cmdvs.SetMultipleCommands(@"cd "+ pathToBaseMod);
+            cmdvs.SetMultipleCommands("call ourcolcon");
+            cmdvs.SetMultipleCommands("call oursource");
+            //cmdvs.SetMultipleCommands("call oursource.bat");
+            //cmdvs.SetMultipleCommands(@"cd ../"+opts.name);
+            //cmdvs.SetMultipleCommands("call ourcolcon.bat");
+            cmdvs.ExecuteMultipleCommands();
+
+            Console.WriteLine(cmdvs.Output); 
+            Console.WriteLine("\n\n--- done running ourcolcon fpr cpp project");
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("--- switching to the rosqt portion of your module");
+            pathToBaseMod = pathToBaseMod + "/rosqt";
+            
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("--- change the include directory name to ${MODULE_NAME}_rqt.");
+            if (!Directory.Exists(pathToBaseMod+"/include/" + oldName + "_cp"))
+            {
+                Console.WriteLine("WARNING: could not find directory rosqt/include/" + oldName + "");
+            }
+            else
+            {
+                Directory.Move(pathToBaseMod + @"include/" + oldName + "_cp", pathToBaseMod + @"include/" + opts.name + "_cp");
+            }
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---deleting build and install directories");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---changing the module name in CMakeLists.txt, "); 
+            contents = File.ReadAllText(pathToBaseMod + @"/CMakeLists.txt");  
+            contentsReplace = Regex.Replace(contents, oldName, opts.name);
+            File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
+
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---change the include directory name to ${MODULE_NAME}_rqt.");
+            if (!Directory.Exists(pathToBaseMod + @"/include/" + oldName + "_rqt"))
+            {
+                Console.WriteLine("WARNING: could not find directory include/" + oldName + "");
+            }
+            else
+            {
+                Directory.Move(pathToBaseMod + @"/include/" + oldName + "_rqt", pathToBaseMod + @"/include/" + opts.name + "_rqt");
+            }
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
+                " replacing all instances of the old module name that you find");
+            filesInSrc = Directory.GetFiles(pathToBaseMod + "/src").ToList();
+            filesInInc = Directory.GetFiles(pathToBaseMod + "/include/" + opts.name + "_rqt").ToList();
+            allFilesToChange = new List<string>(); allFilesToChange.AddRange(filesInSrc); allFilesToChange.AddRange(filesInInc);
+            foreach (var filetochange in allFilesToChange)
+            {
+                Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
+                contents = File.ReadAllText(filetochange);
+                string contentrp = Regex.Replace(contents, oldName, opts.name);
+                File.WriteAllText(filetochange, contentrp);
+            }
+
+
+            //----------------------------------------------------------------------------------------
+            //-cd IF 
+            Console.WriteLine("deleting the build, install_win, and install_lin folders in the IF folder");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/IF/build");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/IF/install_win");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/IF/install_lin");
+
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("--- finally time to build and source everything. do this all in one bash file to keep environment");
+            cmdvs.SetWorkingDirectory(pathToBaseMod);
+            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+            cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
+            cmdvs.SetMultipleCommands("call oursource");   
+            //go to the IF directory to build
+            cmdvs.SetMultipleCommands(@"cd "+ pathToBaseMod + "/IF");
+            //build the interface project
+            cmdvs.SetMultipleCommands(@"call ourcolcon");
+            //source the Interface project
+            cmdvs.SetMultipleCommands(@"call oursource");
+            //go back to the cpp project
+            cmdvs.SetMultipleCommands(@"cd ../..");
+            //just source this one
+            cmdvs.SetMultipleCommands(@"call oursource");
+            //go to the rosqt again
+            cmdvs.SetMultipleCommands(@"cd rosqt");
+            //build and source this one
+            cmdvs.SetMultipleCommands(@"call ourcolcon");
+            cmdvs.SetMultipleCommands(@"call oursource"); 
+
+            cmdvs.ExecuteMultipleCommands(true);
+
+            Console.WriteLine(cmdvs.Output);
+            Console.WriteLine("\n\n--- done running ourcolcon for rosqt");
+
+
+            return null;
+        }
+        #endregion
 
 
 

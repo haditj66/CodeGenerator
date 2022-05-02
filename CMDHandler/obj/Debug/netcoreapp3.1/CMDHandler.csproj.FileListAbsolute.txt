@@ -1,0 +1,9 @@
+C:\CodeGenerator\CMDHandler\bin\Debug\netcoreapp3.1\CMDHandler.deps.json
+C:\CodeGenerator\CMDHandler\bin\Debug\netcoreapp3.1\CMDHandler.dll
+C:\CodeGenerator\CMDHandler\bin\Debug\netcoreapp3.1\CMDHandler.pdb
+C:\CodeGenerator\CMDHandler\obj\Debug\netcoreapp3.1\CMDHandler.csprojAssemblyReference.cache
+C:\CodeGenerator\CMDHandler\obj\Debug\netcoreapp3.1\CMDHandler.AssemblyInfoInputs.cache
+C:\CodeGenerator\CMDHandler\obj\Debug\netcoreapp3.1\CMDHandler.AssemblyInfo.cs
+C:\CodeGenerator\CMDHandler\obj\Debug\netcoreapp3.1\CMDHandler.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CMDHandler\obj\Debug\netcoreapp3.1\CMDHandler.dll
+C:\CodeGenerator\CMDHandler\obj\Debug\netcoreapp3.1\CMDHandler.pdb

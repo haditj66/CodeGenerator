@@ -19,14 +19,69 @@ namespace CodeGenerator.CMD_Handler
         protected ProcessStartInfo processInfo { get; set; }
         protected Process process { get; set; }
 
+        protected List<string> MultipleCommands;
+
         public CMDHandler(string StartingWorkingDirtory)
         {
             processInfo = new ProcessStartInfo("cmd.exe");
             SetWorkingDirectory(StartingWorkingDirtory);
 
+            MultipleCommands = new List<string>();
+
 
         }
 
+
+        public void SetMultipleCommands(string command)
+        { 
+            MultipleCommands.Add(command);
+        }
+
+        public void ExecuteMultipleCommands(bool RunSeperateProcess = false, bool SupressErrorMsg = false)
+        {
+            string pathToBatch = @"C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode() + ".bat";
+            //File.Create(pathToBatch);
+
+            bool keeptrying = true;
+            while (keeptrying)
+            { 
+                try
+                {
+                    File.WriteAllText(pathToBatch, "");
+                    //send commands to a batch file that will run
+                    File.WriteAllLines(pathToBatch, MultipleCommands);
+
+                    keeptrying = false;
+                }
+                catch(Exception e)
+                {
+
+                }
+            }
+
+
+            //get the old workingdirectory
+            string oldwd = processInfo.WorkingDirectory;
+
+            //change to the directory where the batch file is in
+            //SetWorkingDirectory(".");
+
+            //execute the bash file
+            
+            if (RunSeperateProcess == false)
+            {
+                ExecuteCommand(@"call C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode());
+            }
+            else
+            {
+                System.Diagnostics.Process.Start(@"C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode() + ".bat");
+            }
+            
+            MultipleCommands.Clear();
+
+            //change back to the previous working directory
+            //SetWorkingDirectory(oldwd);
+        }
 
         public void ExecuteCommand(string command, bool SupressErrorMsg = false)
         {
@@ -42,6 +97,9 @@ namespace CodeGenerator.CMD_Handler
             int exitCode;
             //processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
             processInfo.Arguments = "/c " + command;
+
+            //processInfo.Arguments = "/c " + "oursource" + " /c " + "cd ../testmod" + " /c " + "ourcolcon";
+
             //GetEnvironmentVariables(processInfo);
             //processInfo = new ProcessStartInfo(@"""C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x86", "/c " + "cl");
             //processInfo.WorkingDirectory = @"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC";

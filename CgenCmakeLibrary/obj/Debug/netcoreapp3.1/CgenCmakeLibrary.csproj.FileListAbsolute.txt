@@ -1,0 +1,9 @@
+C:\CodeGenerator\CgenCmakeLibrary\bin\Debug\netcoreapp3.1\CgenCmakeLibrary.deps.json
+C:\CodeGenerator\CgenCmakeLibrary\bin\Debug\netcoreapp3.1\CgenCmakeLibrary.dll
+C:\CodeGenerator\CgenCmakeLibrary\bin\Debug\netcoreapp3.1\CgenCmakeLibrary.pdb
+C:\CodeGenerator\CgenCmakeLibrary\obj\Debug\netcoreapp3.1\CgenCmakeLibrary.csprojAssemblyReference.cache
+C:\CodeGenerator\CgenCmakeLibrary\obj\Debug\netcoreapp3.1\CgenCmakeLibrary.AssemblyInfoInputs.cache
+C:\CodeGenerator\CgenCmakeLibrary\obj\Debug\netcoreapp3.1\CgenCmakeLibrary.AssemblyInfo.cs
+C:\CodeGenerator\CgenCmakeLibrary\obj\Debug\netcoreapp3.1\CgenCmakeLibrary.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CgenCmakeLibrary\obj\Debug\netcoreapp3.1\CgenCmakeLibrary.dll
+C:\CodeGenerator\CgenCmakeLibrary\obj\Debug\netcoreapp3.1\CgenCmakeLibrary.pdb

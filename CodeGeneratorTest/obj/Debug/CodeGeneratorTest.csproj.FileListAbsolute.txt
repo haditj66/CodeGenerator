@@ -18,3 +18,6 @@ C:\CodeGenerator\CodeGeneratorTest\obj\Debug\CodeGeneratorTest.csproj.CoreCompil
 C:\CodeGenerator\CodeGeneratorTest\obj\Debug\CodeGeneratorTest.csproj.CopyComplete
 C:\CodeGenerator\CodeGeneratorTest\obj\Debug\CodeGeneratorTest.dll
 C:\CodeGenerator\CodeGeneratorTest\obj\Debug\CodeGeneratorTest.pdb
+C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll

@@ -1,126 +1,29 @@
-//generated file: MyNode3.cpp
+//generated file: main.cpp
 //**********************************************************************
 //this is an auto-generated file using the template file located in the directory of C:\CodeGenerator\CodeGenerator\bin\Debug\..\..\FileTemplates\Files
 //ONLY WRITE CODE IN THE UserCode_Section BLOCKS
 //If you write code anywhere else,  it will be overwritten. modify the actual template file if needing to modify code outside usersection blocks.
 
-/*****************************************************************************
-** Includes
-*****************************************************************************/
 
-#include "../include/my_composable_node/MyNode3.hpp"
+ //put all your includes for the tests here manually. If you dont want a test, comment it out.
+##UserCode_a
 
 
-//place your includes here
-##UserCode_h
-
-/*****************************************************************************
-** Namespaces
-*****************************************************************************/
-//QT stuff
-#ifdef ISForQT__ON
-#include "../include/MyQtHeaders/main_window.hpp"
-#endif
-
-
-namespace PROJECT_NAME {
-  using namespace std::chrono_literals;
-
-
-  /*****************************************************************************
-  ** Implementation
-  *****************************************************************************/
-
-  //constructor
-  MyNode3::MyNode3(const rclcpp::NodeOptions & options)
-      : Node("MyNode3", options)
-  {
-
-    //place your own constructor stuff here.
-     ##UserCode_e
-
-
-      #ifdef ISForQT__ON
-      //MainWindow::UIStatic->SomeLabel->text("node has started");
-      #endif
-
-    /*********************
-    ** Publishers
-    **********************/
-              pub1_ = this->create_publisher<my_composable_node_i::msg::Test>("~/sometesttopic",100);
-         
-
-
-    /*********************
-    ** Subscribers
-    **********************/
-              subscription_nodesu = this->create_subscription<std_msgs::msg::String>( "sometopic", 10,
-            std::bind(&MyNode3::nodesu_Callback, this, _1));
- subscription_nodessu = this->create_subscription<std_msgs::msg::String>( "sometopic", 10,
-            std::bind(&MyNode3::nodessu_Callback, this, _1));
- subscription_nodeesf = this->create_subscription<std_msgs::msg::String>( "sometopic", 10,
-            std::bind(&MyNode3::nodeesf_Callback, this, _1));
-       
-
-
-    //*********************
-
-
-    //place your other constructor stuff here.
-    ##UserCode_f
-
-  }
-
-
-//place your implementations here
-##UserCode_g
-
-/*********************
-** Subscribers callback definitions
-**********************/
-          
-//the callback for subscription to topic sometopic
-void MyNode3::nodesu_Callback(const std_msgs::msg::String::SharedPtr msg) const
-{
-##UserCode_nodesuzd
-    //RCLCPP_INFO(this->get_logger(),  MyNode3 has received the sometopic published message: '%s', msg->data.c_str())
-} 
-
+ #include "gtest/gtest.h"
  
-//the callback for subscription to topic sometopic
-void MyNode3::nodessu_Callback(const std_msgs::msg::String::SharedPtr msg) const
+// floating point comparisons.
+//EXPECT_FLOAT_EQ (expected, actual)
+//EXPECT_DOUBLE_EQ (expected, actual)
+//EXPECT_NEAR (expected, actual, absolute_range)
+
+//strings
+// EXPECT_STREQ("h", "h");
+
+
+
+
+int main(int argc, char** argv)
 {
-##UserCode_nodessuze
-    //RCLCPP_INFO(this->get_logger(),  MyNode3 has received the sometopic published message: '%s', msg->data.c_str())
-} 
-
- 
-//the callback for subscription to topic sometopic
-void MyNode3::nodeesf_Callback(const std_msgs::msg::String::SharedPtr msg) const
-{
-##UserCode_nodeesfzf
-    //RCLCPP_INFO(this->get_logger(),  MyNode3 has received the sometopic published message: '%s', msg->data.c_str())
-} 
-
-       
-//*********************
-
-
-
-  MyNode3::~MyNode3()
-  {
-    rclcpp::shutdown();
-  }
-
-
-
-
-
-
-
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
-
-//this is needed for a composable node
-#include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(PROJECT_NAME::MyNode3)
-
