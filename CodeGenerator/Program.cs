@@ -1,4 +1,4 @@
-﻿//#define TESTING 
+﻿//#define TESTING
 
 using System;
 using System.Collections.Generic;
@@ -230,7 +230,7 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
         //public static string envIronDirectory = @"C:\QR_Core\build\win";
         public static string envIronDirectory = @"C:\QR_sync";
-        
+
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
         //static string[] command  = "degenerate -r fiile.txt oubnfe.tct ".Split(' ');
@@ -267,7 +267,7 @@ namespace CodeGenerator
         //static string[] command = "projects".Split(' ');
         //static string[] command = "cmakegui".Split(' ');
         //static string[] command = "post_compile".Split(' ');
-        static string[] command = "QRinit testmo".Split(' '); 
+        static string[] command = "QRinit testmats".Split(' ');
 
 #else
         static string[] command;
@@ -312,7 +312,7 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, QRInitOptions, SyncOptions, ConfigOptions,ProjectsOptions, MacroOptions, ProjConfigOptions,post_compileOptions, cmakeguiOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, QRInitOptions, SyncOptions, ConfigOptions, ProjectsOptions, MacroOptions, ProjConfigOptions, post_compileOptions, cmakeguiOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
@@ -324,7 +324,7 @@ namespace CodeGenerator
 .WithParsed<cmakeguiOptions>(opts => cmakegui(opts))
 .WithParsed<post_compileOptions>(opts => post_compile(opts))
 .WithParsed<ProjConfigOptions>(opts => ProjConfig(opts));
-                
+
             };
 
 #if !TESTING
@@ -813,7 +813,7 @@ namespace CodeGenerator
             {
                 synchronizeProject = SynchronizeProjectIAR.CreateSynchronizeProjectIAR(Path.Combine(envIronDirectory, SynchronizeProjectIAR.FirstIARDir, SynchronizeProjectIAR.SecondIARDir));
                 synchronizeProject.Initiate();
-                MySettingsVS settings = MySettingsVS.CreateMySettingsVS(envIronDirectory,true);
+                MySettingsVS settings = MySettingsVS.CreateMySettingsVS(envIronDirectory, true);
                 /*
                 synchronizeProjectiar.AddAdditionalInclude("bla\\bla2");
                 MyFilter blaFilter = new MyFilter("bla");
@@ -825,7 +825,7 @@ namespace CodeGenerator
                 //first sync all filters
                 foreach (var settingsMyFilter in settings.myFilters)
                 {
-                    synchronizeProject.AddFilter(settingsMyFilter); 
+                    synchronizeProject.AddFilter(settingsMyFilter);
                 }
 
                 //sync all files exxcept mainCG.cpp
@@ -834,7 +834,7 @@ namespace CodeGenerator
                     if (ccomps.Name != "mainCG.cpp")
                     {
                         synchronizeProject.AddCLCompileFile(ccomps);
-                    } 
+                    }
                 }
                 foreach (var cincl in settings.CLIncludeFiles)
                 {
@@ -926,7 +926,7 @@ namespace CodeGenerator
                             File.Copy(".gitattributes", Path.Combine(envIronDirectory, ".gitattributes"));
                         }
 
-                        gitHandler.CommitAll(envIronDirectory,true);
+                        gitHandler.CommitAll(envIronDirectory, true);
                         if (gitHandler.Cmd.Output.Contains("error:") || gitHandler.Cmd.Error.Contains("error:"))
                         {
                             ProblemHandle p = new ProblemHandle();
@@ -1054,7 +1054,7 @@ namespace CodeGenerator
                 }
                 catch (Exception e)
                 {
-                    
+
                     //todo. I should clean up and use a problem handle to save the settings
                     //todo file in a simple string and replace the .vcxproj and .filters and delete the locat CGenSaveFiles directory
                     problemHandle.ThereisAProblem("Something went wrong initializing. error : \n" + e.Message);
@@ -1064,7 +1064,7 @@ namespace CodeGenerator
 
 
                 try
-                { 
+                {
                     //create directory to synced projects like IAR.
                     string IARDirPath = Path.Combine(Program.envIronDirectory, "IAR");
                     if (!Directory.Exists(IARDirPath))
@@ -1083,7 +1083,7 @@ namespace CodeGenerator
                         File.Move(Path.Combine(pathToFile, Path.GetFileName(fileEWW)), Path.Combine(pathToFile, Path.GetFileName(opts.name + ".eww")));
                     }
                 }
-                catch (Exception e )
+                catch (Exception e)
                 {
 
                     Console.WriteLine("there was a problem importing the IAR project. Check to make sure all was imported ok by building that project");
@@ -1100,13 +1100,13 @@ namespace CodeGenerator
 
         #region Projects command ***************************************************************************
         static ParserResult<object> Projects(ProjectsOptions opts)
-        { 
+        {
             foreach (var proj in savefileProjGlobal.CgenProjects.Projects)
             {
                 Console.Write("Project: ");
                 Console.WriteLine(proj.NameOfProject);
                 Console.WriteLine(proj.PathOfProject + "\n");
-            } 
+            }
 
             return null;
         }
@@ -1119,7 +1119,7 @@ namespace CodeGenerator
 
             //get all macro files in the environment directory
             List<string> cgenMFiles = Directory.GetFiles(envIronDirectory).Where((file) =>
-            { 
+            {
                 return Path.GetExtension(file).Equals(".cgenM");
             }).ToList();
 
@@ -1137,11 +1137,11 @@ namespace CodeGenerator
                     GeneralMacro generalMacro = new GeneralMacro(s, Path.GetFileName(cgenMFilePath));
                     generalMacro.CreateTemplate();
 
-                    Console.WriteLine(Path.GetFileName(cgenMFilePath)+" macro was created.");
-                }  
+                    Console.WriteLine(Path.GetFileName(cgenMFilePath) + " macro was created.");
+                }
 
             }
-             
+
             return null;
         }
         #endregion
@@ -1175,7 +1175,7 @@ namespace CodeGenerator
             string environcgensaveFile = Path.Combine(envIronDirectory, "CGensaveFiles", "Dir_Step1.txt");
             if (Directory.Exists(Path.GetDirectoryName(environcgensaveFile)) == false)
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(environcgensaveFile)); 
+                Directory.CreateDirectory(Path.GetDirectoryName(environcgensaveFile));
             }
             if (File.Exists(environcgensaveFile) == false)
             {
@@ -1189,8 +1189,8 @@ namespace CodeGenerator
             }
 
             //read all contents of the Dir_Step1 in the current working directory
-            string Dir_Step1Contents = File.ReadAllText(envIronDirectory +"/CGensaveFiles/Dir_Step1.txt");
-             
+            string Dir_Step1Contents = File.ReadAllText(envIronDirectory + "/CGensaveFiles/Dir_Step1.txt");
+
             //forward this content to the PATHTOCMAKEGUI directory
             File.WriteAllText(PATHTOCMAKEGUI + "/Dir_Step2.txt", Dir_Step1Contents);
 
@@ -1325,7 +1325,7 @@ namespace CodeGenerator
                 if (libraryNameNotSupportingPlat != null)
                 {
                     ProblemHandle p = new ProblemHandle();
-                    p.ThereisAProblem("\n you are building for a platform "+ projectBuilderForVs.GetPlatFormThisisSetupFor()+ " as stated in your mainCG.cpp file, but "+ libraryNameNotSupportingPlat + " does not support the platform you are building for.  \n use cgen configproj -a <nameofScope> \n to add platform to that project scope.");
+                    p.ThereisAProblem("\n you are building for a platform " + projectBuilderForVs.GetPlatFormThisisSetupFor() + " as stated in your mainCG.cpp file, but " + libraryNameNotSupportingPlat + " does not support the platform you are building for.  \n use cgen configproj -a <nameofScope> \n to add platform to that project scope.");
                 }
                 configFileBuilder.WriteTempConfigurationToFinalFile();
 
@@ -1433,16 +1433,24 @@ namespace CodeGenerator
         //- call oursource
 
 
-        private static void CloneDirectory(string root, string dest)
+        private static void CloneDirectory(string root, string dest, List<string> neglectedDirs = null)
         {
-            foreach (var directory in Directory.GetDirectories(root))
+            if (neglectedDirs == null)
             {
-                string dirName = Path.GetFileName(directory);
-                if (!Directory.Exists(Path.Combine(dest, dirName)))
-                {
-                    Directory.CreateDirectory(Path.Combine(dest, dirName));
+                neglectedDirs = new List<string>();
+            }
+
+            foreach (string directory in Directory.GetDirectories(root))
+            {
+                if (!neglectedDirs.Contains(new DirectoryInfo(directory).Name))
+                { 
+                    string dirName = Path.GetFileName(directory);
+                    if (!Directory.Exists(Path.Combine(dest, dirName)))
+                    {
+                        Directory.CreateDirectory(Path.Combine(dest, dirName));
+                    }
+                    CloneDirectory(directory, Path.Combine(dest, dirName));
                 }
-                CloneDirectory(directory, Path.Combine(dest, dirName));
             }
 
             foreach (var file in Directory.GetFiles(root))
@@ -1453,7 +1461,7 @@ namespace CodeGenerator
 
         private static void SetAttributesNormal(DirectoryInfo dir)
         {
-            
+
             foreach (var subDir in dir.GetDirectories())
                 SetAttributesNormal(subDir);
             foreach (var file in dir.GetFiles())
@@ -1474,14 +1482,46 @@ namespace CodeGenerator
                 //delete directory recursively
                 Directory.Delete(dir, true);
             }
-             
+
         }
+
+
+        private static void CreateQTCreatorOpenBatch(CMDHandlerVSDev cmdvs, string pathToBaseMod)
+        {
+            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod);
+            cmdvs.SetMultipleCommands("call oursource");
+            cmdvs.SetMultipleCommands(@"C:\Qt\Tools\QtCreator\bin\qtcreator.exe");
+            cmdvs.ExecuteMultipleCommands_InItsOwnBatch(pathToBaseMod, "OpenQTCreatorHere");
+        }
+
+
+
+        private static void PromptAQuestionToContinue(string q)
+        {
+            do
+            {
+                Console.WriteLine(q + " \n  \'y\' or \'n\'");
+                var mm = Console.ReadKey();
+                if (mm.KeyChar == 'n' || mm.KeyChar == 'N')
+                {
+                    return;
+                }
+                else if (mm.KeyChar == 'y' || mm.KeyChar == 'Y')
+                {
+                    break;
+                }
+            } while (true);
+
+        }
+
 
 
         static ParserResult<object> QRInit(QRInitOptions opts)
         {
             Console.WriteLine(envIronDirectory);
 
+             
            
             //if they didnt provide a name for the module
             if (opts.name == null)
@@ -1492,6 +1532,8 @@ namespace CodeGenerator
             }
 
             string pathToBaseMod = $"{envIronDirectory}\\{opts.name}";
+
+
 
 
             //if they tried to init the project in a directory that already exists
@@ -1507,7 +1549,7 @@ namespace CodeGenerator
 
                 //----------------------------------------------------------------------------------------
                 Console.WriteLine("---cloning base template from the QR_sync/cpp_template directory");
-                CloneDirectory(@"C:/QR_sync/cpp_template", $"{envIronDirectory}\\{opts.name}");
+                CloneDirectory(@"C:/QR_sync/cpp_template", $"{envIronDirectory}\\{opts.name}", new List<string>() { @".git" });
                 Console.WriteLine("---finished cloning");
 
                 Console.WriteLine("---deleting the git repo."); 
@@ -1524,13 +1566,16 @@ namespace CodeGenerator
 
 
             //----------------------------------------------------------------------------------------
-            Console.WriteLine("---changing the module name in CMakeLists.txt, while keeping the old name in memory");
+            Console.WriteLine("---changing the module name in CMakeLists.txt and in the config/module_name.cmake, while keeping the old name in memory");
             //get old name
             string contents = File.ReadAllText(pathToBaseMod + @"/CMakeLists.txt");
+            string contents2 = File.ReadAllText(pathToBaseMod + @"/config/module_name.cmake");
             var maches = Regex.Matches(contents, @"QR_module\((.*)\)");
             string oldName = "qwertasd_module";//maches[0].Groups[1].Value;
             string contentsReplace = Regex.Replace(contents, oldName, opts.name);
+            string contentsReplace2 = Regex.Replace(contents2, oldName, opts.name);
             File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
+            File.WriteAllText(pathToBaseMod + @"/config/module_name.cmake", contentsReplace2);
 
 
             //----------------------------------------------------------------------------------------
@@ -1544,6 +1589,30 @@ namespace CodeGenerator
                 Directory.Move(pathToBaseMod + @"/include/" + oldName + "_cp", pathToBaseMod + @"/include/" + opts.name + "_cp");
             }
 
+
+            //----------------------------------------------------------------------------------------
+            //-cd IF 
+            Console.WriteLine("deleting the build, install_win, and install_lin folders in the IF folder");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/build");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_win");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_lin");
+
+            Console.WriteLine("build the interface project. this is the first one that is built because everthing in this module depends on this one");
+            CMDHandlerVSDev cmdvs = new CMDHandlerVSDev(pathToBaseMod, pathToBaseMod);
+            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+            cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
+            cmdvs.SetMultipleCommands("call oursource");
+            //go to the IF directory to build
+            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod + "/rosqt/IF");
+            //build the interface project
+            cmdvs.SetMultipleCommands(@"call ourcolcon");
+            //source the Interface project
+            cmdvs.SetMultipleCommands(@"call oursource");
+
+            cmdvs.ExecuteMultipleCommands_InSeperateProcess();
+
+
+            PromptAQuestionToContinue("did it colcon build right?");
 
             //----------------------------------------------------------------------------------------
             Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
@@ -1565,20 +1634,30 @@ namespace CodeGenerator
 
             //----------------------------------------------------------------------------------------
             Console.WriteLine("--- running ourcolcon for the cpp project portion of your module");
-            CMDHandlerVSDev cmdvs = new CMDHandlerVSDev(pathToBaseMod , pathToBaseMod);
+            
             //first source QR_core
             cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
             cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
             cmdvs.SetMultipleCommands("call oursource");
-            cmdvs.SetMultipleCommands(@"cd "+ pathToBaseMod);
+            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod + "/rosqt/IF"); 
+            //source the Interface project
+            cmdvs.SetMultipleCommands(@"call oursource");
+            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod);
             cmdvs.SetMultipleCommands("call ourcolcon");
             cmdvs.SetMultipleCommands("call oursource");
             //cmdvs.SetMultipleCommands("call oursource.bat");
             //cmdvs.SetMultipleCommands(@"cd ../"+opts.name);
             //cmdvs.SetMultipleCommands("call ourcolcon.bat");
-            cmdvs.ExecuteMultipleCommands();
+            cmdvs.ExecuteMultipleCommands_InSeperateProcess();
 
-            Console.WriteLine(cmdvs.Output); 
+             
+            PromptAQuestionToContinue("did it colcon build right?");
+
+
+            //creating batch file for opening up qt creator with cp sourced
+            CreateQTCreatorOpenBatch(cmdvs, pathToBaseMod); 
+             
+
             Console.WriteLine("\n\n--- done running ourcolcon fpr cpp project");
 
             //----------------------------------------------------------------------------------------
@@ -1640,12 +1719,7 @@ namespace CodeGenerator
             }
 
 
-            //----------------------------------------------------------------------------------------
-            //-cd IF 
-            Console.WriteLine("deleting the build, install_win, and install_lin folders in the IF folder");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/IF/build");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/IF/install_win");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/IF/install_lin");
+
 
 
             //----------------------------------------------------------------------------------------
@@ -1656,8 +1730,6 @@ namespace CodeGenerator
             cmdvs.SetMultipleCommands("call oursource");   
             //go to the IF directory to build
             cmdvs.SetMultipleCommands(@"cd "+ pathToBaseMod + "/IF");
-            //build the interface project
-            cmdvs.SetMultipleCommands(@"call ourcolcon");
             //source the Interface project
             cmdvs.SetMultipleCommands(@"call oursource");
             //go back to the cpp project
@@ -1670,15 +1742,29 @@ namespace CodeGenerator
             cmdvs.SetMultipleCommands(@"call ourcolcon");
             cmdvs.SetMultipleCommands(@"call oursource"); 
 
-            cmdvs.ExecuteMultipleCommands(true);
+            cmdvs.ExecuteMultipleCommands_InSeperateProcess();
+            PromptAQuestionToContinue("Did it build right"); 
 
-            Console.WriteLine(cmdvs.Output);
+
+            CreateQTCreatorOpenBatch(cmdvs, pathToBaseMod);
+
             Console.WriteLine("\n\n--- done running ourcolcon for rosqt");
 
 
+            Console.WriteLine("\n\n--- finished initializing everything. wanna open qt creator for the cp project?");
             return null;
         }
         #endregion
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -37,10 +37,46 @@ namespace CodeGenerator.CMD_Handler
             MultipleCommands.Add(command);
         }
 
-        public void ExecuteMultipleCommands(bool RunSeperateProcess = false, bool SupressErrorMsg = false)
+
+
+        public void ExecuteMultipleCommands_InSeperateProcess()
         {
-            string pathToBatch = @"C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode() + ".bat";
+            Process p =  ExecuteMultipleCommands(true, false,"","",false);
+            p.WaitForExit();
+        }
+
+        public void ExecuteMultipleCommands(bool SupressErrorMsg = false)
+        {
+            ExecuteMultipleCommands(false, false, "","", SupressErrorMsg);
+        }
+
+
+        public void ExecuteMultipleCommands_InItsOwnBatch(string toBatchFileDir, string nameOfBatch)
+        {
+            ExecuteMultipleCommands(false, true, toBatchFileDir, nameOfBatch);
+        }
+
+
+        private Process ExecuteMultipleCommands(bool RunSeperateProcess = false, bool justCreateBatchFile = false,  string toBatchFileDir ="", string nameOfBatch = "", bool SupressErrorMsg = false)
+        {
+            string NameOfBatch;
+            string pathToBatch;
+            if (justCreateBatchFile)
+            {
+                NameOfBatch = nameOfBatch + ".bat";
+                pathToBatch = toBatchFileDir + @"\" + NameOfBatch;
+            }
+            else
+            {
+                NameOfBatch = "batch_" + this.GetHashCode() + ".bat";
+                pathToBatch = @"C:\CodeGenerator\CodeGenerator\bin\Debug\" + NameOfBatch;
+            }
+
+            
+
+            
             //File.Create(pathToBatch);
+
 
             bool keeptrying = true;
             while (keeptrying)
@@ -67,18 +103,20 @@ namespace CodeGenerator.CMD_Handler
             //SetWorkingDirectory(".");
 
             //execute the bash file
-            
-            if (RunSeperateProcess == false)
+            Process p = null;
+            if (RunSeperateProcess == true)
+            {
+                p = System.Diagnostics.Process.Start(@"C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode() + ".bat");
+                
+            }
+            else if (justCreateBatchFile == false)
             {
                 ExecuteCommand(@"call C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode());
-            }
-            else
-            {
-                System.Diagnostics.Process.Start(@"C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode() + ".bat");
-            }
+            } 
             
             MultipleCommands.Clear();
 
+            return p;
             //change back to the previous working directory
             //SetWorkingDirectory(oldwd);
         }
