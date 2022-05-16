@@ -267,7 +267,7 @@ namespace CodeGenerator
         //static string[] command = "projects".Split(' ');
         //static string[] command = "cmakegui".Split(' ');
         //static string[] command = "post_compile".Split(' ');
-        static string[] command = "QRinit testmats".Split(' ');
+        static string[] command = "QRinit tutthree".Split(' ');
 
 #else
         static string[] command;
@@ -1497,7 +1497,7 @@ namespace CodeGenerator
 
 
 
-        private static void PromptAQuestionToContinue(string q)
+        private static void PromptAQuestionToContinue(string q, Action whatToDoIfNo = null)
         {
             do
             {
@@ -1505,6 +1505,10 @@ namespace CodeGenerator
                 var mm = Console.ReadKey();
                 if (mm.KeyChar == 'n' || mm.KeyChar == 'N')
                 {
+                    if (whatToDoIfNo != null)
+                    {
+                        whatToDoIfNo();
+                    } 
                     return;
                 }
                 else if (mm.KeyChar == 'y' || mm.KeyChar == 'Y')
@@ -1563,6 +1567,7 @@ namespace CodeGenerator
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build"); 
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win"); 
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/log");
 
 
             //----------------------------------------------------------------------------------------
@@ -1576,6 +1581,21 @@ namespace CodeGenerator
             string contentsReplace2 = Regex.Replace(contents2, oldName, opts.name);
             File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
             File.WriteAllText(pathToBaseMod + @"/config/module_name.cmake", contentsReplace2);
+
+            Console.WriteLine("---going through all files package.xml files replacing all instances of the old module name that you find");
+            var fileIncpp = pathToBaseMod + @"/package.xml";
+            var fileInrqt = pathToBaseMod + @"/rosqt/package.xml";  
+            var fileInIF = pathToBaseMod + @"/rosqt/IF/package.xml";  
+            List<string> allFilesToChangexml = new List<string>();
+            allFilesToChangexml.Add(fileIncpp); allFilesToChangexml.Add(fileInrqt); allFilesToChangexml.Add(fileInIF);  
+            foreach (var filetochange in allFilesToChangexml)
+            {
+                Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
+                contents = File.ReadAllText(filetochange);
+                string contentrp = Regex.Replace(contents, oldName, opts.name);
+                File.WriteAllText(filetochange, contentrp);
+            }
+
 
 
             //----------------------------------------------------------------------------------------
@@ -1596,6 +1616,7 @@ namespace CodeGenerator
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/build");
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_win");
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_lin");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/log");
 
             Console.WriteLine("build the interface project. this is the first one that is built because everthing in this module depends on this one");
             CMDHandlerVSDev cmdvs = new CMDHandlerVSDev(pathToBaseMod, pathToBaseMod);
@@ -1608,11 +1629,18 @@ namespace CodeGenerator
             cmdvs.SetMultipleCommands(@"call ourcolcon");
             //source the Interface project
             cmdvs.SetMultipleCommands(@"call oursource");
+            cmdvs.SetMultipleCommands("echo Press any key to exit . . ."); 
+            cmdvs.SetMultipleCommands(@"pause>nul");
+
 
             cmdvs.ExecuteMultipleCommands_InSeperateProcess();
 
 
-            PromptAQuestionToContinue("did it colcon build right?");
+            PromptAQuestionToContinue("did it colcon build right?", ()=> {
+                //delete dir
+                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
+                System.Environment.Exit(1);
+            });
 
             //----------------------------------------------------------------------------------------
             Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
@@ -1645,13 +1673,22 @@ namespace CodeGenerator
             cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod);
             cmdvs.SetMultipleCommands("call ourcolcon");
             cmdvs.SetMultipleCommands("call oursource");
+            cmdvs.SetMultipleCommands("echo Press any key to exit . . .");
+            cmdvs.SetMultipleCommands(@"pause>nul");
+            
+            
             //cmdvs.SetMultipleCommands("call oursource.bat");
             //cmdvs.SetMultipleCommands(@"cd ../"+opts.name);
             //cmdvs.SetMultipleCommands("call ourcolcon.bat");
             cmdvs.ExecuteMultipleCommands_InSeperateProcess();
 
-             
-            PromptAQuestionToContinue("did it colcon build right?");
+
+
+            PromptAQuestionToContinue("did it colcon build right?", () => {
+                //delete dir
+                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
+                System.Environment.Exit(1);
+            });
 
 
             //creating batch file for opening up qt creator with cp sourced
@@ -1682,7 +1719,7 @@ namespace CodeGenerator
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build");
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win");
             DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
-
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/log");
 
             //----------------------------------------------------------------------------------------
             Console.WriteLine("---changing the module name in CMakeLists.txt, "); 
@@ -1740,10 +1777,17 @@ namespace CodeGenerator
             cmdvs.SetMultipleCommands(@"cd rosqt");
             //build and source this one
             cmdvs.SetMultipleCommands(@"call ourcolcon");
-            cmdvs.SetMultipleCommands(@"call oursource"); 
+            cmdvs.SetMultipleCommands(@"call oursource");
+            cmdvs.SetMultipleCommands("echo Press any key to exit . . ."); 
+            cmdvs.SetMultipleCommands(@"pause>nul");
 
             cmdvs.ExecuteMultipleCommands_InSeperateProcess();
-            PromptAQuestionToContinue("Did it build right"); 
+
+            PromptAQuestionToContinue("did it colcon build right?", () => {
+                //delete dir
+                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
+                System.Environment.Exit(1);
+            });
 
 
             CreateQTCreatorOpenBatch(cmdvs, pathToBaseMod);
