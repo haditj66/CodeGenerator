@@ -229,7 +229,9 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CgenCmakeGui\TestFiles";
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
         //public static string envIronDirectory = @"C:\QR_Core\build\win";
-        public static string envIronDirectory = @"C:\QR_sync";
+        //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy";
+        public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
+        //public static string envIronDirectory = @"C:\QR_sync";
 
 
         //static string[] command  = "generate -r fiile.txt oubnfe.tct --aienabled=true".Split(' '); //values should be called LOWER CASED
@@ -265,9 +267,9 @@ namespace CodeGenerator
         //static string[] command = "sync iar".Split(' ');
         //static string[] command = "macro".Split(' ');
         //static string[] command = "projects".Split(' ');
-        //static string[] command = "cmakegui".Split(' ');
+        static string[] command = "cmakegui".Split(' ');
         //static string[] command = "post_compile".Split(' ');
-        static string[] command = "QRinit tutthree".Split(' ');
+        //static string[] command = "QRinit tutthree".Split(' ');
 
 #else
         static string[] command;

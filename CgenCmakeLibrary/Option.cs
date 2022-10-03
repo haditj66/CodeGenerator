@@ -134,43 +134,46 @@ namespace CgenCmakeLibrary
                     //group 1 this possible value will restrict 
                     string possibleValueThatRestrictsName = matchsConst.Groups[1].Value.Trim();
                     PossibleValue possibleValueThatRestricts = nextOption.GetPossibleValue(possibleValueThatRestrictsName);
-
-                    //group 2 option that possible value restricts 
-                    string optionConstrictedName = matchsConst.Groups[2].Value.Trim();
-                    //if option does not exist yet, create it
-                    Option optionToConstrict = AllOptions.Instance.GetOptionCreateIfNotExists(optionConstrictedName);
-                    ConstrictedOptions constOpt = new ConstrictedOptions(nextOption, optionToConstrict, possibleValueThatRestricts);
-
-                    //group 3 get all constrictedPossible values
-                    string possibleconstricContent = matchsConst.RemoveContentsMatchesSoFar(constrictContents);
-                    Regex regexpv = new Regex(@"(.*?)@");//@(.*?);
-                    var matchpv = regexpv.Matches(possibleconstricContent);
-                    List<string> constValues = new List<string>();
-                    foreach (Match mmm in matchpv)
+                    if (possibleValueThatRestricts != null)
                     {
-                        string constrictValue = mmm.Groups[1].Value.Trim();
-                        constValues.Add(constrictValue);
-                        //constOpt.AddValueConstricted(constrictValue);
-                        possibleconstricContent = mmm.RemoveContentsMatchesSoFar(possibleconstricContent);
-                    }
-                    possibleconstricContent = possibleconstricContent.Remove(possibleconstricContent.IndexOf(';'));
-                    constValues.Add(possibleconstricContent);
-                    //constOpt.AddValueConstricted(possibleconstricContent);
+                        //group 2 option that possible value restricts 
+                        string optionConstrictedName = matchsConst.Groups[2].Value.Trim();
+                        //if option does not exist yet, create it
+                        Option optionToConstrict = AllOptions.Instance.GetOptionCreateIfNotExists(optionConstrictedName);
+                        ConstrictedOptions constOpt = new ConstrictedOptions(nextOption, optionToConstrict, possibleValueThatRestricts);
 
-                    //create contrict options for each constValues found 
-                    List<ConstrictedOptions> constrictions = new List<ConstrictedOptions>();
-                    foreach (var item in constValues)
-                    {
-                        ConstrictedOptions cv = new ConstrictedOptions(constOpt.ForOption, constOpt.OptionConstricted, constOpt.WhenThisPossibleValueIsChosen);
-                        cv.AddValueConstricted(item);
-                        constrictions.Add(cv);
-                    }
+                        //group 3 get all constrictedPossible values
+                        string possibleconstricContent = matchsConst.RemoveContentsMatchesSoFar(constrictContents);
+                        Regex regexpv = new Regex(@"(.*?)@");//@(.*?);
+                        var matchpv = regexpv.Matches(possibleconstricContent);
+                        List<string> constValues = new List<string>();
+                        foreach (Match mmm in matchpv)
+                        {
+                            string constrictValue = mmm.Groups[1].Value.Trim();
+                            constValues.Add(constrictValue);
+                            //constOpt.AddValueConstricted(constrictValue);
+                            possibleconstricContent = mmm.RemoveContentsMatchesSoFar(possibleconstricContent);
+                        }
+                        possibleconstricContent = possibleconstricContent.Remove(possibleconstricContent.IndexOf(';'));
+                        constValues.Add(possibleconstricContent);
+                        //constOpt.AddValueConstricted(possibleconstricContent);
+
+                        //create contrict options for each constValues found 
+                        List<ConstrictedOptions> constrictions = new List<ConstrictedOptions>();
+                        foreach (var item in constValues)
+                        {
+                            ConstrictedOptions cv = new ConstrictedOptions(constOpt.ForOption, constOpt.OptionConstricted, constOpt.WhenThisPossibleValueIsChosen);
+                            cv.AddValueConstricted(item);
+                            constrictions.Add(cv);
+                        }
 
 
-                    foreach (var item in constrictions)
-                    {
-                        possibleValueThatRestricts.AddConstrictedOption(item);
+                        foreach (var item in constrictions)
+                        {
+                            possibleValueThatRestricts.AddConstrictedOption(item);
+                        }
                     }
+                  
                     
 
                 }
@@ -208,7 +211,7 @@ namespace CgenCmakeLibrary
 
         public PossibleValue GetPossibleValue(string possibleValueName)
         {
-            return MyPossibleValues.Where(opt => opt.Name == possibleValueName).First();
+            return MyPossibleValues.Where(opt => opt.Name == possibleValueName).FirstOrDefault();
         }
 
         public bool IsPossibleValueExists(string possibleValueName)
@@ -310,11 +313,17 @@ namespace CgenCmakeLibrary
  
         public static bool operator==(PossibleValue thispos, PossibleValue other)
         {
+            if ((object)thispos == null) return (object)other == null;
+            if ((object)other== null) return (object)thispos == null;
+
             return thispos.Name == other.Name;
         }
 
         public static bool operator !=(PossibleValue thispos, PossibleValue other)
         {
+            if ((object)thispos == null) return (object)other != null;
+            if ((object)other == null) return (object)thispos != null;
+
             return thispos.Name != other.Name;
         }
 
@@ -715,29 +724,30 @@ namespace CgenCmakeLibrary
             List<string> UnallowablePVs_l = new List<string>();
             foreach (var selOpt in selectedOptionsSoFar)
             {
-                PossibleValue pv = selOpt.option.MyPossibleValues.First(pv => pv.Name == selOpt.possibleValueSelection);
+                PossibleValue pv = selOpt.option.MyPossibleValues.FirstOrDefault(pv => pv.Name == selOpt.possibleValueSelection);
+                if (pv != null)
+                { 
+                    foreach (var co in pv.MyConstrictedOptions)
+                    {
+                        if (co.OptionConstricted.Name == forConstrictedOption.Name)
+                        {
 
-                foreach (var co in pv.MyConstrictedOptions)
-                {
-                    if (co.OptionConstricted.Name == forConstrictedOption.Name)
-                    { 
+                            allowablePVs.Clear();
+                            allowablePVs.AddRange(pv.MyConstrictedOptions
+                               .Where(co => co.OptionConstricted.Name == forConstrictedOption.Name)
+                               .Select(s => s.ValueConstricted).ToList());
+                            allowablePVs.Distinct().ToList();
 
-                        allowablePVs.Clear();
-                        allowablePVs.AddRange(pv.MyConstrictedOptions
-                           .Where(co => co.OptionConstricted.Name == forConstrictedOption.Name)
-                           .Select(s => s.ValueConstricted).ToList());
-                        allowablePVs.Distinct().ToList();
+                            UnallowablePVs = PossbleValueOfConstric.Except(allowablePVs).ToList(); //.RemoveAll(av => allowablePVs.Exists(av));
 
-                        UnallowablePVs = PossbleValueOfConstric.Except(allowablePVs).ToList(); //.RemoveAll(av => allowablePVs.Exists(av));
+                            ConstrictionInfo info = new ConstrictionInfo() { ForOption = selOpt.option.Name, WhenPVSelected = pv.Name, ConstrictsOption = forConstrictedOption.Name };
+                            info.PVsConstrictedNotAllowed.AddRange(UnallowablePVs);
+                            theConstrictionsOfThePVs.Add(info);
 
-                        ConstrictionInfo info = new ConstrictionInfo() { ForOption = selOpt.option.Name, WhenPVSelected = pv.Name, ConstrictsOption = forConstrictedOption.Name };
-                        info.PVsConstrictedNotAllowed.AddRange(UnallowablePVs);
-                        theConstrictionsOfThePVs.Add(info);
-
-                        UnallowablePVs_l = UnallowablePVs_l.Union(UnallowablePVs).ToList();
+                            UnallowablePVs_l = UnallowablePVs_l.Union(UnallowablePVs).ToList();
+                        }
                     }
-                }
-                 
+                } 
 
             }
 
