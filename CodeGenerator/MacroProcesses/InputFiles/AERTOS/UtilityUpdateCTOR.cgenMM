@@ -1,0 +1,1 @@
+ActionReq@ServiceId@.SetUpdateFunc([](@UtilityName@* p, @FuncArguments@) {return p->_@ServiceName@Update(&p->ActionReq@ServiceId@, @Arguments@); });

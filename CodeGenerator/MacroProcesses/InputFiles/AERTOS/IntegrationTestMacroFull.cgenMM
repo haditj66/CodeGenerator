@@ -1,0 +1,7 @@
+#define AEITEST_END_TestsAfterTimer_@TestChosen@(timeInMilliBeforeEnd) _AEITEST_END_TestsAfterTimer(timeInMilliBeforeEnd)
+#define AEITEST_@TestChosen@(testName, thingToAssert, AssertionMessage) _AEITEST(testName, thingToAssert, AssertionMessage,0,1) 
+#define AEITEST_@TestChosen@_MUST_PASS_THIS_MANY(testName, thingToAssert, AssertionMessage, passedOnlyAfterThisManyPasses) _AEITEST(testName, thingToAssert, AssertionMessage, 0,passedOnlyAfterThisManyPasses) 
+#define AEITEST_@TestChosen@_IgnoreFirstTests(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum) _AEITEST(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum,1) 
+#define AEITEST_EndTestsIfFalseAssertion_@TestChosen@(testName, thingToAssert, AssertionMessage) _AEITEST_EndTestsIfFalseAssertion(testName, thingToAssert, AssertionMessage) 
+#define AEITEST_END_@TestChosen@ _AEITEST_END
+#define AEITEST_EXPECT_TEST_TO_RUN_@TestChosen@(testName) _AEITEST_EXPECT_TEST_TO_RUN(testName)

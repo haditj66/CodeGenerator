@@ -1,0 +1,25 @@
+	  
+	  
+	#define @UtilityName@_@ServiceName@_Service \
+	inline void @ServiceName@(int idOfAO, @FuncArguments@)\
+	{\
+		this->RunRequest@ServiceId@(idOfAO, @Arguments@); \
+	}\
+	\
+	inline Token* @ServiceName@_WithWait(int idOfAO, @FuncArguments@)\
+	{\
+		return this->RunRequestWithWait@ServiceId@(idOfAO, @Arguments@); \
+	}\
+	\
+	inline Action@ServiceId@_RETURNTYPE_t @ServiceName@_WaitForRequestToFinish(Token* token)\
+	{\
+		return this->WaitForRequestToFinish@ServiceId@(token  ); \
+	}\
+	\
+	inline void @ServiceName@_DoneWithRequest(Token* tokenOfRequest)\
+	{\
+		return this->DoneWithRequest@ServiceId@(tokenOfRequest); \
+	}
+	
+	#define @UtilityName@_@ServiceName@ void _@ServiceName@(int idOfAO, @FuncArguments@)
+	#define @UtilityName@_@ServiceName@_Update bool _@ServiceName@Update(ActionRequestObjectArgTDU@TDUNum@@TemplateContents@* actReq, @FuncArguments@)   

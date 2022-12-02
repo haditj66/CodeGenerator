@@ -1,0 +1,14 @@
+
+#Cgen_Start(CGEN_PROJECT_DIRECTORY "@DependDir@")
+
+MATH(EXPR _arg_ONLY_CREATE_LIBRARY "${_arg_ONLY_CREATE_LIBRARY}+1")
+include("@DependDir@/AEConfigProject.cmake")
+MATH(EXPR _arg_ONLY_CREATE_LIBRARY "${_arg_ONLY_CREATE_LIBRARY}-1")
+
+#CREATE_TARGET_INTEGRATIONEXE(NAME_OF_TARGET @DependName@
+#LOCATION_OF_TARGET "@DependDir@"
+#LibrariesToLinkTo AECoreLib @DependDepends@
+#ONLY_CREATE_LIBRARY TRUE
+#)  
+#Cgen_End_Session()
+ 

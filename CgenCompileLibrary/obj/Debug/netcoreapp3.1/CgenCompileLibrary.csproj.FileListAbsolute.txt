@@ -1,9 +1,10 @@
 C:\CodeGenerator\CgenCompileLibrary\bin\Debug\netcoreapp3.1\CgenCompileLibrary.deps.json
 C:\CodeGenerator\CgenCompileLibrary\bin\Debug\netcoreapp3.1\CgenCompileLibrary.dll
 C:\CodeGenerator\CgenCompileLibrary\bin\Debug\netcoreapp3.1\CgenCompileLibrary.pdb
-C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.csprojAssemblyReference.cache
 C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.AssemblyInfoInputs.cache
 C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.AssemblyInfo.cs
 C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.csproj.CoreCompileInputs.cache
 C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.dll
 C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.pdb
+C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.csproj.AssemblyReference.cache
+C:\CodeGenerator\CgenCompileLibrary\obj\Debug\netcoreapp3.1\CgenCompileLibrary.GeneratedMSBuildEditorConfig.editorconfig

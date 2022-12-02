@@ -1,0 +1,44 @@
+
+ 
+#if INTEGRATION_TESTS_FOR_@ProjectName@__@ProjectTest@
+ 
+#include "IntegTestPipeline.h"
+
+
+#include "AECore.h"
+#include "AE_Init.h" 
+#include "AEClock.h"
+#include "AEObservorSensorFilterOut.h"
+#include "AEObjects.h" 
+
+DECLARE_ALL_AO_PTR
+
+@MainHeader@
+
+##UserCode_a
+
+void RunSelectedIntegrationTest_@ProjectName@()
+{
+
+AE_Init();
+ 
+@MainInit@
+
+@LinksInit@
+
+@ClockInit@
+
+//AEITEST_END_TestsAfterTimer_@ProjectName@(5000);
+##UserCode_b
+
+AEAO::ConfigureAndStart();
+}
+
+
+##UserCode_c
+
+
+@FuncInit@
+
+
+#endif

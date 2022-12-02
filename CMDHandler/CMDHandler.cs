@@ -26,8 +26,12 @@ public class CMDHandler
     }
 
 
-    public void ExecuteCommand(string command, bool SupressErrorMsg = false)
+    public async void ExecuteCommand(string command, bool SupressErrorMsg = false)
     {
+
+        Output = "";
+        Error = "";
+
         //if this is a cd command, handle it differently
         if (Regex.IsMatch(command, @"^\s*cd\s*"))
         {
@@ -46,10 +50,10 @@ public class CMDHandler
         //processInfo.WorkingDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";
         //processInfo.WorkingDirectory =@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGenerator\bin\Debug";
         processInfo.CreateNoWindow = true;
-        processInfo.UseShellExecute = false;
+        processInfo.UseShellExecute = true;
         // *** Redirect the output ***
-        processInfo.RedirectStandardError = true;
-        processInfo.RedirectStandardOutput = true;
+        processInfo.RedirectStandardError = false;
+        processInfo.RedirectStandardOutput = false;
 
         //string error = "";
         //string output = "";
@@ -69,10 +73,21 @@ public class CMDHandler
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         */
-        if (!SupressErrorMsg)
+        if (false)//(!SupressErrorMsg)
         {
-            Output = process.StandardOutput.ReadToEnd();
-            Error = process.StandardError.ReadToEnd();
+            var task1 = Task.Run(() => GetAndWaitOutput());
+            
+            int thisManyTries = 0;
+            while (Output == "")
+            { 
+                Thread.Sleep(300);
+                if (thisManyTries >= 25)
+                {
+                    break;
+                }
+                thisManyTries++;
+            } 
+
         }
         else
         {
@@ -101,6 +116,17 @@ public class CMDHandler
 #endif
         process.Close();
     }
+
+
+    public async Task GetAndWaitOutput()
+    {
+        Output = process.StandardOutput.ReadToEnd();
+        Error = process.StandardError.ReadToEnd();
+
+        //return Task.CompletedTask.IsCompleted;
+
+    }
+
 
     public void SetWorkingDirectory(string workingDirectory)
     {

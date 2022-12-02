@@ -13,6 +13,7 @@ namespace CgenCmakeLibrary.FileHandlers
     {
         Empty,
         OptionFound,
+        Reset,
         Done
     }
 
@@ -22,11 +23,13 @@ namespace CgenCmakeLibrary.FileHandlers
         private Task _NextFileThread;
         private Action OptionDoneAction;
         private Action OptionFoundAction;
+        private Action ResetGuiAction;
         private CancellationTokenSource ts;
         private CancellationToken ct;
 
-        public void StartNextFileUpdater(Action optionDoneAction, Action optionFoundAction)
+        public void StartNextFileUpdater(Action optionDoneAction, Action optionFoundAction, Action resetGuiAction)
         {
+            ResetGuiAction = resetGuiAction;
             OptionDoneAction = optionDoneAction;
             OptionFoundAction = optionFoundAction;
 
@@ -77,6 +80,10 @@ namespace CgenCmakeLibrary.FileHandlers
                         //    guioutputScrollHandler.display("Options configuring Done", OutputLevel.Normal); 
                         //});
 
+                    }
+                    else if (nextStatus == NextStatus.Reset)
+                    {
+                        ResetGuiAction();
                     }
                     else if (nextStatus == NextStatus.OptionFound)
                     {
@@ -153,6 +160,11 @@ namespace CgenCmakeLibrary.FileHandlers
                 {
                     RemoveContents();
                     return NextStatus.Done;
+                }
+                if (contentsNext.Contains("---RESET_GUI---"))
+                {
+                    RemoveContents();
+                    return NextStatus.Reset;
                 }
                 else
                 {

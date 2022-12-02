@@ -11,8 +11,8 @@ C:\CodeGenerator\CodeGenerator\bin\Debug\ConsoleApp2.pdb
 C:\CodeGenerator\CodeGenerator\bin\Debug\ConsoleApp2.dll.config
 C:\CodeGenerator\CodeGenerator\bin\Debug\CommandLine.xml
 C:\CodeGenerator\CodeGenerator\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
-C:\CodeGenerator\CodeGenerator\obj\Debug\CodeGenerator.csprojAssemblyReference.cache
 C:\CodeGenerator\CodeGenerator\obj\Debug\CodeGenerator.csproj.CoreCompileInputs.cache
 C:\CodeGenerator\CodeGenerator\obj\Debug\CodeGenerator.csproj.CopyComplete
 C:\CodeGenerator\CodeGenerator\obj\Debug\cgen.exe
 C:\CodeGenerator\CodeGenerator\obj\Debug\cgen.pdb
+C:\CodeGenerator\CodeGenerator\obj\Debug\CodeGenerator.csproj.AssemblyReference.cache

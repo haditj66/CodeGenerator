@@ -1,0 +1,29 @@
+
+set(INTEGRATION_TESTS @ProjectName@)
+add_compile_definitions(INTEGRATION_TESTS__${INTEGRATION_TESTS})
+add_compile_definitions(INTEGRATION_TEST_CHOSEN="@ProjectName@")
+set(INTEGRATION_TESTS_FOR_@ProjectName@ @TestChosen@)
+add_compile_definitions(INTEGRATION_TESTS_FOR_@ProjectName@__${INTEGRATION_TESTS_FOR_@ProjectName@})
+add_compile_definitions(INTEGRATION_TEST_CHOSEN_SPECIFIC="@TestChosen@")
+add_compile_definitions(CGEN_ALLOPTIONS="")
+
+set(INTEGRATION_TARGET_DIRECTORY "@ProjectDir@")
+
+
+#macro(Target_Directory_Chooser)
+		#set(options)
+		#set(oneValueArgs TARGET_NAME )
+		#set(multiValueArgs )
+		#cmake_parse_arguments(_arg "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+#
+        #if(${_arg_TARGET_NAME} STREQUAL "exeHalTest")
+        #set(INTEGRATION_TARGET_DIRECTORY "C:/AERTOS/AERTOS/src/AE/hal/exeHalTest")
+        #elseif(${_arg_TARGET_NAME} STREQUAL "AECoreTestEXE")
+        #set(INTEGRATION_TARGET_DIRECTORY "C:/AERTOS/AERTOS/src/AE/AECoreTestEXE")
+        #elseif(${_arg_TARGET_NAME} STREQUAL "@ProjectName@")
+        #set(INTEGRATION_TARGET_DIRECTORY "C:/AERTOS/AERTOS/src/AE/@ProjectName@")
+        #elseif(${_arg_TARGET_NAME} STREQUAL "CGENTest2")
+        #set(INTEGRATION_TARGET_DIRECTORY "C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest2")
+        #endif()
+#
+#endmacro()

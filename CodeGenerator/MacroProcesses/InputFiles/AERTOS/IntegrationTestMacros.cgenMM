@@ -1,0 +1,11 @@
+#pragma once 
+
+@AllDependsEmpty@ 
+
+#if BUILD_TESTS__TRUE
+//** <h4>integration test enders: will end the test in various ways</h4>*// 
+//** the following will end the test after a certain time in milli has passed*// 
+@ChosenDefines@ 
+#else
+@ChosenDefinesEmpty@ 
+#endif

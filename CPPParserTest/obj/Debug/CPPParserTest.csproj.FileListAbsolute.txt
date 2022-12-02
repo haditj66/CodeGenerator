@@ -12,8 +12,8 @@ C:\CodeGenerator\CPPParserTest\bin\Debug\ConsoleApp2.pdb
 C:\CodeGenerator\CPPParserTest\bin\Debug\ConsoleApp2.dll.config
 C:\CodeGenerator\CPPParserTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
 C:\CodeGenerator\CPPParserTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
-C:\CodeGenerator\CPPParserTest\obj\Debug\CPPParserTest.csprojAssemblyReference.cache
 C:\CodeGenerator\CPPParserTest\obj\Debug\CPPParserTest.csproj.CoreCompileInputs.cache
 C:\CodeGenerator\CPPParserTest\obj\Debug\CPPParserTest.csproj.CopyComplete
 C:\CodeGenerator\CPPParserTest\obj\Debug\CPPParserTest.exe
 C:\CodeGenerator\CPPParserTest\obj\Debug\CPPParserTest.pdb
+C:\CodeGenerator\CPPParserTest\obj\Debug\CPPParserTest.csproj.AssemblyReference.cache

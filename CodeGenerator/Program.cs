@@ -1,4 +1,4 @@
-﻿//#define TESTING
+﻿#define TESTING
 
 using System;
 using System.Collections.Generic;
@@ -39,6 +39,8 @@ using Project = CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project;
 using CodeGenerator.FileTemplates.GeneralMacoTemplate;
 using MyLibClangVisitors.ConsoleApp2;
 using System.Threading;
+using CgenMin.MacroProcesses;
+using CodeGenerator.MacroProcesses.AESetups;
 
 namespace CodeGenerator
 {
@@ -67,6 +69,35 @@ namespace CodeGenerator
         {
 
         }
+
+        [Verb("macro2", HelpText = "create a macro using the new version of macro .cgenMM files")]
+        public class Macro2Options
+        {
+            [Value(0, HelpText = "This is the macro process you want to use to generate all the code. Macro Processes")]
+            public string macroProcess { get; set; }
+        }
+
+        [Verb("aeinit", HelpText = "aertos utility to intialize aertos projects.")]
+        public class aeinitOptions
+        {
+            [Value(0, HelpText = "name of the aertos project")]
+            public string nameOfTheProject { get; set; }
+        }
+
+        [Verb("aeselect", HelpText = "aertos utility to selecting integration tests, and code generating AOs")]
+        public class aeselectOptions
+        {
+            [Value(0, HelpText = "name of the aertos project to select")]
+            public string projectNameSelection { get; set; }
+            [Value(1, HelpText = "name of the aertos exe to select")]
+            public string projectEXETestSelection { get; set; }
+        }
+
+        [Verb("aegenerate", HelpText = "aertos utility to generate current selected aertos project")]
+        public class aegenerateOptions
+        {
+        }
+
 
         [Verb("cmakegui", HelpText = "create a macro file in this directory out of all .cgenM files")]
         public class cmakeguiOptions
@@ -230,7 +261,9 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
         //public static string envIronDirectory = @"C:\QR_Core\build\win";
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy";
-        public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
+        //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
+        //public static string envIronDirectory = @"C:\CodeGenerator\CodeGenerator\macro2Test\CGENTest";
+        public static string envIronDirectory = @"C:/AERTOS/AERTOS/src/AE/AESamples";
         //public static string envIronDirectory = @"C:\QR_sync";
 
 
@@ -267,7 +300,13 @@ namespace CodeGenerator
         //static string[] command = "sync iar".Split(' ');
         //static string[] command = "macro".Split(' ');
         //static string[] command = "projects".Split(' ');
-        static string[] command = "cmakegui".Split(' ');
+        //static string[] command = "cmakegui".Split(' ');
+        //static string[] command = "macro2 AEServiceMacro".Split(' ');
+        //static string[] command = "macro2 AEInitializing".Split(' ');
+        //static string[] command = "aeinit".Split(' ');
+        //static string[] command = "aeselect CGENTest defaultTest".Split(' ');
+        static string[] command = "aegenerate".Split(' ');
+        //static string[] command = "aeinit AESamples".Split(' ');
         //static string[] command = "post_compile".Split(' ');
         //static string[] command = "QRinit tutthree".Split(' ');
 
@@ -314,12 +353,16 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, DegenerateOptions, InitOptions, QRInitOptions, SyncOptions, ConfigOptions, ProjectsOptions, MacroOptions, ProjConfigOptions, post_compileOptions, cmakeguiOptions>(command)
+                Parser.Default.ParseArguments<GenerateOptions, Macro2Options, aeinitOptions, aeselectOptions, aegenerateOptions, DegenerateOptions, InitOptions, QRInitOptions, SyncOptions, ConfigOptions, ProjectsOptions, MacroOptions, ProjConfigOptions, post_compileOptions, cmakeguiOptions>(command)
 .WithParsed<GenerateOptions>(opts => Generate(opts))
 .WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
 .WithParsed<InitOptions>(opts => Init(opts))
 .WithParsed<QRInitOptions>(opts => QRInit(opts))
+.WithParsed<Macro2Options>(opts => Macro2(opts))
+.WithParsed<aeinitOptions>(opts => aeinit(opts))
+.WithParsed<aeselectOptions>(opts => aeselect(opts))
+.WithParsed<aegenerateOptions>(opts => aegenerate(opts))
 .WithParsed<ConfigOptions>(opts => Config(opts))
 .WithParsed<ProjectsOptions>(opts => Projects(opts))
 .WithParsed<MacroOptions>(opts => Macro(opts))
@@ -1149,166 +1192,520 @@ namespace CodeGenerator
         #endregion
 
 
-        #region CmakeConfig command ***************************************************************************
-        //***************************************************************************************************  
 
 
-        //step 1:
-        //Dir_Step1.txt:
-        //main CMakeLists.txt will call the cgen_start() function. this function will write to
-        //${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/Dir_StepOne.txt
-        // it will write the build directory ${CMAKE_CURRENT_BINARY_DIR}
 
-        //step 2:
-        //Dir_Step2.txt:
-        //cgen cmakegui command will be called which will read the Dir_Step1.txt file, and forward that information into 
-        //the Dir_Step2.txt which will be located at this CgenCmakeGui project directory. information forwared will be the 
-        // ${CMAKE_CURRENT_BINARY_DIR} and the ${CMAKE_CURRENT_SOURCE_DIR}
 
-        //directory of cgencmakegui project
-        string cgencmakeguiProj = "";
+        #region Macro2 command ***************************************************************************
 
-        static ParserResult<object> cmakegui(cmakeguiOptions opts)
+
+
+        static ParserResult<object> Macro2(Macro2Options opts)
         {
-            string ggg = DIRECTORYOFTHISCG;
+            ProblemHandle prob = new ProblemHandle();
 
-
-
-            string environcgensaveFile = Path.Combine(envIronDirectory, "CGensaveFiles", "Dir_Step1.txt");
-            if (Directory.Exists(Path.GetDirectoryName(environcgensaveFile)) == false)
+            if (opts.macroProcess == null || opts.macroProcess == "")
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(environcgensaveFile));
-            }
-            if (File.Exists(environcgensaveFile) == false)
-            {
-                File.Create(environcgensaveFile);
-            }
-
-            Thread.Sleep(500);
-            if (File.Exists(environcgensaveFile) == false)
-            {
-                File.Create(environcgensaveFile);
-            }
-
-            //read all contents of the Dir_Step1 in the current working directory
-            string Dir_Step1Contents = File.ReadAllText(envIronDirectory + "/CGensaveFiles/Dir_Step1.txt");
-
-            //forward this content to the PATHTOCMAKEGUI directory
-            File.WriteAllText(PATHTOCMAKEGUI + "/Dir_Step2.txt", Dir_Step1Contents);
-
-
-            return null;
-        }
-
-        #endregion
-
-
-        #region post_compile command ***************************************************************************
-        //***************************************************************************************************  
-        //this is meant to compile my own custom keywords that will change the code. The keywords must follow some rules.
-        //1. They must not change any of the code not generated by this cgen command. This means any code that is from the user.
-        //2. the generated code from the command must be identifiably done once. This means, once the keyword is compiled, it can
-        //      be checked that the post_compile command has already compiled that keyword.
-
-
-        static ParserResult<object> post_compile(post_compileOptions opts)
-        {
-            string ggg = DIRECTORYOFTHISCG;
-
-            // get all intermediary files .ii
-            var intermediaryFiles = Directory.GetFiles(envIronDirectory).Where(f => Path.GetExtension(f) == ".ii").ToList();
-            foreach (var inter in intermediaryFiles)
-            {
-
-            }
-
-
-
-
-
-            return null;
-        }
-
-        #endregion
-
-
-        #region Generate command ***************************************************************************
-        //***************************************************************************************************  
-
-        //private static bool UsingGit = false;
-
-        static ParserResult<object> Generate(GenerateOptions opts)
-        {
-
-            if (opts.ignoreFilesInFilter != null)
-            {
-                if (!opts.ignoreFilesInFilter.IsAnEmptyLine())
-                {
-                    Library.IgnoreFilesFromFilter = opts.ignoreFilesInFilter;
-                }
-            }
-
-            #region --config 
-            if (opts.config)
-            {
-                //first make sure that a project exists here
-                if (IsProjectExistsAtEnvironDirectory())
-                {
-
-                    //get the project settings for the project configs I want to generate. for VS for NOW!
-                    MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(envIronDirectory);
-
-                    //1. I need to create the configuration file for the top level library just so that I can have all
-                    // the libraries configs information that it depends on. in the saveddata.xml file.
-                    ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY, DIRECTORYOFTHISCG, PATHTOCONFIGTEST, null, true);
-                    configFileBuilder.CreateConfigurationToTempFolder();
-
-                    //create project builder. and check if all libraries support the platform Im on
-                    ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
-                    string libraryNameNotSupportingPlat = projectBuilderForVs.GetLibraryThatDoesNOTSupportPlatform(savefileProjGlobal);
-                    if (libraryNameNotSupportingPlat != null)
-                    {
-                        ProblemHandle p = new ProblemHandle();
-                        p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen projconfig -a <nameofScope> \n to add platform to that project scope.");
-                    }
-                    configFileBuilder.WriteTempConfigurationToFinalFile();
-
-
-                    //2.  add filters and folders directories from that toplevel project directory as:
-                    //LibraryDependencies
-                    //  prefix(of libraries top level uses)
-                    //      confTypePrefix(for libraries that are same but different template type.)    
-                    //projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
-
-                    //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
-                    //first grab all lowest level libraries that have no dependencies
-                    projectBuilderForVs.ImportConfigFiles(opts.git);
-
-
-
-                    //4. For the settings(.vcxproj .filters) of the top level I need to get all the cIncludes,
-                    //cClompiles, additionalincludes additional libraries from the other libraries and add to top level
-                    // to the top level library. 
-                    //projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
-
-
-                    //5. Finally recreate the xml settings files. 
-                    //projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
-
-
-
-                }
-                else
-                {
-                    //project does not exist
-                    Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   ");
-                }
-
+                prob.ThereisAProblem("You didnt provide a macroProcess name. do that with \"macro <macroProcess>\"");
                 return null;
             }
-            #endregion
+
+            //use reflection to get all classes that inherit from the abstract MacroProcess class
+            var type = typeof(MacroProcess);
+            var typeProcessToRun = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => type.IsAssignableFrom(p))
+                .Where(p => p.Name == opts.macroProcess)
+                .FirstOrDefault();
+
+            if (typeProcessToRun == null)
+            {
+                prob.ThereisAProblem($"the process {opts.macroProcess} you gave does not have an implementation here. create a class that derives from MacroProcess and give it the name of the process you provided");
+            }
+
+            MacroProcess myProc = (MacroProcess)Activator.CreateInstance(typeProcessToRun);
+            myProc.Init(envIronDirectory);
+            myProc.RunProcess();
 
 
+
+
+
+
+            return null;
+        }
+
+        #endregion
+
+
+
+
+        #region aeinit command ***************************************************************************
+
+        static ParserResult<object> _aeinitProjectFileStructure(aeinitOptions opts, AEInitializing aEInitializing, AEProject projAlreadyExists, string pathToProject)
+        {
+
+            // write to all initialization files within the project. DONT OVERWRITE THESE FILES IF THEY ALREADY EXIST!
+
+            string PathToThis = pathToProject;
+            //root======================================================
+            //AEConfigProject.cmake 
+            //AEConfigProjectUser.cmake     (blank) 
+            //IntegTestPipeline.h           (blank)
+            //main.cpp
+            string AEConfigProject = Path.Combine(PathToThis, "AEConfigProject.cmake");
+            string AEConfigProjectUser = Path.Combine(PathToThis, "AEConfigProjectUser.cmake");
+            string IntegTestPipeline = Path.Combine(PathToThis, "IntegTestPipeline.h");
+            string main = Path.Combine(PathToThis, "main.cpp");
+
+            aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
+                "AERTOS\\AEConfigProject",
+                AEConfigProject,
+                false, false,
+                 new MacroVar() { MacroName = "TestNamesList", VariableValue = string.Join(" ", "") },
+                 new MacroVar() { MacroName = "LibrariesIDependOn", VariableValue = string.Join(" ", "") },
+                 new MacroVar() { MacroName = "DependsInit", VariableValue = string.Join(" ", "") }
+                );
+
+            if (File.Exists(AEConfigProjectUser) == false)
+            { File.Create(AEConfigProjectUser); }
+
+            if (File.Exists(IntegTestPipeline) == false)
+            { File.Create(IntegTestPipeline); }
+
+            aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
+                "AERTOS\\main",
+                main,
+                false, false
+                );
+
+
+            PathToThis = Path.Combine(pathToProject, "include");
+            //root/include======================================================
+            if (Directory.Exists(PathToThis) == false)
+            { Directory.CreateDirectory(PathToThis); }
+
+
+            PathToThis = Path.Combine(pathToProject, "conf");
+            //root/conf======================================================
+            //AEConfig.h            (blank)
+            //EventsForProject.h    (blank)
+            //EventsForProject.cpp  (blank)
+            //UserBSPConfig.cpp   
+            string AEConfig = Path.Combine(PathToThis, "AEConfig.h");
+            string EventsForProjecth = Path.Combine(PathToThis, "EventsForProject.h");
+            string EventsForProjectcpp = Path.Combine(PathToThis, "EventsForProject.cpp");
+            string UserBSPConfig = Path.Combine(PathToThis, "UserBSPConfig.cpp");
+
+            if (Directory.Exists(PathToThis) == false)
+            { Directory.CreateDirectory(PathToThis); }
+
+            if (File.Exists(AEConfig) == false)
+            { File.Create(AEConfig); }
+
+            if (File.Exists(EventsForProjecth) == false)
+            { File.Create(EventsForProjecth); }
+
+            if (File.Exists(EventsForProjectcpp) == false)
+            { File.Create(EventsForProjectcpp); }
+
+            aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
+                "AERTOS\\UserBSPConfig",
+                UserBSPConfig,
+                false, false
+                );
+
+            PathToThis = Path.Combine(pathToProject, "CGensaveFiles");
+            //root/CGensaveFiles======================================================
+            //SavedOptions.txt (blank)
+            if (Directory.Exists(PathToThis) == false)
+            { Directory.CreateDirectory(PathToThis); }
+            string SavedOptions = Path.Combine(PathToThis, "SavedOptions.txt");
+
+            if (File.Exists(SavedOptions) == false)
+            { File.Create(SavedOptions); }
+
+
+            PathToThis = Path.Combine(pathToProject, "CGensaveFiles", "cmakeGui");
+            //root/CGensaveFiles/cmakeGui------------------------
+            if (Directory.Exists(PathToThis) == false)
+            { Directory.CreateDirectory(PathToThis); }
+
+             
+            //root/CGensaveFiles/cmakeGui/{ProjectName}_{boardTarget}/Debug======================================================
+            //cgenCmakeCache.cmake      (blank)
+            //IntegrationTestMacros.h   
+            List<string> tdepends = new List<string>();
+            if (projAlreadyExists != null)
+            {
+                tdepends = projAlreadyExists.LibrariesIDependOnStr_LIB;
+            }
+            IntegrationMacroFileHandler integMacroFile = new IntegrationMacroFileHandler(opts.nameOfTheProject, tdepends, pathToProject, aEInitializing);
+            integMacroFile.CreateAllIntegrationFilesTheFiles();
+
+            foreach (var boardTarget in AEProject.ListOfBoardTargets)
+            {
+                PathToThis = Path.Combine(pathToProject, "CGensaveFiles", "cmakeGui", $"{opts.nameOfTheProject}_{boardTarget}", "DEBUG");
+
+                string cgenCmakeCache = Path.Combine(PathToThis, "cgenCmakeCache.cmake");
+                string IntegrationTestMacros = Path.Combine(PathToThis, "IntegrationTestMacros.h");
+                if (Directory.Exists(PathToThis) == false)
+                { Directory.CreateDirectory(PathToThis); }
+
+                if (File.Exists(cgenCmakeCache) == false)
+                { File.Create(cgenCmakeCache); }
+
+            }
+
+            return null;
+        }
+
+
+
+        static ParserResult<object> aeinit(aeinitOptions opts)
+        {
+            ProblemHandle prob = new ProblemHandle();
+
+            //check if a project already exists here.
+            AEProject projAlreadyExists = AEInitializing.GetProjectIfDirExists(envIronDirectory);
+            if (opts.nameOfTheProject == null)
+            {
+
+                if (projAlreadyExists == null)
+                {
+                    prob.ThereisAProblem("You didnt provide a AEProject name and no project exists here yet. do that with \"aeinit <projectName>\"");
+                }
+
+                opts.nameOfTheProject = projAlreadyExists.Name;
+
+
+            }
+            else if (opts.nameOfTheProject != null)
+            {
+                if (projAlreadyExists != null )
+                {
+                    if (projAlreadyExists.Name != opts.nameOfTheProject)
+                    {
+                        prob.ThereisAProblem($"There already exists a project here of different name {projAlreadyExists.Name}");
+                    }
+                    
+                }
+
+                //check that the current name is not already in use by another project at a different directory
+                if (AEInitializing.GetProjectIfDirExists(opts.nameOfTheProject) != null)
+                {
+                    prob.ThereisAProblem($"There already exists a project of name {projAlreadyExists.Name}, at directory, {projAlreadyExists.DirectoryOfLibrary}. choose another name.");
+                }
+            }
+
+            AEInitializing aEInitializing = new AEInitializing();
+
+
+            if (projAlreadyExists == null)
+            {
+                Console.WriteLine($"creating { opts.nameOfTheProject}.cs at directory  C:/CodeGenerator/CodeGenerator/MacroProcesses/AESetups/AEProjects");
+                //create a .cs class file that will start the project type 
+                aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
+                    "AERTOS\\AEProjectCS",
+                    Path.Combine(@"C:/CodeGenerator/CodeGenerator/MacroProcesses/AESetups/AEProjects", $"{opts.nameOfTheProject}.cs"),
+                    false, false,
+                     new MacroVar() { MacroName = "NameOfProject", VariableValue = opts.nameOfTheProject },
+                     new MacroVar() { MacroName = "DirOfProject", VariableValue = envIronDirectory }
+                     );
+
+
+            }
+
+            Console.WriteLine($"initing { opts.nameOfTheProject}");
+            _aeinitProjectFileStructure(opts,aEInitializing, projAlreadyExists, envIronDirectory);
+            Console.WriteLine($"done initing { opts.nameOfTheProject}");
+
+            return null;
+        }
+
+        #endregion
+
+
+
+        #region aeselect command ***************************************************************************
+
+        static string GetProjectsDisplay()
+        {
+            string disp = ""; 
+            foreach (var proj in AEInitializing.GetAllCurrentAEProjects())
+            {
+                disp += "=============================================================="; disp += "\n";
+                disp += $"ProjectName: {proj.Name}"; disp += "\n";
+                disp += $"ProjectDirectory: {proj.DirectoryOfLibrary}"; disp += "\n";
+                disp += $"ProjectTestsToChoose: "; disp += "\n";
+                foreach (var test in proj.ListOfTests)
+                {
+                    disp += $"  {test}"; disp += "\n";
+                }
+            }
+
+            return disp;
+        }
+
+        static string GetProjectTestsDisplay(AEProject proj)
+        {
+            string disp = "";
+            disp += "=============================================================="; disp += "\n";
+            disp += $"ProjectName: {proj.Name}"; disp += "\n";
+            disp += $"ProjectDirectory: {proj.DirectoryOfLibrary}"; disp += "\n";
+            disp += $"ProjectTestsToChoose: "; disp += "\n";
+            foreach (var test in proj.ListOfTests)
+            {
+                disp += $"  {test}"; disp += "\n";
+            }
+
+            return disp;
+        }
+
+        static ParserResult<object> aeselect(aeselectOptions opts)
+        {
+
+            ProblemHandle prob = new ProblemHandle();
+
+            //if projectName is null, return back a list of possible projects you can select
+            if (opts.projectNameSelection == null)
+            {
+                string disp = "You did not provide projectNameSelection"; disp += "\n";
+                disp += "Here is a list of projects to choose from"; disp += "\n";
+                disp += GetProjectsDisplay();
+
+                Console.WriteLine(disp);
+                return null;
+            }
+
+
+            //projectNameSelection and is valid project provided but not projectSelected
+            var projectSelected = AEInitializing.GetProjectIfNameExists(opts.projectNameSelection);
+            if (opts.projectNameSelection == null && projectSelected != null)
+            {
+                string disp = $"{opts.projectNameSelection} is valid but no tests selected "; disp += "\n";
+                disp += $"Here is a list of test from chosen project {opts.projectNameSelection}"; disp += "\n";
+                disp += GetProjectTestsDisplay(projectSelected);
+                Console.WriteLine(disp);
+                return null;
+            }
+
+            //projectNameSelection provided but is NOT valid
+            if (projectSelected == null)
+            {
+                string disp = $"No such project of name {opts.projectNameSelection} exists."; disp += "\n";
+                disp += "Here is a list of projects to choose from"; disp += "\n";
+                disp += GetProjectsDisplay();
+                Console.WriteLine(disp);
+                return null;
+            }
+
+            //projectNameSelection provided  and is valid but opts.projectEXETestSelection is NOT valid
+            string TestSelected = projectSelected.ListOfTests.FirstOrDefault(s =>s == opts.projectEXETestSelection);
+
+            string dispp = opts.projectEXETestSelection == null ? "You did not provide projectEXETestSelection" : ""; dispp += "\n";
+            if (projectSelected != null &&   (TestSelected == null || string.IsNullOrWhiteSpace(TestSelected)) )
+            {
+                dispp += $"No such test of name {opts.projectEXETestSelection} exists for project named {opts.projectNameSelection} ."; dispp += "\n";
+                dispp += $"Here is a list of test from chosen project {opts.projectNameSelection}"; dispp += "\n";
+                dispp += GetProjectTestsDisplay(projectSelected);
+                Console.WriteLine(dispp);
+                return null;
+            }
+            opts.projectEXETestSelection = TestSelected;
+
+
+
+            //everything is valid from here, start the process of changing the project chosen
+            //step1: set the AETarget.cmake file
+            //step2: set the IntegTestPipeline.h file 
+            //step3: init the project just in case
+            //step4: generate AEConfig TODO
+
+            AEInitializing aEInitializing = new AEInitializing();
+
+            //step1: set the AETarget.cmake file
+            aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
+                "AERTOS\\AETarget",
+                Path.Combine(@"C:/AERTOS/AERTOS", $"AETarget.cmake"),//
+                true, false,
+                 new MacroVar() { MacroName = "ProjectName", VariableValue = projectSelected.Name },
+                 new MacroVar() { MacroName = "ProjectDir", VariableValue = projectSelected.DirectoryOfLibrary },
+                 new MacroVar() { MacroName = "TestChosen", VariableValue = TestSelected }
+                 );
+
+            //step2: set the IntegTestPipeline.h file
+            aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
+                "AERTOS\\IntegTestPipeline",
+                Path.Combine(projectSelected.DirectoryOfLibrary, $"IntegTestPipeline.h"),
+                true, false,
+                 new MacroVar() { MacroName = "ProjectName", VariableValue = projectSelected.Name } 
+                 );
+
+            
+
+            //step3: init the project just in case
+            aeinitOptions aeinitOptions = new aeinitOptions() { nameOfTheProject = projectSelected.Name };
+            _aeinitProjectFileStructure(aeinitOptions, aEInitializing, projectSelected, projectSelected.DirectoryOfLibrary);
+
+
+            //step4: generate AEConfig TODO
+
+
+            return null;
+        } 
+
+
+    #endregion
+
+
+
+    #region aegenerate command ***************************************************************************
+
+    static ParserResult<object> aegenerate(aegenerateOptions opts)
+    {
+        ProblemHandle prob = new ProblemHandle();
+
+            //grab the currently selected
+            //set(INTEGRATION_TESTS AESamples)
+            //add_compile_definitions(INTEGRATION_TESTS__${ INTEGRATION_TESTS})
+            //add_compile_definitions(INTEGRATION_TEST_CHOSEN = "AESamples")
+            //set(INTEGRATION_TESTS_FOR_AESamples SPBSamples)
+
+
+
+
+            string AETargetContents = File.ReadAllText(@"C:/AERTOS/AERTOS/AETarget.cmake");
+
+            Regex re = new Regex(@"\s*set\(\s*INTEGRATION_TESTS\s+(?<ProjectName>.*)\s*\)\s*\n"); 
+            string ProjectName = re.Match(AETargetContents).Groups["ProjectName"].Value;
+            Regex re2 = new Regex(@"\s*set\(\s*INTEGRATION_TESTS_FOR_"+ ProjectName + @"\s+(?<ProjectTest>.*)\s*\)\s*\n?");
+            string ProjectTest = re2.Match(AETargetContents).Groups["ProjectTest"].Value;
+
+
+            
+
+
+            //generate the project.
+            AEInitializing aEInitializing = new AEInitializing();
+            var projectSelected = AEInitializing.GetProjectIfNameExists(ProjectName);
+            aeinitOptions aeinitOptions = new aeinitOptions() { nameOfTheProject = ProjectName };
+            _aeinitProjectFileStructure(aeinitOptions, aEInitializing, projectSelected, projectSelected.DirectoryOfLibrary);
+
+            aEInitializing.GenerateProject(ProjectName, ProjectTest);
+
+
+
+
+            return null;
+    }
+
+    #endregion
+
+
+
+    #region CmakeConfig command ***************************************************************************
+    //***************************************************************************************************  
+
+
+    //step 1:
+    //Dir_Step1.txt:
+    //main CMakeLists.txt will call the cgen_start() function. this function will write to
+    //${CMAKE_CURRENT_SOURCE_DIR}/CGensaveFiles/Dir_StepOne.txt
+    // it will write the build directory ${CMAKE_CURRENT_BINARY_DIR}
+
+    //step 2:
+    //Dir_Step2.txt:
+    //cgen cmakegui command will be called which will read the Dir_Step1.txt file, and forward that information into 
+    //the Dir_Step2.txt which will be located at this CgenCmakeGui project directory. information forwared will be the 
+    // ${CMAKE_CURRENT_BINARY_DIR} and the ${CMAKE_CURRENT_SOURCE_DIR}
+
+    //directory of cgencmakegui project
+    string cgencmakeguiProj = "";
+
+    static ParserResult<object> cmakegui(cmakeguiOptions opts)
+    {
+        string ggg = DIRECTORYOFTHISCG;
+
+
+
+        string environcgensaveFile = Path.Combine(envIronDirectory, "CGensaveFiles", "Dir_Step1.txt");
+        if (Directory.Exists(Path.GetDirectoryName(environcgensaveFile)) == false)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(environcgensaveFile));
+        }
+        if (File.Exists(environcgensaveFile) == false)
+        {
+            File.Create(environcgensaveFile);
+        }
+
+        Thread.Sleep(500);
+        if (File.Exists(environcgensaveFile) == false)
+        {
+            File.Create(environcgensaveFile);
+        }
+
+        //read all contents of the Dir_Step1 in the current working directory
+        string Dir_Step1Contents = File.ReadAllText(envIronDirectory + "/CGensaveFiles/Dir_Step1.txt");
+
+        //forward this content to the PATHTOCMAKEGUI directory
+        File.WriteAllText(PATHTOCMAKEGUI + "/Dir_Step2.txt", Dir_Step1Contents);
+
+
+        return null;
+    }
+
+    #endregion
+
+
+    #region post_compile command ***************************************************************************
+    //***************************************************************************************************  
+    //this is meant to compile my own custom keywords that will change the code. The keywords must follow some rules.
+    //1. They must not change any of the code not generated by this cgen command. This means any code that is from the user.
+    //2. the generated code from the command must be identifiably done once. This means, once the keyword is compiled, it can
+    //      be checked that the post_compile command has already compiled that keyword.
+
+
+    static ParserResult<object> post_compile(post_compileOptions opts)
+    {
+        string ggg = DIRECTORYOFTHISCG;
+
+        // get all intermediary files .ii
+        var intermediaryFiles = Directory.GetFiles(envIronDirectory).Where(f => Path.GetExtension(f) == ".ii").ToList();
+        foreach (var inter in intermediaryFiles)
+        {
+
+        }
+
+
+
+
+
+        return null;
+    }
+
+    #endregion
+
+
+    #region Generate command ***************************************************************************
+    //***************************************************************************************************  
+
+    //private static bool UsingGit = false;
+
+    static ParserResult<object> Generate(GenerateOptions opts)
+    {
+
+        if (opts.ignoreFilesInFilter != null)
+        {
+            if (!opts.ignoreFilesInFilter.IsAnEmptyLine())
+            {
+                Library.IgnoreFilesFromFilter = opts.ignoreFilesInFilter;
+            }
+        }
+
+        #region --config 
+        if (opts.config)
+        {
             //first make sure that a project exists here
             if (IsProjectExistsAtEnvironDirectory())
             {
@@ -1327,7 +1724,7 @@ namespace CodeGenerator
                 if (libraryNameNotSupportingPlat != null)
                 {
                     ProblemHandle p = new ProblemHandle();
-                    p.ThereisAProblem("\n you are building for a platform " + projectBuilderForVs.GetPlatFormThisisSetupFor() + " as stated in your mainCG.cpp file, but " + libraryNameNotSupportingPlat + " does not support the platform you are building for.  \n use cgen configproj -a <nameofScope> \n to add platform to that project scope.");
+                    p.ThereisAProblem(libraryNameNotSupportingPlat + " does not support the platform you are building for. \n use cgen projconfig -a <nameofScope> \n to add platform to that project scope.");
                 }
                 configFileBuilder.WriteTempConfigurationToFinalFile();
 
@@ -1336,22 +1733,22 @@ namespace CodeGenerator
                 //LibraryDependencies
                 //  prefix(of libraries top level uses)
                 //      confTypePrefix(for libraries that are same but different template type.)    
-                projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
+                //projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
 
                 //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
                 //first grab all lowest level libraries that have no dependencies
-                projectBuilderForVs.ImportDependentLibrariesFiles(opts.git);
+                projectBuilderForVs.ImportConfigFiles(opts.git);
 
 
 
                 //4. For the settings(.vcxproj .filters) of the top level I need to get all the cIncludes,
                 //cClompiles, additionalincludes additional libraries from the other libraries and add to top level
                 // to the top level library. 
-                projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
+                //projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
 
 
                 //5. Finally recreate the xml settings files. 
-                projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
+                //projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
 
 
 
@@ -1362,580 +1759,641 @@ namespace CodeGenerator
                 Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   ");
             }
 
-
             return null;
         }
-
         #endregion
 
 
-
-        #region Degenerate command ***************************************************************************
-        //***************************************************************************************************  
-        static ParserResult<object> Degenerate(DegenerateOptions opts)
+        //first make sure that a project exists here
+        if (IsProjectExistsAtEnvironDirectory())
         {
 
+            //get the project settings for the project configs I want to generate. for VS for NOW!
+            MySettingsVS VSsetting = MySettingsVS.CreateMySettingsVS(envIronDirectory);
 
+            //1. I need to create the configuration file for the top level library just so that I can have all
+            // the libraries configs information that it depends on. in the saveddata.xml file.
+            ConfigurationFileBuilder configFileBuilder = new ConfigurationFileBuilder(VSsetting, CGCONFCOMPILATOINSBASEDIRECTORY, DIRECTORYOFTHISCG, PATHTOCONFIGTEST, null, true);
+            configFileBuilder.CreateConfigurationToTempFolder();
 
-            Console.WriteLine(string.Join(" ", command));
-
-            foreach (var item in opts.IncludeFiles)
-            {
-                Console.WriteLine(item);
-            }
-
-
-            return null;
-        }
-
-        #endregion
-
-
-
-
-
-        #region QRInit command ***************************************************************************
-        //***************************************************************************************************  
-
-        // copy directory from cpp template to new directory
-        // -delete the git directory, build, install directories
-        //-change the module name in CMakeLists.txt, while keeping the old name in memory
-        //- change the include directory name to ${MODULE_NAME}_cp.
-        //- go through all files in src and include/${MODULE_NAME}_cp
-        //replace all instances of the old module name that you find
-        //-ourcolcon
-        //- make sure everything built
-
-
-
-        //-cd rqt
-        //- change the include directory name to ${MODULE_NAME}_rqt.
-        //- go through all files in src and include/${MODULE_NAME}_rqt
-        //    replace all instances of the old module name that you find
-        //- delete the install_win and install_lin folders
-
-        //-cd IF
-        //- delete the install_win and install_lin folders
-
-
-        //finally time to build and source everything. do this all in one bash file to keep environment
-        //variables
-
-        //- call c:\opt\ros\foxy\x64\setup.bat
-        //- cd base directory of your module
-        //- call ourcolcon
-        //- call oursource
-
-        //- cd rqt/IF
-        //- call ourcolcon
-        //- call oursource
-
-        //- cd ..
-        //- call ourcolcon
-        //- call oursource
-
-
-        private static void CloneDirectory(string root, string dest, List<string> neglectedDirs = null)
-        {
-            if (neglectedDirs == null)
-            {
-                neglectedDirs = new List<string>();
-            }
-
-            foreach (string directory in Directory.GetDirectories(root))
-            {
-                if (!neglectedDirs.Contains(new DirectoryInfo(directory).Name))
-                { 
-                    string dirName = Path.GetFileName(directory);
-                    if (!Directory.Exists(Path.Combine(dest, dirName)))
-                    {
-                        Directory.CreateDirectory(Path.Combine(dest, dirName));
-                    }
-                    CloneDirectory(directory, Path.Combine(dest, dirName));
-                }
-            }
-
-            foreach (var file in Directory.GetFiles(root))
-            {
-                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)));
-            }
-        }
-
-        private static void SetAttributesNormal(DirectoryInfo dir)
-        {
-
-            foreach (var subDir in dir.GetDirectories())
-                SetAttributesNormal(subDir);
-            foreach (var file in dir.GetFiles())
-            {
-                file.Attributes = FileAttributes.Normal;
-            }
-        }
-
-
-        private static void DeleteDirectoryIfExists_RemoveReadonly(string dir)
-        {
-
-            if (Directory.Exists(dir))
-            {
-                //remove readonly crap
-                SetAttributesNormal(new System.IO.DirectoryInfo(dir));
-
-                //delete directory recursively
-                Directory.Delete(dir, true);
-            }
-
-        }
-
-
-        private static void CreateQTCreatorOpenBatch(CMDHandlerVSDev cmdvs, string pathToBaseMod)
-        {
-            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
-            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod);
-            cmdvs.SetMultipleCommands("call oursource");
-            cmdvs.SetMultipleCommands(@"C:\Qt\Tools\QtCreator\bin\qtcreator.exe");
-            cmdvs.ExecuteMultipleCommands_InItsOwnBatch(pathToBaseMod, "OpenQTCreatorHere");
-        }
-
-
-
-        private static void PromptAQuestionToContinue(string q, Action whatToDoIfNo = null)
-        {
-            do
-            {
-                Console.WriteLine(q + " \n  \'y\' or \'n\'");
-                var mm = Console.ReadKey();
-                if (mm.KeyChar == 'n' || mm.KeyChar == 'N')
-                {
-                    if (whatToDoIfNo != null)
-                    {
-                        whatToDoIfNo();
-                    } 
-                    return;
-                }
-                else if (mm.KeyChar == 'y' || mm.KeyChar == 'Y')
-                {
-                    break;
-                }
-            } while (true);
-
-        }
-
-
-
-        static ParserResult<object> QRInit(QRInitOptions opts)
-        {
-            Console.WriteLine(envIronDirectory);
-
-             
-           
-            //if they didnt provide a name for the module
-            if (opts.name == null)
+            //create project builder. and check if all libraries support the platform Im on
+            ProjectBuilderVS projectBuilderForVs = CreateProjectBuilderVS();
+            string libraryNameNotSupportingPlat = projectBuilderForVs.GetLibraryThatDoesNOTSupportPlatform(savefileProjGlobal);
+            if (libraryNameNotSupportingPlat != null)
             {
                 ProblemHandle p = new ProblemHandle();
-                p.ThereisAProblem("you did not provide a name for the module. do that with QRinit <name>");
-                return null;
+                p.ThereisAProblem("\n you are building for a platform " + projectBuilderForVs.GetPlatFormThisisSetupFor() + " as stated in your mainCG.cpp file, but " + libraryNameNotSupportingPlat + " does not support the platform you are building for.  \n use cgen configproj -a <nameofScope> \n to add platform to that project scope.");
             }
-
-            string pathToBaseMod = $"{envIronDirectory}\\{opts.name}";
-
+            configFileBuilder.WriteTempConfigurationToFinalFile();
 
 
+            //2.  add filters and folders directories from that toplevel project directory as:
+            //LibraryDependencies
+            //  prefix(of libraries top level uses)
+            //      confTypePrefix(for libraries that are same but different template type.)    
+            projectBuilderForVs.RecreateLibraryDependenciesFoldersFilters();
 
-            //if they tried to init the project in a directory that already exists
-            if (Directory.Exists($"{envIronDirectory}\\{opts.name}") && (opts.isToRename == false))
-            {
-                ProblemHandle p = new ProblemHandle();
-                p.ThereisAProblem($"you tried to initialize a module named {opts.name} that already exists");
-                return null;
-            }
-
-            if (opts.isToRename == false)
-            {
-
-                //----------------------------------------------------------------------------------------
-                Console.WriteLine("---cloning base template from the QR_sync/cpp_template directory");
-                CloneDirectory(@"C:/QR_sync/cpp_template", $"{envIronDirectory}\\{opts.name}", new List<string>() { @".git" });
-                Console.WriteLine("---finished cloning");
-
-                Console.WriteLine("---deleting the git repo."); 
-                DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/.git");
-
-            }
-
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---deleting build and install directories"); 
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build"); 
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win"); 
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/log");
-
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---changing the module name in CMakeLists.txt and in the config/module_name.cmake, while keeping the old name in memory");
-            //get old name
-            string contents = File.ReadAllText(pathToBaseMod + @"/CMakeLists.txt");
-            string contents2 = File.ReadAllText(pathToBaseMod + @"/config/module_name.cmake");
-            var maches = Regex.Matches(contents, @"QR_module\((.*)\)");
-            string oldName = "qwertasd_module";//maches[0].Groups[1].Value;
-            string contentsReplace = Regex.Replace(contents, oldName, opts.name);
-            string contentsReplace2 = Regex.Replace(contents2, oldName, opts.name);
-            File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
-            File.WriteAllText(pathToBaseMod + @"/config/module_name.cmake", contentsReplace2);
-
-            Console.WriteLine("---going through all files package.xml files replacing all instances of the old module name that you find");
-            var fileIncpp = pathToBaseMod + @"/package.xml";
-            var fileInrqt = pathToBaseMod + @"/rosqt/package.xml";  
-            var fileInIF = pathToBaseMod + @"/rosqt/IF/package.xml";  
-            List<string> allFilesToChangexml = new List<string>();
-            allFilesToChangexml.Add(fileIncpp); allFilesToChangexml.Add(fileInrqt); allFilesToChangexml.Add(fileInIF);  
-            foreach (var filetochange in allFilesToChangexml)
-            {
-                Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
-                contents = File.ReadAllText(filetochange);
-                string contentrp = Regex.Replace(contents, oldName, opts.name);
-                File.WriteAllText(filetochange, contentrp);
-            }
+            //3. I need to go through each library, git checkout their correct major. (master should be the branch with tag name of major)
+            //first grab all lowest level libraries that have no dependencies
+            projectBuilderForVs.ImportDependentLibrariesFiles(opts.git);
 
 
 
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---change the include directory name to ${MODULE_NAME}_cp.");
-            if (!Directory.Exists(pathToBaseMod+@"/include/" + oldName + "_cp"))
-            {
-                Console.WriteLine("WARNING: could not find directory include/" + oldName+"");
-            }
-            else
-            {
-                Directory.Move(pathToBaseMod + @"/include/" + oldName + "_cp", pathToBaseMod + @"/include/" + opts.name + "_cp");
-            }
+            //4. For the settings(.vcxproj .filters) of the top level I need to get all the cIncludes,
+            //cClompiles, additionalincludes additional libraries from the other libraries and add to top level
+            // to the top level library. 
+            projectBuilderForVs.ImportDependentSettingsLibrariesCincAndCcompAndAdditional(savefileProjGlobal);
 
 
-            //----------------------------------------------------------------------------------------
-            //-cd IF 
-            Console.WriteLine("deleting the build, install_win, and install_lin folders in the IF folder");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/build");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_win");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_lin");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/log");
-
-            Console.WriteLine("build the interface project. this is the first one that is built because everthing in this module depends on this one");
-            CMDHandlerVSDev cmdvs = new CMDHandlerVSDev(pathToBaseMod, pathToBaseMod);
-            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
-            cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
-            cmdvs.SetMultipleCommands("call oursource");
-            //go to the IF directory to build
-            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod + "/rosqt/IF");
-            //build the interface project
-            cmdvs.SetMultipleCommands(@"call ourcolcon");
-            //source the Interface project
-            cmdvs.SetMultipleCommands(@"call oursource");
-            cmdvs.SetMultipleCommands("echo Press any key to exit . . ."); 
-            cmdvs.SetMultipleCommands(@"pause>nul");
-
-
-            cmdvs.ExecuteMultipleCommands_InSeperateProcess();
-
-
-            PromptAQuestionToContinue("did it colcon build right?", ()=> {
-                //delete dir
-                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
-                System.Environment.Exit(1);
-            });
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
-                " replacing all instances of the old module name that you find");
-            var filesInSrc = Directory.GetFiles(pathToBaseMod + "/src").ToList();
-            var filesInInc = Directory.GetFiles(pathToBaseMod + "/include/"+opts.name+"_cp").ToList();
-            var filesInSrcUnit = Directory.GetFiles(pathToBaseMod + "/unit_tests/src").ToList();
-            var filesInIncUnit = Directory.GetFiles(pathToBaseMod + "/unit_tests/include").ToList();
-            List<string> allFilesToChange = new List<string>(); 
-            allFilesToChange.AddRange(filesInSrc); allFilesToChange.AddRange(filesInInc); allFilesToChange.AddRange(filesInSrcUnit); allFilesToChange.AddRange(filesInIncUnit);
-            foreach (var filetochange in allFilesToChange)
-            {
-                Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
-                contents = File.ReadAllText(filetochange); 
-                string contentrp = Regex.Replace(contents, oldName, opts.name);
-                File.WriteAllText(filetochange, contentrp); 
-            }
-
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("--- running ourcolcon for the cpp project portion of your module");
-            
-            //first source QR_core
-            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
-            cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
-            cmdvs.SetMultipleCommands("call oursource");
-            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod + "/rosqt/IF"); 
-            //source the Interface project
-            cmdvs.SetMultipleCommands(@"call oursource");
-            cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod);
-            cmdvs.SetMultipleCommands("call ourcolcon");
-            cmdvs.SetMultipleCommands("call oursource");
-            cmdvs.SetMultipleCommands("echo Press any key to exit . . .");
-            cmdvs.SetMultipleCommands(@"pause>nul");
-            
-            
-            //cmdvs.SetMultipleCommands("call oursource.bat");
-            //cmdvs.SetMultipleCommands(@"cd ../"+opts.name);
-            //cmdvs.SetMultipleCommands("call ourcolcon.bat");
-            cmdvs.ExecuteMultipleCommands_InSeperateProcess();
+            //5. Finally recreate the xml settings files. 
+            projectBuilderForVs.LibTop.GenerateXMLSettings(projectBuilderForVs.BaseDirectoryForProject);
 
 
 
-            PromptAQuestionToContinue("did it colcon build right?", () => {
-                //delete dir
-                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
-                System.Environment.Exit(1);
-            });
-
-
-            //creating batch file for opening up qt creator with cp sourced
-            CreateQTCreatorOpenBatch(cmdvs, pathToBaseMod); 
-             
-
-            Console.WriteLine("\n\n--- done running ourcolcon fpr cpp project");
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("--- switching to the rosqt portion of your module");
-            pathToBaseMod = pathToBaseMod + "/rosqt";
-            
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("--- change the include directory name to ${MODULE_NAME}_rqt.");
-            if (!Directory.Exists(pathToBaseMod+"/include/" + oldName + "_cp"))
-            {
-                Console.WriteLine("WARNING: could not find directory rosqt/include/" + oldName + "");
-            }
-            else
-            {
-                Directory.Move(pathToBaseMod + @"include/" + oldName + "_cp", pathToBaseMod + @"include/" + opts.name + "_cp");
-            }
-
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---deleting build and install directories");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
-            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/log");
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---changing the module name in CMakeLists.txt, "); 
-            contents = File.ReadAllText(pathToBaseMod + @"/CMakeLists.txt");  
-            contentsReplace = Regex.Replace(contents, oldName, opts.name);
-            File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
-
-
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---change the include directory name to ${MODULE_NAME}_rqt.");
-            if (!Directory.Exists(pathToBaseMod + @"/include/" + oldName + "_rqt"))
-            {
-                Console.WriteLine("WARNING: could not find directory include/" + oldName + "");
-            }
-            else
-            {
-                Directory.Move(pathToBaseMod + @"/include/" + oldName + "_rqt", pathToBaseMod + @"/include/" + opts.name + "_rqt");
-            }
-
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
-                " replacing all instances of the old module name that you find");
-            filesInSrc = Directory.GetFiles(pathToBaseMod + "/src").ToList();
-            filesInInc = Directory.GetFiles(pathToBaseMod + "/include/" + opts.name + "_rqt").ToList();
-            allFilesToChange = new List<string>(); allFilesToChange.AddRange(filesInSrc); allFilesToChange.AddRange(filesInInc);
-            foreach (var filetochange in allFilesToChange)
-            {
-                Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
-                contents = File.ReadAllText(filetochange);
-                string contentrp = Regex.Replace(contents, oldName, opts.name);
-                File.WriteAllText(filetochange, contentrp);
-            }
-
-
-
-
-
-            //----------------------------------------------------------------------------------------
-            Console.WriteLine("--- finally time to build and source everything. do this all in one bash file to keep environment");
-            cmdvs.SetWorkingDirectory(pathToBaseMod);
-            cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
-            cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
-            cmdvs.SetMultipleCommands("call oursource");   
-            //go to the IF directory to build
-            cmdvs.SetMultipleCommands(@"cd "+ pathToBaseMod + "/IF");
-            //source the Interface project
-            cmdvs.SetMultipleCommands(@"call oursource");
-            //go back to the cpp project
-            cmdvs.SetMultipleCommands(@"cd ../..");
-            //just source this one
-            cmdvs.SetMultipleCommands(@"call oursource");
-            //go to the rosqt again
-            cmdvs.SetMultipleCommands(@"cd rosqt");
-            //build and source this one
-            cmdvs.SetMultipleCommands(@"call ourcolcon");
-            cmdvs.SetMultipleCommands(@"call oursource");
-            cmdvs.SetMultipleCommands("echo Press any key to exit . . ."); 
-            cmdvs.SetMultipleCommands(@"pause>nul");
-
-            cmdvs.ExecuteMultipleCommands_InSeperateProcess();
-
-            PromptAQuestionToContinue("did it colcon build right?", () => {
-                //delete dir
-                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
-                System.Environment.Exit(1);
-            });
-
-
-            CreateQTCreatorOpenBatch(cmdvs, pathToBaseMod);
-
-            Console.WriteLine("\n\n--- done running ourcolcon for rosqt");
-
-
-            Console.WriteLine("\n\n--- finished initializing everything. wanna open qt creator for the cp project?");
-            return null;
         }
-        #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-        #region helper static functions  ***************************************************************************
-        //***************************************************************************************************  
-
-
-
-        public static void UpdateCCGKeywordsIncludes()
+        else
         {
-            //update CGKeywords.h and alllibraryincludes.h here
-            FileTemplateAllLibraryInlcudes faAllLibraryInlcudes = new FileTemplateAllLibraryInlcudes(PATHTOCONFIGTEST, savefileProjGlobal);
-            FileTemplateCGKeywordDefine fileTemplateCgKeyword = new FileTemplateCGKeywordDefine(PATHTOCONFIGTEST, savefileProjGlobal);
-            faAllLibraryInlcudes.CreateTemplate();
-            fileTemplateCgKeyword.CreateTemplate();
-            Console.WriteLine("LibraryIncludes updated");
+            //project does not exist
+            Console.WriteLine("A project does not exist here yet.  to create one use \ncgen init <NAMEOFPROJECT>   ");
         }
 
 
-        static bool isIncludeExistForPlatform(string forPlatform, string forInclude)
-        {
-            var additionals = savefileProjGlobal.CgenProjects.Projects
-                .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
-                .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == forPlatform)
-                .AdditionalIncludes.AdditionalInclude;
-            if (additionals.Count == 0)
-            {
-                return false;
-            }
-            return additionals.Any(ad => ad == forInclude);
-        }
+        return null;
+    }
 
-        static bool isLibraryExistForPlatform(string forPlatform, string forLibrary)
-        {
-            var libraries = savefileProjGlobal.CgenProjects.Projects
-                .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
-                .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == forPlatform)
-                .AdditionalLibraries.AdditionalLibrary;
-            if (libraries.Count == 0)
-            {
-                return false;
-            }
-            return libraries.Any(ad => ad == forLibrary);
-        }
+    #endregion
 
-        /// <summary>
-        /// check that the platform exists as a created platform
-        /// </summary>
-        /// <param name="PlatformName"></param>
-        /// <returns></returns>
-        static bool isPlatformExistAsACreatedPlatform(string PlatformName)
-        {
-            //check that the platform exists as a created platform
-            if (saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.Any(pl => pl == PlatformName))
-            {
-                return true;
-            }
 
-            return false;
+
+    #region Degenerate command ***************************************************************************
+    //***************************************************************************************************  
+    static ParserResult<object> Degenerate(DegenerateOptions opts)
+    {
+
+
+
+        Console.WriteLine(string.Join(" ", command));
+
+        foreach (var item in opts.IncludeFiles)
+        {
+            Console.WriteLine(item);
         }
 
 
-        /// <summary>
-        /// is the local project has platform in scope
-        /// </summary>
-        /// <param name="PlatformName"></param>
-        /// <returns></returns>
-        static bool isPlatformInProjectScope(string PlatformName, cgenProjectGlobal projGlob)
+        return null;
+    }
+
+    #endregion
+
+
+
+
+
+    #region QRInit command ***************************************************************************
+    //***************************************************************************************************  
+
+    // copy directory from cpp template to new directory
+    // -delete the git directory, build, install directories
+    //-change the module name in CMakeLists.txt, while keeping the old name in memory
+    //- change the include directory name to ${MODULE_NAME}_cp.
+    //- go through all files in src and include/${MODULE_NAME}_cp
+    //replace all instances of the old module name that you find
+    //-ourcolcon
+    //- make sure everything built
+
+
+
+    //-cd rqt
+    //- change the include directory name to ${MODULE_NAME}_rqt.
+    //- go through all files in src and include/${MODULE_NAME}_rqt
+    //    replace all instances of the old module name that you find
+    //- delete the install_win and install_lin folders
+
+    //-cd IF
+    //- delete the install_win and install_lin folders
+
+
+    //finally time to build and source everything. do this all in one bash file to keep environment
+    //variables
+
+    //- call c:\opt\ros\foxy\x64\setup.bat
+    //- cd base directory of your module
+    //- call ourcolcon
+    //- call oursource
+
+    //- cd rqt/IF
+    //- call ourcolcon
+    //- call oursource
+
+    //- cd ..
+    //- call ourcolcon
+    //- call oursource
+
+
+    private static void CloneDirectory(string root, string dest, List<string> neglectedDirs = null)
+    {
+        if (neglectedDirs == null)
         {
-            //is the local project has platform in scope
-            if (projGlob.PlatFormsInScope.PlatForms.Any(pl => pl.PlatFormName == PlatformName))
-            {
-                return true;
-            }
-            return false;
+            neglectedDirs = new List<string>();
         }
 
-
-        static bool IsProjectExistsAtEnvironDirectory()
+        foreach (string directory in Directory.GetDirectories(root))
         {
-            string fullpath = Path.Combine(envIronDirectory, CGSAVEFILESBASEDIRECTORY, "cgenProjs.cgx");
-            if (Directory.Exists(Path.GetDirectoryName(fullpath)))
+            if (!neglectedDirs.Contains(new DirectoryInfo(directory).Name))
             {
-                if (File.Exists(fullpath))
+                string dirName = Path.GetFileName(directory);
+                if (!Directory.Exists(Path.Combine(dest, dirName)))
                 {
-                    return true;
+                    Directory.CreateDirectory(Path.Combine(dest, dirName));
                 }
+                CloneDirectory(directory, Path.Combine(dest, dirName));
             }
-            return false;
         }
 
-        static SaveFilecgenProjectLocal GetSaveFilecgenProjectAtEnvironDirectory()
+        foreach (var file in Directory.GetFiles(root))
         {
-            if (!IsProjectExistsAtEnvironDirectory())
-            {
-                throw new Exception("there is no such project here yet");
-            }
-
-            return (new SaveFilecgenProjectLocal(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY));
-
+            File.Copy(file, Path.Combine(dest, Path.GetFileName(file)));
         }
+    }
 
+    private static void SetAttributesNormal(DirectoryInfo dir)
+    {
 
-        public static ProjectBuilderVS CreateProjectBuilderVS()
+        foreach (var subDir in dir.GetDirectories())
+            SetAttributesNormal(subDir);
+        foreach (var file in dir.GetFiles())
         {
-
-            //DONT WORRY ABOUT LIBRARIES THAT DEPEND ON LIBRARIES FOR NOW JUST GET THIS MUCH TO WORK.
-            // steps to import a new library would be
-            //1. get the libraries config xmlclasses created. (located in configTest/savedData.xml)
-            IDESetting settingConfig = new IDESetting(PATHTOCONFIGTEST, ".xml", typeof(Root));
-
-
-            //2: get the libraries settings xml file (they will be in the same directory as the config 
-            //file path )converted to the settingxml   
-
-            return new ProjectBuilderVS(settingConfig);
-
+            file.Attributes = FileAttributes.Normal;
         }
+    }
 
 
-        #endregion
+    private static void DeleteDirectoryIfExists_RemoveReadonly(string dir)
+    {
 
+        if (Directory.Exists(dir))
+        {
+            //remove readonly crap
+            SetAttributesNormal(new System.IO.DirectoryInfo(dir));
 
+            //delete directory recursively
+            Directory.Delete(dir, true);
+        }
 
     }
+
+
+    private static void CreateQTCreatorOpenBatch(CMDHandlerVSDev cmdvs, string pathToBaseMod)
+    {
+        cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+        cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod);
+        cmdvs.SetMultipleCommands("call oursource");
+        cmdvs.SetMultipleCommands(@"C:\Qt\Tools\QtCreator\bin\qtcreator.exe");
+        cmdvs.ExecuteMultipleCommands_InItsOwnBatch(pathToBaseMod, "OpenQTCreatorHere");
+    }
+
+
+
+    private static void PromptAQuestionToContinue(string q, Action whatToDoIfNo = null)
+    {
+        do
+        {
+            Console.WriteLine(q + " \n  \'y\' or \'n\'");
+            var mm = Console.ReadKey();
+            if (mm.KeyChar == 'n' || mm.KeyChar == 'N')
+            {
+                if (whatToDoIfNo != null)
+                {
+                    whatToDoIfNo();
+                }
+                return;
+            }
+            else if (mm.KeyChar == 'y' || mm.KeyChar == 'Y')
+            {
+                break;
+            }
+        } while (true);
+
+    }
+
+
+
+    static ParserResult<object> QRInit(QRInitOptions opts)
+    {
+        Console.WriteLine(envIronDirectory);
+
+
+
+        //if they didnt provide a name for the module
+        if (opts.name == null)
+        {
+            ProblemHandle p = new ProblemHandle();
+            p.ThereisAProblem("you did not provide a name for the module. do that with QRinit <name>");
+            return null;
+        }
+
+        string pathToBaseMod = $"{envIronDirectory}\\{opts.name}";
+
+
+
+
+        //if they tried to init the project in a directory that already exists
+        if (Directory.Exists($"{envIronDirectory}\\{opts.name}") && (opts.isToRename == false))
+        {
+            ProblemHandle p = new ProblemHandle();
+            p.ThereisAProblem($"you tried to initialize a module named {opts.name} that already exists");
+            return null;
+        }
+
+        if (opts.isToRename == false)
+        {
+
+            //----------------------------------------------------------------------------------------
+            Console.WriteLine("---cloning base template from the QR_sync/cpp_template directory");
+            CloneDirectory(@"C:/QR_sync/cpp_template", $"{envIronDirectory}\\{opts.name}", new List<string>() { @".git" });
+            Console.WriteLine("---finished cloning");
+
+            Console.WriteLine("---deleting the git repo.");
+            DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/.git");
+
+        }
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---deleting build and install directories");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/log");
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---changing the module name in CMakeLists.txt and in the config/module_name.cmake, while keeping the old name in memory");
+        //get old name
+        string contents = File.ReadAllText(pathToBaseMod + @"/CMakeLists.txt");
+        string contents2 = File.ReadAllText(pathToBaseMod + @"/config/module_name.cmake");
+        var maches = Regex.Matches(contents, @"QR_module\((.*)\)");
+        string oldName = "qwertasd_module";//maches[0].Groups[1].Value;
+        string contentsReplace = Regex.Replace(contents, oldName, opts.name);
+        string contentsReplace2 = Regex.Replace(contents2, oldName, opts.name);
+        File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
+        File.WriteAllText(pathToBaseMod + @"/config/module_name.cmake", contentsReplace2);
+
+        Console.WriteLine("---going through all files package.xml files replacing all instances of the old module name that you find");
+        var fileIncpp = pathToBaseMod + @"/package.xml";
+        var fileInrqt = pathToBaseMod + @"/rosqt/package.xml";
+        var fileInIF = pathToBaseMod + @"/rosqt/IF/package.xml";
+        List<string> allFilesToChangexml = new List<string>();
+        allFilesToChangexml.Add(fileIncpp); allFilesToChangexml.Add(fileInrqt); allFilesToChangexml.Add(fileInIF);
+        foreach (var filetochange in allFilesToChangexml)
+        {
+            Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
+            contents = File.ReadAllText(filetochange);
+            string contentrp = Regex.Replace(contents, oldName, opts.name);
+            File.WriteAllText(filetochange, contentrp);
+        }
+
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---change the include directory name to ${MODULE_NAME}_cp.");
+        if (!Directory.Exists(pathToBaseMod + @"/include/" + oldName + "_cp"))
+        {
+            Console.WriteLine("WARNING: could not find directory include/" + oldName + "");
+        }
+        else
+        {
+            Directory.Move(pathToBaseMod + @"/include/" + oldName + "_cp", pathToBaseMod + @"/include/" + opts.name + "_cp");
+        }
+
+
+        //----------------------------------------------------------------------------------------
+        //-cd IF 
+        Console.WriteLine("deleting the build, install_win, and install_lin folders in the IF folder");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/build");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_win");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/install_lin");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/rosqt/IF/log");
+
+        Console.WriteLine("build the interface project. this is the first one that is built because everthing in this module depends on this one");
+        CMDHandlerVSDev cmdvs = new CMDHandlerVSDev(pathToBaseMod, pathToBaseMod);
+        cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+        cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
+        cmdvs.SetMultipleCommands("call oursource");
+        //go to the IF directory to build
+        cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod + "/rosqt/IF");
+        //build the interface project
+        cmdvs.SetMultipleCommands(@"call ourcolcon");
+        //source the Interface project
+        cmdvs.SetMultipleCommands(@"call oursource");
+        cmdvs.SetMultipleCommands("echo Press any key to exit . . .");
+        cmdvs.SetMultipleCommands(@"pause>nul");
+
+
+        cmdvs.ExecuteMultipleCommands_InSeperateProcess();
+
+
+        PromptAQuestionToContinue("did it colcon build right?", () =>
+        {
+                //delete dir
+                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
+            System.Environment.Exit(1);
+        });
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
+            " replacing all instances of the old module name that you find");
+        var filesInSrc = Directory.GetFiles(pathToBaseMod + "/src").ToList();
+        var filesInInc = Directory.GetFiles(pathToBaseMod + "/include/" + opts.name + "_cp").ToList();
+        var filesInSrcUnit = Directory.GetFiles(pathToBaseMod + "/unit_tests/src").ToList();
+        var filesInIncUnit = Directory.GetFiles(pathToBaseMod + "/unit_tests/include").ToList();
+        List<string> allFilesToChange = new List<string>();
+        allFilesToChange.AddRange(filesInSrc); allFilesToChange.AddRange(filesInInc); allFilesToChange.AddRange(filesInSrcUnit); allFilesToChange.AddRange(filesInIncUnit);
+        foreach (var filetochange in allFilesToChange)
+        {
+            Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
+            contents = File.ReadAllText(filetochange);
+            string contentrp = Regex.Replace(contents, oldName, opts.name);
+            File.WriteAllText(filetochange, contentrp);
+        }
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("--- running ourcolcon for the cpp project portion of your module");
+
+        //first source QR_core
+        cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+        cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
+        cmdvs.SetMultipleCommands("call oursource");
+        cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod + "/rosqt/IF");
+        //source the Interface project
+        cmdvs.SetMultipleCommands(@"call oursource");
+        cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod);
+        cmdvs.SetMultipleCommands("call ourcolcon");
+        cmdvs.SetMultipleCommands("call oursource");
+        cmdvs.SetMultipleCommands("echo Press any key to exit . . .");
+        cmdvs.SetMultipleCommands(@"pause>nul");
+
+
+        //cmdvs.SetMultipleCommands("call oursource.bat");
+        //cmdvs.SetMultipleCommands(@"cd ../"+opts.name);
+        //cmdvs.SetMultipleCommands("call ourcolcon.bat");
+        cmdvs.ExecuteMultipleCommands_InSeperateProcess();
+
+
+
+        PromptAQuestionToContinue("did it colcon build right?", () =>
+        {
+                //delete dir
+                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
+            System.Environment.Exit(1);
+        });
+
+
+        //creating batch file for opening up qt creator with cp sourced
+        CreateQTCreatorOpenBatch(cmdvs, pathToBaseMod);
+
+
+        Console.WriteLine("\n\n--- done running ourcolcon fpr cpp project");
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("--- switching to the rosqt portion of your module");
+        pathToBaseMod = pathToBaseMod + "/rosqt";
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("--- change the include directory name to ${MODULE_NAME}_rqt.");
+        if (!Directory.Exists(pathToBaseMod + "/include/" + oldName + "_cp"))
+        {
+            Console.WriteLine("WARNING: could not find directory rosqt/include/" + oldName + "");
+        }
+        else
+        {
+            Directory.Move(pathToBaseMod + @"include/" + oldName + "_cp", pathToBaseMod + @"include/" + opts.name + "_cp");
+        }
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---deleting build and install directories");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/build");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_win");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/install_lin");
+        DeleteDirectoryIfExists_RemoveReadonly(pathToBaseMod + @"/log");
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---changing the module name in CMakeLists.txt, ");
+        contents = File.ReadAllText(pathToBaseMod + @"/CMakeLists.txt");
+        contentsReplace = Regex.Replace(contents, oldName, opts.name);
+        File.WriteAllText(pathToBaseMod + @"/CMakeLists.txt", contentsReplace);
+
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---change the include directory name to ${MODULE_NAME}_rqt.");
+        if (!Directory.Exists(pathToBaseMod + @"/include/" + oldName + "_rqt"))
+        {
+            Console.WriteLine("WARNING: could not find directory include/" + oldName + "");
+        }
+        else
+        {
+            Directory.Move(pathToBaseMod + @"/include/" + oldName + "_rqt", pathToBaseMod + @"/include/" + opts.name + "_rqt");
+        }
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("---going through all files in src and include /${ MODULE_NAME}_cp and" +
+            " replacing all instances of the old module name that you find");
+        filesInSrc = Directory.GetFiles(pathToBaseMod + "/src").ToList();
+        filesInInc = Directory.GetFiles(pathToBaseMod + "/include/" + opts.name + "_rqt").ToList();
+        allFilesToChange = new List<string>(); allFilesToChange.AddRange(filesInSrc); allFilesToChange.AddRange(filesInInc);
+        foreach (var filetochange in allFilesToChange)
+        {
+            Console.WriteLine($"    changing all occurences of {oldName} with {opts.name} in file {filetochange}");
+            contents = File.ReadAllText(filetochange);
+            string contentrp = Regex.Replace(contents, oldName, opts.name);
+            File.WriteAllText(filetochange, contentrp);
+        }
+
+
+
+
+
+        //----------------------------------------------------------------------------------------
+        Console.WriteLine("--- finally time to build and source everything. do this all in one bash file to keep environment");
+        cmdvs.SetWorkingDirectory(pathToBaseMod);
+        cmdvs.SetMultipleCommands(@"call c:\opt\ros\foxy\x64\setup.bat");
+        cmdvs.SetMultipleCommands(@"cd C:\QR_sync\QR_core");
+        cmdvs.SetMultipleCommands("call oursource");
+        //go to the IF directory to build
+        cmdvs.SetMultipleCommands(@"cd " + pathToBaseMod + "/IF");
+        //source the Interface project
+        cmdvs.SetMultipleCommands(@"call oursource");
+        //go back to the cpp project
+        cmdvs.SetMultipleCommands(@"cd ../..");
+        //just source this one
+        cmdvs.SetMultipleCommands(@"call oursource");
+        //go to the rosqt again
+        cmdvs.SetMultipleCommands(@"cd rosqt");
+        //build and source this one
+        cmdvs.SetMultipleCommands(@"call ourcolcon");
+        cmdvs.SetMultipleCommands(@"call oursource");
+        cmdvs.SetMultipleCommands("echo Press any key to exit . . .");
+        cmdvs.SetMultipleCommands(@"pause>nul");
+
+        cmdvs.ExecuteMultipleCommands_InSeperateProcess();
+
+        PromptAQuestionToContinue("did it colcon build right?", () =>
+        {
+                //delete dir
+                DeleteDirectoryIfExists_RemoveReadonly($"{envIronDirectory}\\{opts.name}");
+            System.Environment.Exit(1);
+        });
+
+
+        CreateQTCreatorOpenBatch(cmdvs, pathToBaseMod);
+
+        Console.WriteLine("\n\n--- done running ourcolcon for rosqt");
+
+
+        Console.WriteLine("\n\n--- finished initializing everything. wanna open qt creator for the cp project?");
+        return null;
+    }
+    #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #region helper static functions  ***************************************************************************
+    //***************************************************************************************************  
+
+
+
+    public static void UpdateCCGKeywordsIncludes()
+    {
+        //update CGKeywords.h and alllibraryincludes.h here
+        FileTemplateAllLibraryInlcudes faAllLibraryInlcudes = new FileTemplateAllLibraryInlcudes(PATHTOCONFIGTEST, savefileProjGlobal);
+        FileTemplateCGKeywordDefine fileTemplateCgKeyword = new FileTemplateCGKeywordDefine(PATHTOCONFIGTEST, savefileProjGlobal);
+        faAllLibraryInlcudes.CreateTemplate();
+        fileTemplateCgKeyword.CreateTemplate();
+        Console.WriteLine("LibraryIncludes updated");
+    }
+
+
+    static bool isIncludeExistForPlatform(string forPlatform, string forInclude)
+    {
+        var additionals = savefileProjGlobal.CgenProjects.Projects
+            .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+            .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == forPlatform)
+            .AdditionalIncludes.AdditionalInclude;
+        if (additionals.Count == 0)
+        {
+            return false;
+        }
+        return additionals.Any(ad => ad == forInclude);
+    }
+
+    static bool isLibraryExistForPlatform(string forPlatform, string forLibrary)
+    {
+        var libraries = savefileProjGlobal.CgenProjects.Projects
+            .First(p => p.NameOfProject == SaveFilecgenProjectLocal.CgenProjects.Project.NameOfProject)
+            .PlatFormsInScope.PlatForms.First(pl => pl.PlatFormName == forPlatform)
+            .AdditionalLibraries.AdditionalLibrary;
+        if (libraries.Count == 0)
+        {
+            return false;
+        }
+        return libraries.Any(ad => ad == forLibrary);
+    }
+
+    /// <summary>
+    /// check that the platform exists as a created platform
+    /// </summary>
+    /// <param name="PlatformName"></param>
+    /// <returns></returns>
+    static bool isPlatformExistAsACreatedPlatform(string PlatformName)
+    {
+        //check that the platform exists as a created platform
+        if (saveFilecgenConfigGlobal.CgenConfig.PlatForms.PlatForm.Any(pl => pl == PlatformName))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /// <summary>
+    /// is the local project has platform in scope
+    /// </summary>
+    /// <param name="PlatformName"></param>
+    /// <returns></returns>
+    static bool isPlatformInProjectScope(string PlatformName, cgenProjectGlobal projGlob)
+    {
+        //is the local project has platform in scope
+        if (projGlob.PlatFormsInScope.PlatForms.Any(pl => pl.PlatFormName == PlatformName))
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    static bool IsProjectExistsAtEnvironDirectory()
+    {
+        string fullpath = Path.Combine(envIronDirectory, CGSAVEFILESBASEDIRECTORY, "cgenProjs.cgx");
+        if (Directory.Exists(Path.GetDirectoryName(fullpath)))
+        {
+            if (File.Exists(fullpath))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static SaveFilecgenProjectLocal GetSaveFilecgenProjectAtEnvironDirectory()
+    {
+        if (!IsProjectExistsAtEnvironDirectory())
+        {
+            throw new Exception("there is no such project here yet");
+        }
+
+        return (new SaveFilecgenProjectLocal(envIronDirectory + "\\" + CGSAVEFILESBASEDIRECTORY));
+
+    }
+
+
+    public static ProjectBuilderVS CreateProjectBuilderVS()
+    {
+
+        //DONT WORRY ABOUT LIBRARIES THAT DEPEND ON LIBRARIES FOR NOW JUST GET THIS MUCH TO WORK.
+        // steps to import a new library would be
+        //1. get the libraries config xmlclasses created. (located in configTest/savedData.xml)
+        IDESetting settingConfig = new IDESetting(PATHTOCONFIGTEST, ".xml", typeof(Root));
+
+
+        //2: get the libraries settings xml file (they will be in the same directory as the config 
+        //file path )converted to the settingxml   
+
+        return new ProjectBuilderVS(settingConfig);
+
+    }
+
+
+    #endregion
+
+
+
+}
 
 
 }

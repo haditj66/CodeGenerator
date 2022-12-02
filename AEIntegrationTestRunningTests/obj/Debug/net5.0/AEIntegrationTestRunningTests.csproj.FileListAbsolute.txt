@@ -93,7 +93,6 @@ C:\CodeGenerator\AEIntegrationTestRunningTests\bin\Debug\net5.0\AEIntegrationTes
 C:\CodeGenerator\AEIntegrationTestRunningTests\bin\Debug\net5.0\CMDHandler.dll
 C:\CodeGenerator\AEIntegrationTestRunningTests\bin\Debug\net5.0\AEIntegrationTestRunningLibrary.pdb
 C:\CodeGenerator\AEIntegrationTestRunningTests\bin\Debug\net5.0\CMDHandler.pdb
-C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTestRunningTests.csprojAssemblyReference.cache
 C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTestRunningTests.GeneratedMSBuildEditorConfig.editorconfig
 C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTestRunningTests.AssemblyInfoInputs.cache
 C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTestRunningTests.AssemblyInfo.cs
@@ -103,3 +102,4 @@ C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTes
 C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\ref\AEIntegrationTestRunningTests.dll
 C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTestRunningTests.pdb
 C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTestRunningTests.genruntimeconfig.cache
+C:\CodeGenerator\AEIntegrationTestRunningTests\obj\Debug\net5.0\AEIntegrationTestRunningTests.csproj.AssemblyReference.cache

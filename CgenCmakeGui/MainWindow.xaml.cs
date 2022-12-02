@@ -33,7 +33,7 @@ namespace CgenCmakeGui
     public partial class MainWindow : Window
     {
 
-  
+
 
 
 
@@ -48,6 +48,7 @@ namespace CgenCmakeGui
         OutputScrollHandler guioutputScrollHandler;
 
         NEXTFileParser nextfile;
+        GridGeneratorForUI ggUI1;
         CmakeCacheFileParser cmakecachefile;
         CmakeSettingsFile cmakeSettingsFile;
         SavedOptionsFileHandler savedOptionsFileHandler;
@@ -60,7 +61,7 @@ namespace CgenCmakeGui
 
         OptionsView optionsViewWindow;
 
-        
+
 
         //step 1:
         //Dir_Step1.txt:
@@ -75,9 +76,14 @@ namespace CgenCmakeGui
         // ${CMAKE_CURRENT_BINARY_DIR} and the ${CMAKE_CURRENT_SOURCE_DIR}
 
         public static string CMAKE_CURRENT_BINARY_DIR;
+        public static string CGEN_PROJECT_DIRECTORY;
+        public static string CGEN_CMAKE_SETTINGS_FILE;
+        public static string AERTOS_BASE_DIR;
         public static string CMAKE_CURRENT_SOURCE_DIR;
         public static string PLATFORM;
         public static string CMAKE_BUILD_TYPE;
+        public static string CGEN_ORIGINAL_PROJECT_DIRECTORY;
+        public static string CGEN_DIRECTORY;   
         public static string CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES;
 
         public static string CGensaveFilesDir;
@@ -93,7 +99,10 @@ namespace CgenCmakeGui
         public MainWindow()
         {
             InitializeComponent();
-
+            InitCmakeGui();
+        }
+        public void InitCmakeGui()
+        {
             //test aaa = new test();
             //aaa.grow();
 
@@ -129,6 +138,47 @@ namespace CgenCmakeGui
                 CMAKE_BUILD_TYPE = match.Groups[1].Value.Trim();
             }
 
+             
+
+            regex = new Regex(@"CGEN_ORIGINAL_PROJECT_DIRECTORY: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                CGEN_ORIGINAL_PROJECT_DIRECTORY = match.Groups[1].Value.Trim();
+            }
+
+            
+            regex = new Regex(@"CGEN_DIRECTORY: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                CGEN_DIRECTORY = match.Groups[1].Value.Trim();
+            }
+
+            regex = new Regex(@"CGEN_PROJECT_DIRECTORY: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                CGEN_PROJECT_DIRECTORY = match.Groups[1].Value.Trim();
+            }
+
+
+            regex = new Regex(@"CGEN_CMAKE_SETTINGS_FILE: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                CGEN_CMAKE_SETTINGS_FILE = match.Groups[1].Value.Trim();
+            }
+
+            regex = new Regex(@"AERTOS_BASE_DIR: (.*)");
+            match = regex.Match(Dir_Step2Contents);
+            if (match.Success)
+            {
+                AERTOS_BASE_DIR = match.Groups[1].Value.Trim();
+            }
+
+            
+
             regex = new Regex(@"CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES: (.*)");
             match = regex.Match(Dir_Step2Contents);
             if (match.Success)
@@ -150,19 +200,32 @@ namespace CgenCmakeGui
             //string saveFile = File.ReadAllText(Environment.CurrentDirectory+ "../../../../TestFiles/CGensaveFiles/cgenCmakeGuiSaveFile.txt");
             //string saveFile = File.ReadAllText(CMAKE_CURRENT_BINARY_DIR + "/CGensaveFiles/cgenCmakeGuiSaveFile.txt");
 
-            CGensaveFilesDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles\\cmakeGui" + CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES;//PLATFORM + "\\" + CMAKE_BUILD_TYPE; //CMAKE_CURRENT_BINARY_DIR + "\\CGensaveFiles";
+            //CGensaveFilesDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles\\cmakeGui" + CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES;//PLATFORM + "\\" + CMAKE_BUILD_TYPE; //CMAKE_CURRENT_BINARY_DIR + "\\CGensaveFiles";
             string CGensaveFilesRootDir = CMAKE_CURRENT_SOURCE_DIR + "\\CGensaveFiles";
-            nextfile = new NEXTFileParser(new DirectoryInfo(CGensaveFilesDir));//( Environment.CurrentDirectory + "../../../../TestFiles/CGensaveFiles"));
-            cmakecachefile = new CmakeCacheFileParser(new DirectoryInfo(CGensaveFilesDir));
-            cmakeSettingsFile = new CmakeSettingsFile(new DirectoryInfo(CGensaveFilesDir), CMAKE_CURRENT_SOURCE_DIR, CMAKE_CURRENT_BINARY_DIR);
-            savedOptionsFileHandler = new SavedOptionsFileHandler(new DirectoryInfo(CGensaveFilesRootDir));
+            nextfile = new NEXTFileParser(new DirectoryInfo(CGEN_ORIGINAL_PROJECT_DIRECTORY));// CGEN_PROJECT_DIRECTORY + "\\CGensaveFiles\\cmakeGui" + CGEN_DIRECTORY_OF_CACHE_PROJECT_FILES));//( Environment.CurrentDirectory + "../../../../TestFiles/CGensaveFiles"));
+            nextfile.RemoveContents();
+
+            cmakeSettingsFile = new CmakeSettingsFile(new DirectoryInfo(CGEN_CMAKE_SETTINGS_FILE), AERTOS_BASE_DIR, CMAKE_CURRENT_BINARY_DIR);
+
+            //this file will use the CGEN_DIRECTORY as this is the one that is reset when a cgen gui reset command is used to start at a new project directory. 
+            savedOptionsFileHandler = new SavedOptionsFileHandler(new DirectoryInfo(CGEN_PROJECT_DIRECTORY + "\\CGensaveFiles"));
 
 
+            //if the original directory is the same as the current use this constructor. otherwise use the other one. 
+            if (CGEN_ORIGINAL_PROJECT_DIRECTORY == CGEN_DIRECTORY)
+            {
+                cmakecachefile = new CmakeCacheFileParser(new DirectoryInfo(CGEN_ORIGINAL_PROJECT_DIRECTORY));
+            }
+            else
+            {
+                cmakecachefile = new CmakeCacheFileParser(new DirectoryInfo(CGEN_ORIGINAL_PROJECT_DIRECTORY), CGEN_PROJECT_DIRECTORY);
+            }
 
 
 
             int ggui1Row = 6; int ggui1Col = 6;
-            GridGeneratorForUI ggUI1 = new GridGeneratorForUI(ggui1Row, ggui1Col, mainWindow);
+            ggUI1 = new GridGeneratorForUI(ggui1Row, ggui1Col, mainWindow);
+            
 
             //#################
             //status and output handlers
@@ -186,7 +249,7 @@ namespace CgenCmakeGui
             outputScroll.ScrollToEnd();
             outputScroll.Content = "ss";
             outputScrollHandler = new OutputScrollHandler(outputScroll, this.Dispatcher, true);
-            outputScroll.Visibility = Visibility.Visible; 
+            outputScroll.Visibility = Visibility.Visible;
 
 
 
@@ -194,12 +257,13 @@ namespace CgenCmakeGui
             //OptionsSelectedGuiBox
             //#################
             ggForConfigDisplay = new GridGeneratorForUI(10, 3, mainWindow);
-            OptionsSelectedGuiBox.Init(ggForConfigDisplay, mypanel, 6, guioutputScrollHandler, ()=> {
+            OptionsSelectedGuiBox.Init(ggForConfigDisplay, mypanel, 6, guioutputScrollHandler, () =>
+            {
                 //write option to the cgenCmakeCache.cmake
                 cmakecachefile.WriteOptionsToFile(OptionsSelectedGuiBox.optionsSelected);
 
                 //run the cmake command to get the next config option.
-                runCmakeCmd(); 
+                runCmakeCmd();
 
                 //save/update all options so far
                 savedOptionsFileHandler.SaveAllOptions();
@@ -214,19 +278,19 @@ namespace CgenCmakeGui
             foreach (var item in optsionssel)
             {
                 OptionsSelectedGuiBox.AddOptionSelectedToGui(item);
-                
+
             }
 
-             
- 
-
-            cmdHandler = new CMDHandler(CMAKE_CURRENT_SOURCE_DIR);//(AppDomain.CurrentDomain.BaseDirectory + "..\\..\\..\\TestFiles");
-             
 
 
 
+            cmdHandler = new CMDHandler(AERTOS_BASE_DIR);//(AppDomain.CurrentDomain.BaseDirectory + "..\\..\\..\\TestFiles");
 
-            int ggui1Col2 = ggui1Col+1;
+
+
+
+
+            int ggui1Col2 = ggui1Col + 1;
             Button newBtn = new Button();
             newBtn.Content = "Go To Options";
             newBtn.Click += button_Click;
@@ -304,7 +368,7 @@ namespace CgenCmakeGui
             win.GeneratorComboBox.Items.Add("Visual Studio 15 2017");
             win.GeneratorComboBox.Items.Add("Visual Studio 16 2019");
             win.GeneratorComboBox.Items.Add("CodeBlocks - Unix Makefiles");
-            
+
             if (cmakeSettingsFile.IsDataLoaded == true)
             {
                 CgenCmakeLibrary.FileHandlers.CmakeSettings cm = cmakeSettingsFile.CmakeSettingsData;
@@ -358,7 +422,7 @@ namespace CgenCmakeGui
                 cm.RemoteWorkingDirectory = win.RemoteDirectory.Text;
                 cm.RemoteIPAddress = win.RemoteIPAddress.Text;
                 cm.RemoteUsername = win.RemoteUsername.Text;
-                cm.RemotePassword= win.RemotePassword.Text; 
+                cm.RemotePassword = win.RemotePassword.Text;
             }
             else
             {
@@ -376,7 +440,18 @@ namespace CgenCmakeGui
         {
             this.Dispatcher.Invoke(() =>
             {
-                guioutputScrollHandler.display("Options configuring Done", OutputLevel.Normal);
+                guioutputScrollHandler.display("Options configuring Done. Shutting down in 2 seconds.", OutputLevel.Normal);
+
+
+            });
+
+
+            this.Dispatcher.Invoke(() =>
+            {
+                Thread.Sleep(2000);
+                //InitCmakeGui();
+                //System.Windows.Application.Current.Shutdown();
+
             });
         }
 
@@ -414,7 +489,7 @@ namespace CgenCmakeGui
 
                     // CreateOptionBox(jj, ii, nextfile.NextOption);
                 });
-                 
+
             }
             else
             {
@@ -441,21 +516,32 @@ namespace CgenCmakeGui
             //run cmake at least once if the next file is empty
             //if (rancmakeAtLeastOnce == false)
             //{
-                if (nextfile.IsFileContentsFilled() == false)
-                {
-                    runCmakeCmd();
-                } 
+            if (nextfile.IsFileContentsFilled() == false)
+            {
+                runCmakeCmd();
+            }
             //    rancmakeAtLeastOnce = true;
             //}
 
 
             //ConfigOptThread = new Thread(CheckForNextOptionThread);
             //ConfigOptThread.Start();
-            
-            nextfile.StartNextFileUpdater(()=> {
+
+            nextfile.StartNextFileUpdater(() =>
+            {
                 WhenOptionDoneAction();
-            }, () => {
+            }, () =>
+            {
                 WhenOptionFoundAction();
+            }, () =>
+            {
+
+                this.Dispatcher.Invoke(() =>
+                {
+
+                    InitCmakeGui();
+
+                });
             }
             );
 
@@ -469,10 +555,10 @@ namespace CgenCmakeGui
             OptionsSelectedGuiBox.Reset();
 
             runCmakeCmd();
-            
+
         }
 
-         
+
 
 
 
@@ -485,7 +571,7 @@ namespace CgenCmakeGui
 
 
             this.Dispatcher.Invoke(() =>
-            {  
+            {
                 optionsViewWindow = new OptionsView();
 
                 //List<Button> buttons = new List<Button>();
@@ -500,16 +586,16 @@ namespace CgenCmakeGui
                 //buttons.Add(optionsViewWindow.button9);
                 //buttons.Add(optionsViewWindow.button10);
 
-        //                <Button x:Name="button1" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button2" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button3" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button4" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button5" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button6" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button7" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button8" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button9" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
-        //<Button x:Name="button10" Content="edit Option" Canvas.Left="218" Canvas.Top="118"/>
+                //                <Button x:Name="button1" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button2" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button3" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button4" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button5" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button6" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button7" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button8" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button9" Content="edit Option" Canvas.Left="95" Canvas.Top="76"/>
+                //<Button x:Name="button10" Content="edit Option" Canvas.Left="218" Canvas.Top="118"/>
 
                 gridForOptionsView = new GridGeneratorForUI(8, 3, optionsViewWindow);
                 OptionsViewGuiBox.Init(gridForOptionsView, optionsViewWindow.mypanel, 7, savedOptionsFileHandler);
@@ -518,8 +604,9 @@ namespace CgenCmakeGui
                 {
                     OptionsViewGuiBox.AddOptionToGui(item);
                 }
-           
-            optionsViewWindow.Show(); });
+
+                optionsViewWindow.Show();
+            });
         }
 
 
@@ -554,14 +641,25 @@ namespace CgenCmakeGui
         {
             base.OnClosed(e);
 
+            ShutDownGui();
+        }
+
+        protected void ShutDownGui()
+        {
+
             if (SSHhandler != null)
             {
                 SSHhandler.Dispose();
             }
 
+
+
             nextfile.StopNextFileUpdater();
 
-            ConfigOptThread.Abort();
+            if (ConfigOptThread != null)
+            {
+                ConfigOptThread.Abort();
+            }
 
             Application.Current.Shutdown();
         }

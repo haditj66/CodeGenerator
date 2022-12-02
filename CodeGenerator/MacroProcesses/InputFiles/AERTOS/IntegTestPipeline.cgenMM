@@ -1,0 +1,8 @@
+#pragma once
+
+void RunSelectedIntegrationTest_@ProjectName@();
+
+static void RunSelectedIntegrationTest()
+{
+    RunSelectedIntegrationTest_@ProjectName@();
+}

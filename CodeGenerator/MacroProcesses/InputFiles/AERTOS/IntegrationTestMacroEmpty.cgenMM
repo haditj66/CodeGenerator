@@ -1,0 +1,7 @@
+#define AEITEST_END_TestsAfterTimer_@TestEmpty@(timeInMilliBeforeEnd) 
+#define AEITEST_@TestEmpty@(testName, thingToAssert, AssertionMessage) 
+#define AEITEST_@TestEmpty@_MUST_PASS_THIS_MANY(testName, thingToAssert, AssertionMessage, passedOnlyAfterThisManyPasses) 
+#define AEITEST_@TestEmpty@_IgnoreFirstTests(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum) 
+#define AEITEST_EndTestsIfFalseAssertion_@TestEmpty@(testName, thingToAssert, AssertionMessage) 
+#define AEITEST_END_@TestEmpty@ 
+#define AEITEST_EXPECT_TEST_TO_RUN_@TestEmpty@(testName) 

@@ -10,15 +10,14 @@
         "projectUniqueName": "C:\\CodeGenerator\\CgenCompileLibrary\\CgenCompileLibrary.csproj",
         "projectName": "CgenCompileLibrary",
         "projectPath": "C:\\CodeGenerator\\CgenCompileLibrary\\CgenCompileLibrary.csproj",
-        "packagesPath": "C:\\Users\\Hadi\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\hadi\\.nuget\\packages\\",
         "outputPath": "C:\\CodeGenerator\\CgenCompileLibrary\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Hadi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\hadi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -59,7 +58,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.412\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -69,15 +68,14 @@
         "projectUniqueName": "C:\\CodeGenerator\\CgenCompileTests\\CgenCompileTests.csproj",
         "projectName": "CgenCompileTests",
         "projectPath": "C:\\CodeGenerator\\CgenCompileTests\\CgenCompileTests.csproj",
-        "packagesPath": "C:\\Users\\Hadi\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\hadi\\.nuget\\packages\\",
         "outputPath": "C:\\CodeGenerator\\CgenCompileTests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Hadi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\hadi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -140,7 +138,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.412\\RuntimeIdentifierGraph.json"
         }
       }
     }

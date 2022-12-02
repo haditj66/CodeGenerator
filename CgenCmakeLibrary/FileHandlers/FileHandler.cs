@@ -9,11 +9,23 @@ namespace CgenCmakeLibrary.FileHandlers
     public class FileHandler
     {
 
-        public DirectoryInfo DirectoryOfFile { get; }
+        public DirectoryInfo DirectoryOfFile { get; protected set; }
         protected string FullFilePath;
+        protected string FullFileName;
 
         public FileHandler(DirectoryInfo dir, string fileName)
         {
+            _init(dir, fileName);
+        }
+
+        protected FileHandler()
+        { 
+
+        }
+
+        protected void _init(DirectoryInfo dir, string fileName)
+        {
+            FullFileName = fileName;
             DirectoryOfFile = dir;
             FullFilePath = Path.Combine(DirectoryOfFile.FullName, fileName);
 

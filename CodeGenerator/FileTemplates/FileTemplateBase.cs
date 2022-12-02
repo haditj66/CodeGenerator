@@ -47,6 +47,8 @@ namespace CodeGenerator.FileTemplates
 
         public void CreateTemplate()
         {
+            
+
             //read from the template file
             string templateFileContents = "";
             string FullPathToTemplate = Path.Combine(PathTOFileTemplate, NameOfTemplateFile);
@@ -56,9 +58,12 @@ namespace CodeGenerator.FileTemplates
             }
 
 
+
             //read all usercode sections from the generated file and save it  
             string generatedContent = "";
             string pathToGeneratedFile = Path.Combine(TemplateOutputDestination, NameOfOutputTemplateFile);
+
+
             //if that file does not exist, then create the file
             if (!File.Exists(pathToGeneratedFile))
             {
@@ -99,7 +104,7 @@ namespace CodeGenerator.FileTemplates
             foreach (Match mmat in matches)
             {
                 string prefix = mmat.Groups[1].Value;
-                UserCode userCode = new UserCode(mmat.Groups[2].Value.Trim(), mmat.Groups[1].Value);
+                UserCode userCode = new UserCode(mmat.Groups[2].Value, mmat.Groups[1].Value);//.Trim()
                 UserCodes.Add(userCode);
             }
 
@@ -194,7 +199,14 @@ namespace CodeGenerator.FileTemplates
 
                 if (!userCode.Contents.IsAnEmptyLine())
                 {
-                    templateFileContents = templateFileContents.Insert(mU.Index + mU.Length, "\n" + userCode.Contents);
+                    //string usercontents = userCode.Contents[userCode.Contents.Length] == "\n" ? userCode.Contents - 1 ;
+                    templateFileContents = templateFileContents.Insert(mU.Index + mU.Length, userCode.Contents);// "\n" +
+                    //remove the trailing line break
+                    if (templateFileContents[mU.Index + mU.Length + userCode.Contents.Length] == '\n')
+                    {
+                        templateFileContents = templateFileContents.Remove(mU.Index + mU.Length + userCode.Contents.Length, 1);
+                    }
+                    
                 }
                 
             }
@@ -207,7 +219,30 @@ namespace CodeGenerator.FileTemplates
             //now write this into the destination File
             //this will overwrite the file itf it exists file does not exist
             string FullFilePathDestination = Path.Combine(TemplateOutputDestination, NameOfOutputTemplateFile);
-            File.WriteAllText(FullFilePathDestination, templateFileContents);
+
+
+            Console.WriteLine($"macro1: generating file {Path.GetFileName(FullFilePathDestination)}");
+
+            //do a check if the current contents are the same as the contents of what it is about to write. if it is
+            //the same, dont overwrite it so to not trigger weird cmake stuff.
+            string currentContents = File.ReadAllText(FullFilePathDestination);
+
+            // if there is the CGEN_IGNORE_THIS keywork anywhere in the file contents, ignore this generation!
+            if (currentContents.Contains("CGEN_IGNORE_THIS"))       
+            {
+                    Console.WriteLine($"macro1: cgen will be ignoring file {Path.GetFileName(FullFilePathDestination)} as keyword CGEN_IGNORE_THIS  was found."); 
+            }
+            else if (currentContents != templateFileContents)
+            {
+                Console.WriteLine($"macro1: writing generated contents to {Path.GetFileName(FullFilePathDestination)} \n *******************************************");
+                File.WriteAllText(FullFilePathDestination, templateFileContents);
+            }
+            else
+            {
+                Console.WriteLine($"macro1: no contents written to {Path.GetFileName(FullFilePathDestination)} as contents have not changed \n -------------"); 
+            }
+
+             
         }
 
 

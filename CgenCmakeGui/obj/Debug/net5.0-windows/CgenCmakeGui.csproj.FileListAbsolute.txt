@@ -12,7 +12,6 @@ C:\CodeGenerator\CgenCmakeGui\bin\Debug\net5.0-windows\CgenCmakeLibrary.dll
 C:\CodeGenerator\CgenCmakeGui\bin\Debug\net5.0-windows\CMDHandler.dll
 C:\CodeGenerator\CgenCmakeGui\bin\Debug\net5.0-windows\CgenCmakeLibrary.pdb
 C:\CodeGenerator\CgenCmakeGui\bin\Debug\net5.0-windows\CMDHandler.pdb
-C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\CgenCmakeGui.csprojAssemblyReference.cache
 C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\CmakeSettings.g.cs
 C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\MainWindow.g.cs
 C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\OptionEditView.g.cs
@@ -34,3 +33,4 @@ C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\CgenCmakeGui.dll
 C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\ref\CgenCmakeGui.dll
 C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\CgenCmakeGui.pdb
 C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\CgenCmakeGui.genruntimeconfig.cache
+C:\CodeGenerator\CgenCmakeGui\obj\Debug\net5.0-windows\CgenCmakeGui.csproj.AssemblyReference.cache

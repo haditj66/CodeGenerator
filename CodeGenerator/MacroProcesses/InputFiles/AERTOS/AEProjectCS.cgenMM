@@ -1,0 +1,37 @@
+
+
+using CgenMin.MacroProcesses;
+using System.Collections.Generic;
+
+namespace @NameOfProject@Project
+{
+
+    public class @NameOfProject@ : AEProject
+    {
+		[AEEXETest]
+        public void InitAE()
+        {
+
+        }
+
+        protected override string _GetDirectoryOfLibrary()
+        {
+            return @"@DirOfProject@"; 
+        }
+
+        protected override List<AEEvent> _GetEventsInLibrary()
+        {
+            return new List<AEEvent>() { };
+        }
+
+
+        protected override List<AEProject> _GetLibrariesIDependOn()
+        {
+            return new List<AEProject>() { };
+        }
+ 
+    }
+	
+	
+	
+}

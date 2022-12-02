@@ -6,8 +6,8 @@ C:\CodeGenerator\CodeGenerator\ConsoleApp2\bin\Debug\Microsoft.VisualStudio.Test
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
-C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\CPPParser.csprojAssemblyReference.cache
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\CPPParser.csproj.CoreCompileInputs.cache
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\CPPParser.csproj.CopyComplete
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\ConsoleApp2.dll
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\ConsoleApp2.pdb
+C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\CPPParser.csproj.AssemblyReference.cache

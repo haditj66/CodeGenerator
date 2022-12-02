@@ -1,0 +1,1 @@
+#define @UtilityName@_@ServiceName@_CTOR ActionReq@ServiceId@.SetServiceFunc([](@UtilityName@* p, @FuncArguments@){p->_@ServiceName@(@Arguments@); });
