@@ -7,14 +7,18 @@
 
 using CgenMin.MacroProcesses;
 using CodeGenerator.MacroProcesses.AESetups.SPBs;
+using System;
 using System.Collections.Generic;
 
 namespace CGENTestProject
 {
+
+
+
     public class DerivativeFilter : AEFilter
     {
         public DerivativeFilter()
-            : base("CGENTest", "DerivativeFilter", 2, false)
+            : base("CGENTest",   2, false)
         {
 
         }
@@ -22,25 +26,195 @@ namespace CGENTestProject
 
 
 
+
+    class UARTDriver : AEUtilityService
+    {
+        public UARTDriver(string instanceNameOfTDU, int serviceBuffersize, AEPriorities priority)
+            : base("CGENTest", instanceNameOfTDU, priority, serviceBuffersize,  
+                  new CppFunctionArgs(
+                        new CppFunctionArg(CppTypeEnum.float_t, "SomeVar1"),
+                        new CppFunctionArg(CppTypeEnum.int32_t, "somePer")
+                        ),
+                  new ActionRequest("Transmit", ServiceType.Normal, "bool", "char const*", "msg")
+                  )
+        {
+        }
+    }
+
+    class UARTDriverTDU : AEUtilityService
+    {
+        public UARTDriverTDU(string instanceNameOfTDU, int serviceBuffersize, AEPriorities priority)
+            : base("CGENTest", instanceNameOfTDU, priority, serviceBuffersize,  null,
+                  new ActionRequest("Transmit", ServiceType.Normal, "bool", "char const*", "msg"),
+                  new ActionRequest("TransmitTDU", ServiceType.TDU, "int8_t", "char*", "msg")
+                  )
+        {
+        }
+
+    }
+
+
+    public class AELoopObjectTest2 : AELoopObject
+    {
+        public AELoopObjectTest2(string instanceNameOfloopObject, AEPriorities priority, int freqOfLoop)
+            : base("CGENTest",   instanceNameOfloopObject, priority, freqOfLoop)
+        {
+        }
+    }
+
+
+    //example: multiple user defined channels. NOTE all channels must be of same countbuffer or size consumption
+    public class AdderSPB : AESPBBase
+    {
+        public AdderSPB(string nameOfSPB, StyleOfSPB styleOfSPB, bool isSubscribable, int numOfChannels, SPBChannelUserDefinedCountBuffer channelAllSame)
+            : base("CGENTest", nameOfSPB, styleOfSPB,  "", "", isSubscribable, new SizeOfOutput_IfUserDefined(1, false), numOfChannels, channelAllSame)
+        {
+
+        }
+
+
+    }
+
+
+    public class AverageSPB : AESPBBase
+    {
+        public AverageSPB(string nameOfSPB, StyleOfSPB styleOfSPB, string templateType, bool isSubscribable, SPBChannelUserDefinedCountBuffer ch1)
+            : base("CGENTest", nameOfSPB, styleOfSPB, "", templateType, isSubscribable, new SizeOfOutput_IfUserDefined(1, false), ch1)
+        {
+
+        }
+    }
+
+
+    public class ThreeDimensionalVector : AESPBBase
+    {
+        public ThreeDimensionalVector(string nameOfSPB, StyleOfSPB styleOfSPB, bool isSubscribable, int countBufferForAll3Channels)
+            : base("CGENTest", nameOfSPB, styleOfSPB, "", "", isSubscribable, new SizeOfOutput_IfUserDefined(4, false), new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels), new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels), new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels))
+        {
+
+        }
+    }
+
+
+    public class BlindsUITOPFSM : AEFSM
+    {
+        public BlindsUITOPFSM(string instanceNameOfMachine, AEPriorities priority)
+            : base("CGENTest",   instanceNameOfMachine,  
+
+                   new AEState("Idle", 0, null,
+                new AEStateEvent(Button1.Instance, "Configuring"),
+                new AEStateEvent(Button2.Instance, "NormalOperating"),
+                new AEStateEvent(Button3.Instance))
+
+                  , priority, null)
+        {
+        }
+
+        public override List<AEState> _GetAllStates()
+        {
+            return new List<AEState>() {
+            new AEState("Configuring", 100, "ConfiguringFSM",
+                new AEStateEvent(Button1.Instance),
+                new AEStateEvent(Button2.Instance),
+                new AEStateEvent(Button3.Instance, "Idle")
+                ),
+            new AEState("NormalOperating", 100, "NormalOperationFSM",
+                new AEStateEvent(Button1.Instance),
+                new AEStateEvent(Button2.Instance),
+                new AEStateEvent(Button3.Instance, "Idle")
+                )
+            };
+        }
+    }
+
+
+    public class ConfiguringFSM : AEFSM
+    {
+        public ConfiguringFSM(string instanceNameOfMachine, AEPriorities priority)
+            : base("CGENTest",   instanceNameOfMachine, 
+                   
+                  new AEState("Idle", 100, null,
+                        new AEStateEvent(Button1.Instance),
+                        new AEStateEvent(Button2.Instance),
+                        new AEStateEvent(Button3.Instance, "SettingTopLimit"))
+
+                  , priority, null)
+        {
+        }
+
+        public override List<AEState> _GetAllStates()
+        {
+            return new List<AEState>() {
+            new AEState("SettingTopLimit", 100, null,
+                new AEStateEvent(Button1.Instance),
+                new AEStateEvent(Button2.Instance),
+                new AEStateEvent(Button3.Instance, "SettingBottomLimit")
+                ),
+            new AEState("SettingBottomLimit", 100, null,
+                new AEStateEvent(Button1.Instance),
+                new AEStateEvent(Button2.Instance),
+                new AEStateEvent(Button3.Instance, true)
+                )
+            };
+        }
+    }
+
+    public class NormalOperationFSM : AEFSM
+    {
+        public NormalOperationFSM(string instanceNameOfMachine, AEPriorities priority)
+            : base("CGENTest",   instanceNameOfMachine,  
+
+                  new AEState("Idle", 0, null,
+                        new AEStateEvent(Button1.Instance),
+                        new AEStateEvent(Button2.Instance),
+                        new AEStateEvent(Button3.Instance, "MovingToPoint"))
+
+                  , priority, null)
+        {
+        }
+
+        public override List<AEState> _GetAllStates()
+        {
+            return new List<AEState>() {
+            new AEState("MovingToPoint", 0, null,
+                new AEStateEvent(Button1.Instance),
+                new AEStateEvent(Button2.Instance),
+                new AEStateEvent(Button3.Instance, "Idle")
+                ) 
+            };
+        }
+    }
+
+
     public class CGENTest : AEProject
     {
 
 
-        [AEEXETest()]
+        [AEEXETest(aEconfigTOTAL_HEAP_SIZE:85000)]
         public void defaultTest()
         {
 
+
+
+            BlindsUITOPFSM blinduifsm = new  BlindsUITOPFSM("blinduifsm", AEPriorities.MediumPriority);
+            ConfiguringFSM configfsm = new  ConfiguringFSM("configfsm", AEPriorities.MediumPriority);
+            NormalOperationFSM normalfsm = new  NormalOperationFSM("normalfsm ", AEPriorities.MediumPriority);
+
+
+            AELoopObjectTest2 aELoopObjectTest2 = new AELoopObjectTest2("loopobjectTest2", AEPriorities.MediumPriority, 3);
+
             AEClock aEClock = new AEClock("clock1", 1000, "clock1_callback");
             AESensor sensor1 = new AESensor("sensor1", SensorResolution.Resolution12Bit, 0, 100);
-            AESensor sensor2 = new AESensor("sensor2", SensorResolution.Resolution12Bit);
+            AESensor sensor2 = new AESensor("sensor2", ADCPERIPHERAL1_CH1.Instance);//SensorResolution.Resolution12Bit);
             AESensor sensor3 = new AESensor("sensor3", SensorResolution.Resolution12Bit);
-            AverageSPB averageSPB1 = new AverageSPB("averageSPB1", " ", false, new SPBChannelUserDefinedCountBuffer(10));
-            AverageSPB averageSPB2 = new AverageSPB("averageSPB2", " ", false, new SPBChannelUserDefinedCountBuffer(10));
-            AverageSPB averageSPB3 = new AverageSPB("averageSPB3", " ", false, new SPBChannelUserDefinedCountBuffer(10));
+            AverageSPB averageSPB1 = new AverageSPB("averageSPB1", StyleOfSPB.EachSPBTask, " ", false, new SPBChannelUserDefinedCountBuffer(10));
+            AverageSPB averageSPB2 = new AverageSPB("averageSPB2", StyleOfSPB.EachSPBTask, " ", false, new SPBChannelUserDefinedCountBuffer(10));
+            AverageSPB averageSPB3 = new AverageSPB("averageSPB3", StyleOfSPB.EachSPBTask, " ", false, new SPBChannelUserDefinedCountBuffer(10));
 
-            AdderSPB adderSPB = new AdderSPB("adderSPB", false, 3, new SPBChannelUserDefinedCountBuffer(10));
+            AdderSPB adderSPB = new AdderSPB("adderSPB", StyleOfSPB.EachSPBTask, false, 3, new SPBChannelUserDefinedCountBuffer(10));
 
             UARTDriver uts = new UARTDriver("uartDriver", 10, AEPriorities.MediumPriority);
+
             UARTDriverTDU utstduu = new UARTDriverTDU("uartDriverTDU", 10, AEPriorities.MediumPriority);
 
             aEClock.FlowIntoTDU(utstduu, AEClock_PrescalerEnum.PRESCALER1);
@@ -85,7 +259,24 @@ namespace CGENTestProject
         protected override List<AEEvent> _GetEventsInLibrary()
         {
             return new List<AEEvent>() {
-                new I2C_RXCpltEVT(10)
+                I2C_RXCpltEVT.Init(10),
+                Button1.Init(10),
+                Button2.Init(10),
+                Button3.Init(10)
+            };
+        }
+
+        protected override List<AEHal> _GetPeripheralsInLibrary()
+        {
+            return new List<AEHal>() {
+               ADCPERIPHERAL1_CH1.Init(Portenum.PortB, PinEnum.PIN0),
+            ADCPERIPHERAL1_CH2.Init(Portenum.PortA, PinEnum.PIN2) ,
+            PWMPERIPHERAL1.Init(Portenum.PortD, PinEnum.PIN13),
+            UARTPERIPHERAL1.Init(BaudRatesEnum.T_115200,2,Portenum.PortD, PinEnum.PIN5, Portenum.PortD, PinEnum.PIN6),
+            I2CPERIPHERAL1.Init(10000,Portenum.PortB, PinEnum.PIN6, Portenum.PortB, PinEnum.PIN7),
+            GPIOPERIPHERAL1.Init(Portenum.PortD, PinEnum.PIN12),
+            GPIOPERIPHERAL_INPUT1.Init(Portenum.PortD, PinEnum.PIN0),
+            SPIPERIPHERAL1.Init(false, Portenum.PortA, PinEnum.PIN5, Portenum.PortA, PinEnum.PIN6, Portenum.PortA, PinEnum.PIN7, Portenum.PortA, PinEnum.PIN4)
             };
         }
 

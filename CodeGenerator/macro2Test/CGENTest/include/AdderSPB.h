@@ -44,6 +44,9 @@ CHANNELCOUNTBUFFER, false>
 		//UserCode_Sectionpublic
 //UserCode_Sectionpublic_end
 
+
+	
+	
 	private:
 	//UserCode_Sectionprivate
 //UserCode_Sectionprivate_end

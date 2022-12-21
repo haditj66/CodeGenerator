@@ -35,10 +35,10 @@ namespace CgenMin.MacroProcesses
             }
         }
 
-        public AOWritableToAOClassContents(string fromLibraryName, string className, string instanceName, AOTypeEnum aOType) : 
-            base(className, instanceName, aOType)
+        public AOWritableToAOClassContents(string fromLibraryName, string instanceName, AOTypeEnum aOType) : 
+            base(  instanceName, aOType)
         {
-            FromLibraryName = fromLibraryName;
+            FromLibraryName =  fromLibraryName;
             //// from this library name, I need to get the directory that it belongs to.
             ////first grab all the contents of the cmake file in C:/AERTOS/AERTOS/CMakeLists.txt .
             //string cmakeCont = File.ReadAllText(@"C:/AERTOS/AERTOS/CMakeLists.txt");
@@ -49,6 +49,7 @@ namespace CgenMin.MacroProcesses
             //_ProjectDirectory = re.Match(cmakeCont).Value;
 
             //_ProjectDirectory = FromLibraryName == "CGENTest" ? @"C:\CodeGenerator\CodeGenerator\macro2Test\CGENTest" : _ProjectDirectory; //for debugging
+             
 
             _ProjectDirectory = AEInitializing.GetRunningDirectoryFromProjectName(fromLibraryName);
 

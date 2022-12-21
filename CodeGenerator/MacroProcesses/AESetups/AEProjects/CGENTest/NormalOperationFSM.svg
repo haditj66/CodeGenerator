@@ -1,0 +1,16 @@
+digraph {
+compound=true;
+node [shape=Mrecord]
+rankdir="LR"
+"Idle" [label="Idle|entry / Function\nexit / Function"];
+"MovingToPoint" [label="MovingToPoint|entry / Function\nexit / Function"];
+
+"Idle" -> "Idle" [style="solid", label="Button1 / "];
+"Idle" -> "Idle" [style="solid", label="Button2 / "];
+"Idle" -> "MovingToPoint" [style="solid", label="Button3"];
+"MovingToPoint" -> "MovingToPoint" [style="solid", label="Button1 / "];
+"MovingToPoint" -> "MovingToPoint" [style="solid", label="Button2 / "];
+"MovingToPoint" -> "Idle" [style="solid", label="Button3"];
+ init [label="", shape=point];
+ init -> "Idle"[style = "solid"]
+}

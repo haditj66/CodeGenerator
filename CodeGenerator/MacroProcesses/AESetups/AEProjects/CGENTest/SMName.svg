@@ -1,0 +1,12 @@
+digraph {
+compound=true;
+node [shape=Mrecord]
+rankdir="LR"
+"Off" [label="Off"];
+"On" [label="On"];
+
+"Off" -> "On" [style="solid", label=" "];
+"On" -> "Off" [style="solid", label=" "];
+ init [label="", shape=point];
+ init -> "Off"[style = "solid"]
+}

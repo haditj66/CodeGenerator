@@ -1,5 +1,9 @@
-
-
+#pragma once 
+ 
+ 
+#ifdef  BOARD_USED__STM32F411RE
+#include "stm32f4xx_hal.h"
+#endif //  BOARD_USED__STM32F411RE
 
 ##UserCode_defines
 

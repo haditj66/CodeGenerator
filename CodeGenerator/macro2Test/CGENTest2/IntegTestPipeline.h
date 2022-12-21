@@ -1,27 +1,15 @@
-//generated file: default.cpp
+//generated file: IntegTestPipeline.h
 //**********************************************************************
 //this is an auto-generated file using the template file located in the directory of C:\CodeGenerator\CodeGenerator\bin\Debug\..\..\FileTemplates\Files
 //ONLY WRITE CODE IN THE UserCode_Section BLOCKS
 //If you write code anywhere else,  it will be overwritten. modify the actual template file if needing to modify code outside usersection blocks.
 
 
-#if INTEGRATION_TESTS_FOR_CGENTest__default
- 
-#include "IntegTestPipeline.h"
+#pragma once
 
-//UserCode_Sectiona
-//UserCode_Sectiona_end
+void RunSelectedIntegrationTest_default2();
 
-void RunSelectedIntegrationTest_default()
+static void RunSelectedIntegrationTest()
 {
-
-//UserCode_Sectionb
-//UserCode_Sectionb_end
-
+    RunSelectedIntegrationTest_default2();
 }
-
-
-//UserCode_Sectionc
-//UserCode_Sectionc_end
-
-#endif

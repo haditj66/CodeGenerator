@@ -9,7 +9,7 @@
 @Template@
 class @FilterName@ : public Filter<@FilterName@, @PastBufferSize@>
 {
-  template<class TFilterDerived, uint16_t PastDataBufferSize>
+  //template<class TFilterDerived, uint16_t PastDataBufferSize>
 	friend class Filter;
 
 public:

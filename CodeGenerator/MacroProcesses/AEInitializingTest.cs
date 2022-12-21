@@ -1,6 +1,7 @@
 ﻿using CodeGenerator.MacroProcesses.AESetups;
 using CodeGenerator.MacroProcesses.AESetups.SPBs;
-using CodeGenerator.ProblemHandler;
+using Stateless;
+using Stateless.Graph;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,135 +12,6 @@ using System.Threading.Tasks;
 
 namespace CgenMin.MacroProcesses
 {
-
-
-    public abstract class AEProject
-    {
-
-        public static string BaseAEDir = "";
-
-        public static readonly List<string> ListOfBoardTargets = new List<string>() {
-        "mingw",
-        "STM32F411RE"
-        };
-
-        public List<AEProject> _LibrariesIDependOn { get; protected set; }
-        public List<AEProject> LibrariesIDependOn
-        {
-            get
-            {
-                return _LibrariesIDependOn;
-            }
-        }
-        public List<string> LibrariesIDependOnStr_LIB { get { return LibrariesIDependOn.Select(a => a.Name + "_lib").ToList(); } }
-        public List<AEEvent> EventsInLibrary { get { return _GetEventsInLibrary(); } }
-        public List<string> ListOfTests { get { return _GetListOfTests(); } }
-        public string DirectoryOfLibrary
-        {
-            get
-            {
-                string _DirectoryOfLibrary = _GetDirectoryOfLibrary();
-                //_DirectoryOfLibrary = AEInitializing.GetRunningDirectoryFromProjectName(Name);
-
-                _DirectoryOfLibrary =
-                    Path.IsPathRooted(_DirectoryOfLibrary) == false ? _DirectoryOfLibrary = Path.Combine(BaseAEDir, _DirectoryOfLibrary)
-                    : _DirectoryOfLibrary;
-
-                return _DirectoryOfLibrary;
-            }
-        }
-
-        public string Name { get { return this.GetType().Name; } }
-
-        public AEProject()
-        {
-            _LibrariesIDependOn = new List<AEProject>();
-        }
-
-        public void Init()
-        {
-
-            _LibrariesIDependOn = new List<AEProject>();
-            try
-            {
-                _LibrariesIDependOn = _GetLibrariesIDependOn();
-
-                foreach (var item in LibrariesIDependOn)
-                {
-                    item.Init();
-                }
-            }
-            catch (System.StackOverflowException e)
-            {
-                ProblemHandle problemHandle = new ProblemHandle();
-                problemHandle.ThereisAProblem("there must have been a circular dependency on your libraries");
-                throw;
-            }
-
-        }
-         
-
-        private List<string> _ListOfTests = null;
-        protected  List<string> _GetListOfTests()
-        {
-            if (_ListOfTests == null)
-            {
-               _ListOfTests = new List<string>();
-
-                var type = typeof(AEProject);
-                var typeProcessToRun = AppDomain.CurrentDomain.GetAssemblies()
-              .SelectMany(s => s.GetTypes())
-              .Where(p => type.IsAssignableFrom(p))
-              .Where(p => p.Name == Name)
-              .FirstOrDefault();
-
-                var methodsOfAEEXETest = AppDomain.CurrentDomain.GetAssemblies()
-              .SelectMany(s => s.GetTypes())
-               .Where(p => type.IsAssignableFrom(typeProcessToRun))
-              .SelectMany(t => t.GetMethods())
-              .Where(m => m.GetCustomAttributes(typeof(AEEXETest), false).Length > 0)
-              .ToArray();
-
-                foreach (var item in methodsOfAEEXETest)
-                {
-                    _ListOfTests.Add(item.Name);
-                }
-
-            }
-            return _ListOfTests;
-        }
-
-        public AEConfig GenerateTestOfName(string testName)
-        {
-            var type = typeof(AEProject);
-            var typeProcessToRun = AppDomain.CurrentDomain.GetAssemblies()
-          .SelectMany(s => s.GetTypes())
-          .Where(p => type.IsAssignableFrom(p))
-          .Where(p => p.Name == Name)
-          .FirstOrDefault();
-
-            var methodsToRun = AppDomain.CurrentDomain.GetAssemblies()
-          .SelectMany(s => s.GetTypes())
-           .Where(p => type.IsAssignableFrom(typeProcessToRun))
-          .SelectMany(t => t.GetMethods())
-          .Where(m => m.GetCustomAttributes(typeof(AEEXETest), false).Length > 0)
-          .Where(m => m.Name == testName)
-          .FirstOrDefault();
-
-           var attr = (AEEXETest)methodsToRun.GetCustomAttributes(typeof(AEEXETest), false).FirstOrDefault();
-            
-
-            methodsToRun.Invoke(this,null);
-            return attr.AEconfigToUse;
-        }
-
-        protected abstract string _GetDirectoryOfLibrary();
-        protected abstract List<AEEvent> _GetEventsInLibrary();
-
-        protected abstract List<AEProject> _GetLibrariesIDependOn();// where T : AELibrary;
-
-
-    }
 
 
 
@@ -159,6 +31,9 @@ namespace CgenMin.MacroProcesses
 
             // from this library name, I need to get the directory that it belongs to.
             //first grab all the contents of the cmake file in C:/AERTOS/AERTOS/CMakeLists.txt .
+
+            return GetProjectIfNameExists(projectName).DirectoryOfLibrary;
+
             string cmakeCont = File.ReadAllText(@"C:/AERTOS/AERTOS/CMakeLists.txt");
 
             //    STREQUAL "exeHalTest")
@@ -255,6 +130,61 @@ namespace CgenMin.MacroProcesses
             //AEUtilityService uts = new AEUtilityService("uartDriver", "UUartDriver",Path.Combine(this.EvironmentDirectory, "include", "UUARTDriver.h"));
             //AEUtilityService utstdu = new AEUtilityService("uartDriver", "UUartDriverTDU",Path.Combine(this.EvironmentDirectory, "include", "UUARTDriver.h"));
 
+            const string on = "On";
+            const string off = "Off";
+            const char space = ' ';
+
+
+
+            //            var rxEvent = new I2C_RXCpltEVT(10);
+            //            var updEvent = new UpdateEVT(10);
+            //            var button1 = new Button1(10);
+            //            var button2 = new Button2(10);
+            //            var button3 = new Button3(10);
+
+
+
+            //            var ConfigureUIFSM = new StateMachine<string, string>("Idle"); 
+
+            //            ConfigureUIFSM.Configure("Idle") 
+            //                .PermitReentry(updEvent.ClassName) //update function
+            //                .InternalTransition(button1.ClassName, ()=> { }) //event state transition
+            //                .InternalTransition(button2.ClassName, () => { }) //event state transition 
+            //                .Permit(button3.ClassName, "SettingTopLimit") //event state transition
+            //                .OnEntry((a) => { Console.WriteLine($"entered {a.Destination}"); })
+            //                .OnExit((a) => { Console.WriteLine($"Transitioning {a.Source} => {a.Destination}"); });
+            //            //.OnEntryAsync("Entry")
+            //            //.OnExitAsync(OnDraftExitAsync);
+
+            //            ConfigureUIFSM.Configure("SettingTopLimit")
+            //       .PermitReentry(updEvent.ClassName) //update function
+            //       .InternalTransition(button1.ClassName, () => { }) //event state transition
+            //       .InternalTransition(button2.ClassName, () => { }) //event state transition 
+            //       .Permit(button3.ClassName, "SettingBottomLimit") //event state transition
+            //       .OnEntry((a) => { Console.WriteLine($"entered {a.Destination}"); })
+            //       .OnExit((a) => { Console.WriteLine($"Transitioning {a.Source} => {a.Destination}"); });
+
+            //            ConfigureUIFSM.Configure("SettingBottomLimit")
+            //.PermitReentry(updEvent.ClassName) //update function
+            //.InternalTransition(button1.ClassName, () => { }) //event state transition
+            //.InternalTransition(button2.ClassName, () => { }) //event state transition 
+            //.Permit(button3.ClassName, "ExitFSM") //event state transition
+            //.OnEntry((a) => { Console.WriteLine($"entered {a.Destination}"); })
+            //.OnExit((a) => { Console.WriteLine($"Transitioning {a.Source} => {a.Destination}"); });
+
+
+            //            string asdDOT = UmlDotGraph.Format(ConfigureUIFSM.GetInfo());
+
+            //            string pathToDOTFile = @"C:\CodeGenerator\CodeGenerator\MacroProcesses\AESetups\AEProjects" + $"\\{projectName}\\";
+            //            if (Directory.Exists(pathToDOTFile) == false)
+            //            {
+            //                Directory.CreateDirectory(pathToDOTFile);
+            //            }
+            //            File.WriteAllText(pathToDOTFile + "SMName.svg", asdDOT);
+
+
+
+            //I dunno. doesnt look too bad maybe. 
 
 
             TheMacro2Session = this;
@@ -289,28 +219,60 @@ namespace CgenMin.MacroProcesses
             //aeProject.InitAE();
 
             //get the project test lists
-            var methodsOfAEEXETest = AppDomain.CurrentDomain.GetAssemblies()
-                      .SelectMany(s => s.GetTypes())
-                       .Where(p => type.IsAssignableFrom(typeProcessToRun))
-                      .SelectMany(t => t.GetMethods())
-                      .Where(m => m.GetCustomAttributes(typeof(AEEXETest), false).Length > 0)
-                      .ToArray(); 
+            //var methodsOfAEEXETest = AppDomain.CurrentDomain.GetAssemblies()
+            //          .SelectMany(s => s.GetTypes())
+            //           .Where(p => type.IsAssignableFrom(typeProcessToRun))
+            //           .Where(p => typeProcessToRun.Name == p.Name)
+            //          .SelectMany(t => t.GetMethods())
+            //          .Where(m => m.GetCustomAttributes(typeof(AEEXETest), false).Length > 0)
+            //          .ToArray(); 
+
+
+            //get all depending libraries
+            List<List<AEProject>> AlldependingProjectsByLayers = new List<List<AEProject>>();
+            int layer = 0;
+            List<AEProject> libdependLayer0 = aeProject.LibrariesIDependOn;
+            AlldependingProjectsByLayers.Add(libdependLayer0);
+            if (libdependLayer0.Count != 0)
+            { 
+                for (; ; )
+                {
+                    layer++;
+
+                    List<AEProject> libdependLayer = new List<AEProject>();
+                    foreach (var proj in AlldependingProjectsByLayers[layer - 1])
+                    {
+                        libdependLayer.AddRange(proj.LibrariesIDependOn);
+                    }
+
+                    if (libdependLayer.Count == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        AlldependingProjectsByLayers.Add(libdependLayer);
+                    } 
+                } 
+            }
+
 
 
             var tt = aeProject.ListOfTests;
+            var eventsinlin = aeProject.EventsInLibrary;
+            var peripheralslib = aeProject.PeripheralsInLibrary;
             AEConfig aEConfig = aeProject.GenerateTestOfName(projectTest);
 
-            //string ss = aEClock.GenerateMainInitializeSection();
-
-            //string sss = averageSPB3.GenerateAEConfigSection();
-            //string ssss = averageSPB2.GenerateAEConfigSection(); 
-            //string ssssa1 = averageSPB2.GenerateMainInitializeSection();
-            //string ssssa2 = averageSPB2.GenerateMainLinkSetupsSection();
-            //string ssss1 = averageSPB3.GenerateMainInitializeSection();
-            //string ssss2 = averageSPB3.GenerateMainLinkSetupsSection();
+            //grab all FSMs and create their DOT files.
+            foreach (var fsm in AO.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.SimpleFSM).Cast<AEFSM>())
+            {
+                fsm.GenerateDOTDiagramFromUML();
+            }
 
 
-             string aeconfig = AO.All_GenerateAEConfigSection();
+
+
+            string aeconfig = AO.All_GenerateAEConfigSection();
             string mainHeader = AO.All_GenerateMainHeaderSection();
             string clockInit = AO.All_GenerateMainClockSetupsSection();
             string mainInit = AO.All_GenerateMainInitializeSection();
@@ -321,6 +283,8 @@ namespace CgenMin.MacroProcesses
 
             //AEConfig aEConfig = new AEConfig();
             aEConfig.GenerateFile(RunningProjectDir, this, aeconfig, "");
+
+
             //AOWritableToAOClassContents.WriteAllFileContents();
 
             //string aeConfigOUT = this.GenerateFileOut("AERTOS\\AEConfig",
@@ -380,11 +344,11 @@ namespace CgenMin.MacroProcesses
             "AERTOS\\projectTest",
             Path.Combine(RunningProjectDir, $"{projectTest}.cpp"),
             true, true,
-             new MacroVar() { MacroName = "ProjectName", VariableValue =  projectName },
+             new MacroVar() { MacroName = "ProjectName", VariableValue = projectName },
              new MacroVar() { MacroName = "ProjectTest", VariableValue = projectTest },
              new MacroVar() { MacroName = "MainHeader", VariableValue = mainHeader },
              new MacroVar() { MacroName = "ClockInit", VariableValue = clockInit },
-             new MacroVar() { MacroName = "MainInit", VariableValue = mainInit } ,
+             new MacroVar() { MacroName = "MainInit", VariableValue = mainInit },
              new MacroVar() { MacroName = "LinksInit", VariableValue = linksInit },
              new MacroVar() { MacroName = "FuncInit", VariableValue = funcInit }
             );

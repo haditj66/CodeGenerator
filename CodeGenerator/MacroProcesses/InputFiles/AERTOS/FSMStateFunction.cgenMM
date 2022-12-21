@@ -1,0 +1,36 @@
+inline AETransitionType @ClassName@::@StateName@(TypeOfThisFSM * const thisFSM, AEEventDiscriminator_t const * const evt)
+{
+	AETransitionType transitionType = UNHANDLED;
+
+	##UserCode_@StateName@a
+	
+	
+	auto evtId = evt->GetEvtID();
+	switch (evtId)
+	{
+	case Enter_Sig:
+	{
+@EnterSubs@ 
+		
+	##UserCode_@StateName@enter
+		 
+		 
+		break;
+	}
+	case Exit_Sig:
+	{
+@ExitSubs@ 
+		
+	##UserCode_@StateName@exit
+		
+		break;
+	}
+	
+@EventCallbacks@ 
+	
+	default:
+		break;
+	}
+
+	return transitionType;
+}

@@ -404,22 +404,8 @@ namespace CgenMin.MacroProcesses
 
     }
 
-    //class UtilityServiceFromFile
-    //{
-    //private static List<UtilityService> requests = new List<UtilityService>();
 
-    //public UtilityServicesFromDirectory(string fromDirectory)
-    //{
-    //    FromDirectory = fromDirectory;
-    //}
-
-    //public string FromDirectory { get; }
-
-
-
-
-
-    public abstract class AEUtilityService : AOWritableToAOClassContents
+        public abstract class AEUtilityService : AOWritableConstructible
     {
 
 
@@ -453,7 +439,8 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
         //    utService = new UtilityService(fromFileThisComesFrom,className);
         //}
 
-        public AEUtilityService(string fromLibrary, string instanceNameOfTDU, AEPriorities priority, int serviceBuffer, string className, params ActionRequest[] actionRequests) : base(fromLibrary, className, instanceNameOfTDU, AOTypeEnum.UtilityService)
+        public AEUtilityService(string fromLibrary, string instanceNameOfTDU, AEPriorities priority, int serviceBuffer,  CppFunctionArgs cppFunctionArgs = null, params ActionRequest[] actionRequests) :
+            base(fromLibrary, instanceNameOfTDU, AOTypeEnum.UtilityService, cppFunctionArgs)
         {
             requests = actionRequests.ToList();
             FromFileThisComesFrom = "";
@@ -487,7 +474,8 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
         /// </summary>
         /// <param name="fromFile"></param>
         /// <param name="className"></param>
-        public AEUtilityService(string fromLibrary, string instanceNameOfTDU, AEPriorities priority, string className, string fromFile) : base(fromLibrary, className, instanceNameOfTDU, AOTypeEnum.UtilityService)
+        public AEUtilityService(string fromLibrary, string instanceNameOfTDU, AEPriorities priority,  string fromFile) 
+            : base(fromLibrary,  instanceNameOfTDU, AOTypeEnum.UtilityService)
         {
             FromFileThisComesFrom = fromFile;
             //UtilityService utService = null;
@@ -503,7 +491,7 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
                 //strip out all comments from the file.
                 cont = Regex.Replace(cont, @"\/\/.*\n", "", RegexOptions.Multiline);
 
-                Regex regclass = new Regex(@"class\s+" + className + @"\s*:\s*public\s*AEService");
+                Regex regclass = new Regex(@"class\s+" + ClassName + @"\s*:\s*public\s*AEService");
 
 
 
@@ -716,7 +704,8 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
     new MacroVar() { MacroName = "Service3Func", VariableValue = $"{functionService3}" },
     new MacroVar() { MacroName = "Service4Func", VariableValue = $"{functionService4}" },
     new MacroVar() { MacroName = "Service5Func", VariableValue = $"{functionService5}" },
-    new MacroVar() { MacroName = "Service6Func", VariableValue = $"{functionService6}" }
+    new MacroVar() { MacroName = "Service6Func", VariableValue = $"{functionService6}" },
+    new MacroVar() { MacroName = "InitFunction", VariableValue = $"{GetInitializationFunction()}" }
     );
             relativeDirPathWrites.Add(new RelativeDirPathWrite($"{ClassName}", ".h", "include", contentesOut, true)); 
             relativeDirPathWrites.Add(new RelativeDirPathWrite($"{ClassName}_ServiceGen", ".h", "include", GetUtilityPublicFuncContents(AEInitializing.TheMacro2Session), false));

@@ -1,0 +1,45 @@
+#pragma once
+ 
+#include "AEClock.h"
+
+#include "AESimpleFSM.h"
+ 
+#include "AEEventBase.h" 
+
+@OtherSubMachineFSMHeader@ 
+
+##UserCode_header
+ 
+
+class @ClassName@ : public AESimpleFSM<@BaseTemplate@>
+{
+public:
+	@ClassName@() 
+	{
+	##UserCode_ctor
+	};
+
+	##UserCode_public
+
+	@StatesDeclared@ 
+
+
+	// Inherited via AESimpleFSM
+	StateFuncPtr InitialState() override;
+	
+protected:
+
+	##UserCode_prot
+
+};
+
+
+##UserCode_func
+ 
+@StatesDefined@ 
+
+
+inline @ClassName@::StateFuncPtr @ClassName@::InitialState()
+{
+	return CastToStateFuncPtr(&@InitialStateName@);
+}

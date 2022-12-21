@@ -6,6 +6,7 @@
 
 
 using CgenMin.MacroProcesses;
+using CGENTestProject;
 using CodeGenerator.MacroProcesses.AESetups.SPBs;
 using System.Collections.Generic;
 
@@ -28,15 +29,20 @@ namespace CGENTest2Project
 
         protected override List<AEEvent> _GetEventsInLibrary()
         {
-            return new List<AEEvent>() { new I2C_RXCpltEVT(10) };
+            return new List<AEEvent>() { I2C_RXCpltEVT.Init(10) };
         }
 
 
         protected override List<AEProject> _GetLibrariesIDependOn()
+        { 
+            return new List<AEProject>() {(AEProject) new CGENTest()};
+        }
+        protected override List<AEHal> _GetPeripheralsInLibrary()
         {
-            return new List<AEProject>() { };
+            return null;
         }
 
+        
 
     }
 }

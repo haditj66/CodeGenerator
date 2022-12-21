@@ -19,22 +19,13 @@
 ##LoopIncrement9
 ##LoopIncrement10
 
-##ToFile default.cpp
+##ToFile IntegTestPipeline.h
 
-#if INTEGRATION_TESTS_FOR_CGENTest__default
- 
-#include "IntegTestPipeline.h"
+#pragma once
 
-##UserCode_a
+void RunSelectedIntegrationTest_default2();
 
-void RunSelectedIntegrationTest_default()
+static void RunSelectedIntegrationTest()
 {
-
-##UserCode_b
-
+    RunSelectedIntegrationTest_default2();
 }
-
-
-##UserCode_c
-
-#endif

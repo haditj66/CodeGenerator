@@ -19,6 +19,9 @@ template<@Template@>
 		
 		##UserCode_public
 
+
+	@InitFunction@
+	
 	private:
 	##UserCode_private
 

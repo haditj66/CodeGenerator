@@ -1,0 +1,20 @@
+@AllProperties@
+public: void UserInitialize(@CTORArgs@)
+	{
+		@CTORArgsDefining@
+		
+		##UserCode_userInited
+		
+		userInitialized = true;
+	}
+private: bool userInitialized = false;
+protected: void CheckIfConfiguredProperly() const override  
+	{
+		//@ClassName@::CheckIfConfiguredProperly();
+		if (userInitialized == false)
+		{
+			// you did not initialize one of your AEobjects
+			AEAssertRuntime(userInitialized == true, "user did not call the UserInitailize function for  @ClassName@"); 
+		} 
+		 
+	}

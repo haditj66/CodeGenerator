@@ -17,7 +17,8 @@ namespace CgenMin.MacroProcesses
         public AEFilter FilterICameFrom { get; set; }
         static int FiltersCreatedSoFar = 0;
 
-        public AEFilter(string fromLibraryName, string filterName, int filterSamplingNum, bool isUserInputedFilterSampling) : base(fromLibraryName, filterName, $"filter{FiltersCreatedSoFar.ToString()}", AOTypeEnum.Filter)
+        public AEFilter(string fromLibraryName,   int filterSamplingNum, bool isUserInputedFilterSampling) 
+            : base(fromLibraryName,  $"filter{FiltersCreatedSoFar.ToString()}", AOTypeEnum.Filter)
         {
             //ClassName = filterName;
             FilterSamplingNum = filterSamplingNum;

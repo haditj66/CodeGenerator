@@ -1,0 +1,6 @@
+VISUALGDB_DIR==C:/Program Files (x86)/Sysprogs/VisualGDB/ninja.exe
+PLAT_TOOLCHAIN==STM32F411RE
+BuildTarget==AECoreLib
+BuildTarget==AEHalLib
+BuildTarget==CGENTest2_lib
+BuildTarget==CGENTest2

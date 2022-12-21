@@ -36,6 +36,11 @@ namespace AESamplesProject
             return new List<AEProject>() { };
         }
 
+        protected override List<AEHal> _GetPeripheralsInLibrary()
+        {
+            return null;
+        }
+
         //protected override List<string> _GetListOfTests()
         //{
         //    return new List<string>() { "SPBSamples" };

@@ -42,9 +42,7 @@ namespace CgenMin.MacroProcesses
         public List<SPBChannelBase> Channels { get; protected set; }
         public SizeOfOutput_IfUserDefined SizeOfOutput { get; protected set; }
         public bool IsNumOFInputChannelsUserDefined { get; protected set; }
-
-         
-
+        public StyleOfSPB TheStyleOfSPB { get; protected set; }
 
         public string Get_AESPBObservorOutputType_TemplateArgsValues()
         {
@@ -284,8 +282,8 @@ namespace CgenMin.MacroProcesses
         /// <param name="templateType"> these are additional template types the spb uses. </param>
         /// <param name="templateargs"> these are additional template args the spb uses. </param>
         /// <param name="sizeOfOutput"> this is the output size of the spb. for example a pose filter might have a size three for eulter angle outputs theta, beta, gamma</param>
-        public AESPBBase(string fromLibraryName, string nameOfSPB, string typeOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, SPBChannelBase channel1, params SPBChannelBase[] channels)
-        : base(fromLibraryName, typeOfSPB, nameOfSPB, AOTypeEnum.SPB)
+        public AESPBBase(string fromLibraryName, string nameOfSPB, StyleOfSPB styleOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, SPBChannelBase channel1, params SPBChannelBase[] channels)
+        : base(fromLibraryName,   nameOfSPB, AOTypeEnum.SPB)
         {
             Channels = new List<SPBChannelBase>();
             Channels.Add(channel1);
@@ -294,34 +292,21 @@ namespace CgenMin.MacroProcesses
                 Channels.Add(item);
             }
 
-            this.init( templateType, templateargs, isSubscribable, sizeOfOutput, Channels);
+            this.init(styleOfSPB, templateType, templateargs, isSubscribable, sizeOfOutput, Channels);
             IsNumOFInputChannelsUserDefined = false;
-
+            
         }
 
 
-        public AESPBBase(string fromLibraryName, string nameOfSPB, string typeOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, List<SPBChannelBase> channels)
-        : base(fromLibraryName, typeOfSPB, nameOfSPB, AOTypeEnum.SPB)
+        public AESPBBase(string fromLibraryName, string nameOfSPB, StyleOfSPB styleOfSPB,  string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, List<SPBChannelBase> channels)
+        : base(fromLibraryName,   nameOfSPB, AOTypeEnum.SPB)
         {
-            init( templateType, templateargs, isSubscribable, sizeOfOutput, channels);
+            init(styleOfSPB, templateType, templateargs, isSubscribable, sizeOfOutput, channels);
             IsNumOFInputChannelsUserDefined = true;
         }
 
-        public AESPBBase(string fromLibraryName, string nameOfSPB, string typeOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelUserDefinedCountBuffer channelsAllSame)
-        : base(fromLibraryName, typeOfSPB, nameOfSPB, AOTypeEnum.SPB)
-        {
-            List<SPBChannelBase> channels = new List<SPBChannelBase>();
-            channels.Add(channelsAllSame);
-            for (int i = 1; i < numOfOfChannels; i++)
-            {
-                channels.Add(new SPBChannelBase(channelsAllSame));
-            }
-
-            init( templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
-            IsNumOFInputChannelsUserDefined = true;
-        }
-        public AESPBBase(string fromLibraryName, string nameOfSPB, string typeOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelUserDefinedChannelConsumptionSize channelsAllSame)
-        : base(fromLibraryName, typeOfSPB, nameOfSPB, AOTypeEnum.SPB)
+        public AESPBBase(string fromLibraryName, string nameOfSPB, StyleOfSPB styleOfSPB,   string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelUserDefinedCountBuffer channelsAllSame)
+        : base(fromLibraryName,   nameOfSPB, AOTypeEnum.SPB)
         {
             List<SPBChannelBase> channels = new List<SPBChannelBase>();
             channels.Add(channelsAllSame);
@@ -329,11 +314,12 @@ namespace CgenMin.MacroProcesses
             {
                 channels.Add(new SPBChannelBase(channelsAllSame));
             }
-            init( templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
+
+            init(styleOfSPB, templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
             IsNumOFInputChannelsUserDefined = true;
         }
-        public AESPBBase(string fromLibraryName, string nameOfSPB, string typeOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelLockedInCountBuffer channelsAllSame)
-        : base(fromLibraryName, typeOfSPB, nameOfSPB, AOTypeEnum.SPB)
+        public AESPBBase(string fromLibraryName, string nameOfSPB, StyleOfSPB styleOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelUserDefinedChannelConsumptionSize channelsAllSame)
+        : base(fromLibraryName,   nameOfSPB, AOTypeEnum.SPB)
         {
             List<SPBChannelBase> channels = new List<SPBChannelBase>();
             channels.Add(channelsAllSame);
@@ -341,11 +327,11 @@ namespace CgenMin.MacroProcesses
             {
                 channels.Add(new SPBChannelBase(channelsAllSame));
             }
-            init( templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
+            init(styleOfSPB, templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
             IsNumOFInputChannelsUserDefined = true;
         }
-        public AESPBBase(string fromLibraryName, string nameOfSPB, string typeOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelLockedInChannelConsumptionSize channelsAllSame)
-            : base(fromLibraryName, typeOfSPB, nameOfSPB, AOTypeEnum.SPB)
+        public AESPBBase(string fromLibraryName, string nameOfSPB, StyleOfSPB styleOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelLockedInCountBuffer channelsAllSame)
+        : base(fromLibraryName,  nameOfSPB, AOTypeEnum.SPB)
         {
             List<SPBChannelBase> channels = new List<SPBChannelBase>();
             channels.Add(channelsAllSame);
@@ -353,17 +339,31 @@ namespace CgenMin.MacroProcesses
             {
                 channels.Add(new SPBChannelBase(channelsAllSame));
             }
-            init( templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
+            init(styleOfSPB, templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
+            IsNumOFInputChannelsUserDefined = true;
+        }
+        public AESPBBase(string fromLibraryName, string nameOfSPB, StyleOfSPB styleOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, int numOfOfChannels, SPBChannelLockedInChannelConsumptionSize channelsAllSame)
+            : base(fromLibraryName,  nameOfSPB, AOTypeEnum.SPB)
+        {
+            List<SPBChannelBase> channels = new List<SPBChannelBase>();
+            channels.Add(channelsAllSame);
+            for (int i = 1; i < numOfOfChannels; i++)
+            {
+                channels.Add(new SPBChannelBase(channelsAllSame));
+            }
+            init(styleOfSPB, templateType, templateargs, isSubscribable, sizeOfOutput, channels.Cast<SPBChannelBase>().ToList());
             IsNumOFInputChannelsUserDefined = true;
         }
 
-        protected void init(string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, List<SPBChannelBase> channels)
+        protected void init(StyleOfSPB styleOfSPB, string templateType, string templateargs, bool isSubscribable, SizeOfOutput_IfUserDefined sizeOfOutput, List<SPBChannelBase> channels)
         {
             //NameOfSPB = nameOfSPB;
             TemplateType = templateType;
             Templateargs = templateargs;
             IsSubscribable = isSubscribable;
             Channels = channels;
+
+            TheStyleOfSPB = styleOfSPB;
 
             SizeOfOutput = sizeOfOutput;
 
@@ -410,7 +410,8 @@ namespace CgenMin.MacroProcesses
 
             string ret = "";
 
-            ret += $"static {this.ClassName}<{GetFullTemplateArgsValues()}> {this.InstanceName}L; {this.InstanceName}L.InitSPBObserver(); "; ret += "\n";
+
+            ret += $"static {this.ClassName}<{GetFullTemplateArgsValues()}> {this.InstanceName}L; {this.InstanceName}L.InitSPBObserver(StyleOfSPB::{AO.GetStyleOfSPBStr(this.TheStyleOfSPB)}); "; ret += "\n";
             ret += $"{this.InstanceName} = &{this.InstanceName}L;"; ret += "\n";
 
             return ret;
@@ -501,6 +502,7 @@ namespace CgenMin.MacroProcesses
                 new MacroVar() { MacroName = "ClassName", VariableValue = $"{ClassName}" },
                 new MacroVar() { MacroName = "OutputSize", VariableValue = $"{SizeOfOutput.SizeOfOutput.ToString()}" },
                 new MacroVar() { MacroName = "ChInstantiation", VariableValue = $"{ChInstantiation}" },
+                new MacroVar() { MacroName = "InitFunction", VariableValue = $"{GetInitializationFunction()}" },
                 new MacroVar() { MacroName = "TemplateArgValues", VariableValue = $"" }
                 );
             relativeDirPathWrites.Add(new RelativeDirPathWrite($"{ClassName}", ".h", "include", contentesOut, true));

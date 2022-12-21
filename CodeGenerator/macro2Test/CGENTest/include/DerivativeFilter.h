@@ -20,7 +20,7 @@
 
 class DerivativeFilter : public Filter<DerivativeFilter, 2>
 {
-  template<class TFilterDerived, uint16_t PastDataBufferSize>
+  //template<class TFilterDerived, uint16_t PastDataBufferSize>
 	friend class Filter;
 
 public:

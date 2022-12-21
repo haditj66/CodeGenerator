@@ -1,10 +1,26 @@
 ﻿using CodeGenerator.MacroProcesses.AESetups;
+using CodeGenerator.ProblemHandler;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CgenMin.MacroProcesses
 {
 
+
+    public enum StyleOfSPB
+    {
+        // look at file AESPBObservor.cpp at funciton _RefreshCheckStyle() for where this implementation makes a difference. 
+        EachSPBTask,  //each spb has its own task that it will use to execute its refresh
+        ChainOfSPBsTask, // there is one "chain task" that will run all refreshs
+                         //there are no tasks involved and so everything is run within the interrupt(although doesnt need to be an interrupt, can also just be from a normal tick() of a clock).
+                         //Currently this doesnt look to be any different than the 
+                         //ChainOfSPBsTask so maybe use this for now intead of that one. Remeber that if you do infact use this in an interrupt, it should be a VERY quick spb
+        ChainOfSPBsFromInterrupt
+
+    }
+;
 
     public enum AOTypeEnum
     {
@@ -15,7 +31,8 @@ namespace CgenMin.MacroProcesses
         Clock,
         Event,
         LoopObject,
-        SimpleFSM
+        SimpleFSM,
+        AEHal
     }
 
 
@@ -62,7 +79,7 @@ namespace CgenMin.MacroProcesses
         public AEEXETest(int aEconfigTICK_RATE_HZ = 1000,
             int aEconfigMINIMAL_STACK_SIZE = 928,
             int aEconfigTIMER_TASK_STACK_DEPTH = 1500,
-            int aEconfigTOTAL_HEAP_SIZE = 56360,
+            int aEconfigTOTAL_HEAP_SIZE = 75000,
             bool dontCheckForHardDeadlinesInSPBsForEverySetInput = true)
         { 
             AEconfigToUse = new AEConfig(
@@ -74,6 +91,7 @@ namespace CgenMin.MacroProcesses
         }
 
     }
+
 
 
 
@@ -105,15 +123,31 @@ namespace CgenMin.MacroProcesses
         public string ClassName;
         public string InstanceName;
 
-        public AO(string className, string instanceName, AOTypeEnum aOType)
+        public AO(string instanceName, AOTypeEnum aOType)
         {
-            InstanceName = instanceName;
-            ClassName = className;
+            ClassName = GetType().Name;
+
+            InstanceName = instanceName.Trim(); 
             AOType = aOType;
-            AllInstancesOfAO.Add(this);
+
+            if (this.ClassName != "UpdateEVT")
+            {
+                AllInstancesOfAO.Add(this);
+            }
         }
 
-        public List<T> GetAllAOOfType<T>() where T : AO
+        public static string GetStyleOfSPBStr(StyleOfSPB styleOfSPB)
+        {
+            string ret = 
+                styleOfSPB == StyleOfSPB.ChainOfSPBsFromInterrupt ? "ChainOfSPBsFromInterrupt" :
+                styleOfSPB == StyleOfSPB.ChainOfSPBsTask ? "ChainOfSPBsTask" :
+                styleOfSPB == StyleOfSPB.EachSPBTask ? "EachSPBTask" : ""
+                ;
+
+            return ret; 
+        }
+
+        public static List<T> GetAllAOOfType<T>() where T : AO
         {
             if (typeof(T) == typeof(AESensor))
             {

@@ -2,7 +2,7 @@
 
 namespace CgenMin.MacroProcesses
 {
-    public abstract class AOObserver : AOWritableToAOClassContents
+    public abstract class AOObserver : AOWritableConstructible
     {
         public List<AEFilter> FiltersIflowTo { get; protected set; }
 
@@ -11,7 +11,8 @@ namespace CgenMin.MacroProcesses
         public AESensor SensorIOriginateFrom { get; protected set; }
         public AESPBBase SPBIOriginateFrom { get; protected set; }
 
-        public AOObserver(string fromeLibraryName, string className, string instanceName, AOTypeEnum aotype) : base(fromeLibraryName,className, instanceName, aotype)
+        public AOObserver(string fromeLibraryName,  string instanceName, AOTypeEnum aotype) 
+            : base(fromeLibraryName,  instanceName, aotype)
         {
             FiltersIflowTo = new List<AEFilter>();
 

@@ -9,14 +9,15 @@
 //###############################################
 
 
+#pragma once
 
 #include "AEUtilityAsService.h" 
 
 #include "AEPublishSubscribeManager.h" 
- 
-#include "AE_TDUAsService.h" 
 
 #include "ActionRequestObjectArgTDU.h"
+ 
+#include "AE_TDUAsService.h" 
 
 #include "UUartDriverTDU_ServiceGen.h"
 
@@ -48,6 +49,9 @@ public:
 		 	
 	}
 	UUartDriverTDU_Service
+	
+	
+	
 	
 protected: 
 	
@@ -97,6 +101,7 @@ protected:
    {
 
          //UserCode_SectionTransmitTDUu
+	   AEPrint("entered tdu with msg: %s", msg);
 //UserCode_SectionTransmitTDUu_end 
     return true; 
     }

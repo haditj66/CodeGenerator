@@ -1,0 +1,39 @@
+#pragma once
+ 
+#include "AELoopObject.h" 
+#include  "AEObjects.h"   
+
+##UserCode_header
+
+class @ClassName@ : public AELoopObject
+{
+	
+public:
+	@ClassName@() { 
+		  ##UserCode_ctor
+	} 
+	
+ ##UserCode_public
+	
+@InitFunction@
+
+protected: 
+	
+		void StartAOLoopObject()  override
+	{
+//		AELoopSubscribe(Button1, AELoopObject1Test, Button1_Callback);
+		##UserCode_startae
+	}
+	
+	void Update() override {
+		
+		##UserCode_update
+		 
+	} 
+	
+	##UserCode_protect
+	
+};
+
+
+##UserCode_funcs

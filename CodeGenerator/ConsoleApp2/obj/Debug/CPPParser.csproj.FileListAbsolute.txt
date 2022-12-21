@@ -10,4 +10,3 @@ C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\CPPParser.csproj.CoreCompil
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\CPPParser.csproj.CopyComplete
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\ConsoleApp2.dll
 C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\ConsoleApp2.pdb
-C:\CodeGenerator\CodeGenerator\ConsoleApp2\obj\Debug\CPPParser.csproj.AssemblyReference.cache

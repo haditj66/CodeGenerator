@@ -15,17 +15,21 @@ DECLARE_ALL_AO_PTR
 
 @MainHeader@
 
+
+
 ##UserCode_a
 
-void RunSelectedIntegrationTest_@ProjectName@()
+void RunSelectedIntegrationTest_@ProjectTest@()
 {
 
 AE_Init();
- 
+ ##UserCode_beforemain
 @MainInit@
 
+##UserCode_beforelinks
 @LinksInit@
 
+##UserCode_beforeclock
 @ClockInit@
 
 //AEITEST_END_TestsAfterTimer_@ProjectName@(5000);

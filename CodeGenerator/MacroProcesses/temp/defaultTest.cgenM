@@ -20,47 +20,84 @@
 
 DECLARE_ALL_AO_PTR
 
+#include "BlindsUITOPFSM.h"
+static BlindsUITOPFSM* blinduifsm;
+#include "ConfiguringFSM.h"
+static ConfiguringFSM* configfsm;
+#include "NormalOperationFSM.h"
+static NormalOperationFSM* normalfsm;
+#include "AELoopObjectTest2.h"
+static AELoopObjectTest2* loopobjectTest2;
 static void clock1_callback(TimerHandle_t xTimerHandle);
 static uint32_t sensor1_data[1];
-static uint32_t sensor2_data[1];
 static uint32_t sensor3_data[1];
+
+
 
 
 ##UserCode_a
 
-void RunSelectedIntegrationTest_CGENTest()
+void RunSelectedIntegrationTest_defaultTest()
 {
 
 AE_Init();
- 
+ ##UserCode_beforemain
+
+
+
+
+
+
+
+
+
+
+
+
+static BlindsUITOPFSM blinduifsm_l;
+blinduifsm = &blinduifsm_l;
+blinduifsm->Init(false, AEPriorities::MediumPriority, 1);
+
+static ConfiguringFSM configfsm_l;
+configfsm = &configfsm_l;
+configfsm->Init(true, AEPriorities::MediumPriority, 100);
+
+static NormalOperationFSM normalfsm_l;
+normalfsm = &normalfsm_l;
+normalfsm->Init(true, AEPriorities::MediumPriority, 1);
+
+static AELoopObjectTest2 loopobjectTest2_l;
+loopobjectTest2 = &loopobjectTest2_l;
+loopobjectTest2->InitObject(3, AEPriorities::MediumPriority);
+
 static AEClock<AEObservorSensor, AEObservorInterpretorBaseDUMMY, 3, 0, 1, 0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0> clock1L(1000, clock1_callback);
 clock1 = &clock1L;
 
 static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor1L((uint32_t*) sensor1_data, SensorResolution::Resolution12Bit , 0 , 100);
 sensor1 = &sensor1L;
 
-static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor2L((uint32_t*) sensor2_data, SensorResolution::Resolution12Bit  );
+static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor2L((uint16_t*) ADCPERIPHERAL_inst1_ch1->GetADCDataAddress(), SensorResolution::Resolution16Bit  );
 sensor2 = &sensor2L;
 
 static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor3L((uint32_t*) sensor3_data, SensorResolution::Resolution12Bit  );
 sensor3 = &sensor3L;
 
-static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB1L; averageSPB1L.InitSPBObserver(); 
+static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB1L; averageSPB1L.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 averageSPB1 = &averageSPB1L;
 
-static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB2L; averageSPB2L.InitSPBObserver(); 
+static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB2L; averageSPB2L.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 averageSPB2 = &averageSPB2L;
 
-static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB3L; averageSPB3L.InitSPBObserver(); 
+static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB3L; averageSPB3L.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 averageSPB3 = &averageSPB3L;
 
-static AdderSPB< 3,  false, 10> adderSPBL; adderSPBL.InitSPBObserver(); 
+static AdderSPB< 3,  false, 10> adderSPBL; adderSPBL.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 adderSPB = &adderSPBL;
 
-static UUartDriver uartDriver_L; uartDriver_L.Init(AEPriorities::MediumPriority);
+static UARTDriver uartDriver_L; uartDriver_L.Init(AEPriorities::MediumPriority);
 uartDriver = &uartDriver_L;
 
-static UUartDriverTDU uartDriverTDU_L; uartDriverTDU_L.Init(AEPriorities::MediumPriority);
+static UARTDriverTDU uartDriverTDU_L; uartDriverTDU_L.Init(AEPriorities::MediumPriority);
 uartDriverTDU = &uartDriverTDU_L;
 
 
@@ -74,6 +111,9 @@ uartDriverTDU = &uartDriverTDU_L;
 
 
 
+##UserCode_beforelinks
+blinduifsm->AddSubmachine1(configfsm);
+blinduifsm->AddSubmachine2(normalfsm);
 static float averageSPB1chBuffer1[10];
 averageSPB1->AddSignalFlowLinkToChannelWithCopy1(sensor1, averageSPB1chBuffer1, 2);
 static float averageSPB2chBuffer1[10];
@@ -88,6 +128,7 @@ static float adderSPBchBuffer3[10];
 adderSPB->AddSignalFlowLinkToChannelWithCopy3(averageSPB3, adderSPBchBuffer3, 1);
 
 
+##UserCode_beforeclock
 clock1->SetObservorToClock(sensor1, AEClock_PrescalerEnum::PRESCALER1);
 clock1->SetObservorToClock(sensor2, AEClock_PrescalerEnum::PRESCALER1);
 clock1->SetObservorToClock(sensor3, AEClock_PrescalerEnum::PRESCALER1);

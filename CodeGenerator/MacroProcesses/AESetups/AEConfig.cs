@@ -114,6 +114,7 @@ namespace CodeGenerator.MacroProcesses.AESetups
 
             MaxNumOfAELoops += AO.AllInstancesOfAO.Count(a => a.AOType == AOTypeEnum.LoopObject);
             MaxNumOfAELoops = MaxNumOfAELoops == 0 ? 1 : MaxNumOfAELoops;
+            MaxNumOfAELoops += 2;
 
             var allspb = AO.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.SPB).Cast<AESPBBase>().ToList();
             MAXNUMBEROFINPUTSIGNALS_TO_A_SPB = allspb.Count == 0 ? 1 : allspb.Max(a => a.Channels.Count);

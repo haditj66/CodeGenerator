@@ -23,48 +23,115 @@
 
 DECLARE_ALL_AO_PTR
 
+#include "BlindsUITOPFSM.h"
+static BlindsUITOPFSM* blinduifsm;
+#include "ConfiguringFSM.h"
+static ConfiguringFSM* configfsm;
+#include "NormalOperationFSM.h"
+static NormalOperationFSM* normalfsm;
+#include "AELoopObjectTest2.h"
+static AELoopObjectTest2* loopobjectTest2;
 static void clock1_callback(TimerHandle_t xTimerHandle);
 static uint32_t sensor1_data[1];
-static uint32_t sensor2_data[1];
 static uint32_t sensor3_data[1];
 
 
+
+
 //UserCode_Sectiona
+#include "LoopObjeect1Test.h"
+//#include <cinttypes>
+//extern uint8_t ucHeap[AEconfigTOTAL_HEAP_SIZE];
+
+static AELoopObject1Test * objectTest;
+int StateTracker = 0;
 //UserCode_Sectiona_end
 
-void RunSelectedIntegrationTest_CGENTest()
+void RunSelectedIntegrationTest_defaultTest()
 {
 
 AE_Init();
- 
+ //UserCode_Sectionbeforemain
+	AEITEST_END_TestsAfterTimer_CGENTest(5000)
+	
+	static AELoopObject1Test  objectTest_l;
+	objectTest = &objectTest_l;
+	objectTest->InitObject(2, AEPriorities::MediumPriority);
+	
+	objectTest_l.UserInitialize(5, false);
+	
+	PWMPERIPHERAL_inst1->StartPWM();
+	PWMPERIPHERAL_inst1->ChangeDutyCycle(30);
+	
+	I2CPERIPHERAL_inst1->WriteByte(2, 3, 3);
+	
+	UARTPERIPHERAL_inst1->_RxCpltCallback_t = [](char* msg, uint32_t sizeOfReceivedMsg)  -> void {
+		AEPrint("recieved messagef from uart of : %s", msg);
+	};
+	
+	GPIOPERIPHERAL_inst1->GPIO_SetHigh();
+	auto pinstate = GPIOPERIPHERAL_inst1->GPIO_ReadPin();
+	
+	auto pinstate2 = GPIOInputPERIPHERAL_inst1->GPIO_ReadPin();
+	
+	SPIPERIPHERAL_inst1->AE_SPI_Transmit(new uint8_t{2}, 1);
+//UserCode_Sectionbeforemain_end
+
+
+
+
+
+
+
+
+
+
+
+
+static BlindsUITOPFSM blinduifsm_l;
+blinduifsm = &blinduifsm_l;
+blinduifsm->Init(false, AEPriorities::MediumPriority, 1);
+
+static ConfiguringFSM configfsm_l;
+configfsm = &configfsm_l;
+configfsm->Init(true, AEPriorities::MediumPriority, 100);
+
+static NormalOperationFSM normalfsm_l;
+normalfsm = &normalfsm_l;
+normalfsm->Init(true, AEPriorities::MediumPriority, 1);
+
+static AELoopObjectTest2 loopobjectTest2_l;
+loopobjectTest2 = &loopobjectTest2_l;
+loopobjectTest2->InitObject(3, AEPriorities::MediumPriority);
+
 static AEClock<AEObservorSensor, AEObservorInterpretorBaseDUMMY, 3, 0, 1, 0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0> clock1L(1000, clock1_callback);
 clock1 = &clock1L;
 
 static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor1L((uint32_t*) sensor1_data, SensorResolution::Resolution12Bit , 0 , 100);
 sensor1 = &sensor1L;
 
-static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor2L((uint32_t*) sensor2_data, SensorResolution::Resolution12Bit  );
+static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor2L((uint16_t*) ADCPERIPHERAL_inst1_ch1->GetADCDataAddress(), SensorResolution::Resolution16Bit  );
 sensor2 = &sensor2L;
 
 static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor3L((uint32_t*) sensor3_data, SensorResolution::Resolution12Bit  );
 sensor3 = &sensor3L;
 
-static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB1L; averageSPB1L.InitSPBObserver(); 
+static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB1L; averageSPB1L.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 averageSPB1 = &averageSPB1L;
 
-static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB2L; averageSPB2L.InitSPBObserver(); 
+static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB2L; averageSPB2L.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 averageSPB2 = &averageSPB2L;
 
-static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB3L; averageSPB3L.InitSPBObserver(); 
+static AverageSPB< false,  10,  1, Filter<DerivativeFilter, 2>> averageSPB3L; averageSPB3L.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 averageSPB3 = &averageSPB3L;
 
-static AdderSPB< 3,  false, 10> adderSPBL; adderSPBL.InitSPBObserver(); 
+static AdderSPB< 3,  false, 10> adderSPBL; adderSPBL.InitSPBObserver(StyleOfSPB::EachSPBTask); 
 adderSPB = &adderSPBL;
 
-static UUartDriver uartDriver_L; uartDriver_L.Init(AEPriorities::MediumPriority);
+static UARTDriver uartDriver_L; uartDriver_L.Init(AEPriorities::MediumPriority);
 uartDriver = &uartDriver_L;
 
-static UUartDriverTDU uartDriverTDU_L; uartDriverTDU_L.Init(AEPriorities::MediumPriority);
+static UARTDriverTDU uartDriverTDU_L; uartDriverTDU_L.Init(AEPriorities::MediumPriority);
 uartDriverTDU = &uartDriverTDU_L;
 
 
@@ -78,6 +145,10 @@ uartDriverTDU = &uartDriverTDU_L;
 
 
 
+//UserCode_Sectionbeforelinks
+//UserCode_Sectionbeforelinks_end
+blinduifsm->AddSubmachine1(configfsm);
+blinduifsm->AddSubmachine2(normalfsm);
 static float averageSPB1chBuffer1[10];
 averageSPB1->AddSignalFlowLinkToChannelWithCopy1(sensor1, averageSPB1chBuffer1, 2);
 static float averageSPB2chBuffer1[10];
@@ -92,6 +163,8 @@ static float adderSPBchBuffer3[10];
 adderSPB->AddSignalFlowLinkToChannelWithCopy3(averageSPB3, adderSPBchBuffer3, 1);
 
 
+//UserCode_Sectionbeforeclock
+//UserCode_Sectionbeforeclock_end
 clock1->SetObservorToClock(sensor1, AEClock_PrescalerEnum::PRESCALER1);
 clock1->SetObservorToClock(sensor2, AEClock_PrescalerEnum::PRESCALER1);
 clock1->SetObservorToClock(sensor3, AEClock_PrescalerEnum::PRESCALER1);
@@ -100,8 +173,13 @@ clock1->SetTDUToClock(uartDriverTDU, AEClock_PrescalerEnum::PRESCALER1);
 
 //AEITEST_END_TestsAfterTimer_CGENTest(5000);
 //UserCode_Sectionb
-	//uartDriver->Transmit(1, "asvsv");
-//UserCode_Sectionb_end
+	
+	uartDriver->UserInitialize(3, 5);
+		//uartDriver->Transmit(1, "asvsv");
+	
+	auto ttt =  xPortGetFreeHeapSize();
+	
+		//UserCode_Sectionb_end
 
 AEAO::ConfigureAndStart();
 }
@@ -113,14 +191,14 @@ AEAO::ConfigureAndStart();
 
 static void clock1_callback(TimerHandle_t xTimerHandle) {  
   //UserCode_Sectionclock1before 
-	//sdvdv 
-//UserCode_Sectionclock1before_end 
+	  //sdvdv 
+	  //UserCode_Sectionclock1before_end 
   
  clock1->Tick(); 
   //UserCode_Sectionclock1after 
-	//fbdfbdfbrg 
+	  //fbdfbdfbrg 
 		
-//UserCode_Sectionclock1after_end 
+	  //UserCode_Sectionclock1after_end 
 }
 
 

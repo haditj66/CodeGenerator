@@ -29,7 +29,7 @@ namespace CgenMin.MacroProcesses
 
         public AESensor(string nameOfSensor, SensorResolution sensorResolution,
         float mapsToAFLoatOfLowerBound = 0,
-        float mapsToAFLoatOfUpperBound = 0) : base("nothing","AEObservorSensorFilterOut", nameOfSensor, AOTypeEnum.Sensor)
+        float mapsToAFLoatOfUpperBound = 0) : base("nothing", nameOfSensor, AOTypeEnum.Sensor)//"AEObservorSensorFilterOut",
         {  
             TheSensorResolution = sensorResolution;
             MapsToAFLoatOfLowerBound = mapsToAFLoatOfLowerBound;
@@ -38,11 +38,14 @@ namespace CgenMin.MacroProcesses
             numOfSensorsSoFar++;
             SensorId = numOfSensorsSoFar;
         }
-
-        public void SetSensorToADC(string adcName)
-        {
-            ADC_IMSetTo = adcName;
+        public AESensor(string nameOfSensor, IADC adcImSetTo,
+        float mapsToAFLoatOfLowerBound = 0,
+        float mapsToAFLoatOfUpperBound = 0) : this(nameOfSensor, SensorResolution.Resolution16Bit, mapsToAFLoatOfLowerBound, mapsToAFLoatOfUpperBound)
+        { 
+            ADC_IMSetTo = adcImSetTo.ADCInstName; 
         }
+
+ 
 
 
         protected override string _GenerateAEConfigSection(int numOfAOOfThisSameTypeGeneratesAlready)

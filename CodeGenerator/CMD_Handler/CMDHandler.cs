@@ -33,7 +33,7 @@ namespace CodeGenerator.CMD_Handler
 
 
         public void SetMultipleCommands(string command)
-        { 
+        {
             MultipleCommands.Add(command);
         }
 
@@ -41,13 +41,13 @@ namespace CodeGenerator.CMD_Handler
 
         public void ExecuteMultipleCommands_InSeperateProcess()
         {
-            Process p =  ExecuteMultipleCommands(true, false,"","",false);
+            Process p = ExecuteMultipleCommands(true, false, "", "", false);
             p.WaitForExit();
         }
 
         public void ExecuteMultipleCommands(bool SupressErrorMsg = false)
         {
-            ExecuteMultipleCommands(false, false, "","", SupressErrorMsg);
+            ExecuteMultipleCommands(false, false, "", "", SupressErrorMsg);
         }
 
 
@@ -57,7 +57,7 @@ namespace CodeGenerator.CMD_Handler
         }
 
 
-        private Process ExecuteMultipleCommands(bool RunSeperateProcess = false, bool justCreateBatchFile = false,  string toBatchFileDir ="", string nameOfBatch = "", bool SupressErrorMsg = false)
+        private Process ExecuteMultipleCommands(bool RunSeperateProcess = false, bool justCreateBatchFile = false, string toBatchFileDir = "", string nameOfBatch = "", bool SupressErrorMsg = false)
         {
             string NameOfBatch;
             string pathToBatch;
@@ -72,15 +72,15 @@ namespace CodeGenerator.CMD_Handler
                 pathToBatch = @"C:\CodeGenerator\CodeGenerator\bin\Debug\" + NameOfBatch;
             }
 
-            
 
-            
+
+
             //File.Create(pathToBatch);
 
 
             bool keeptrying = true;
             while (keeptrying)
-            { 
+            {
                 try
                 {
                     File.WriteAllText(pathToBatch, "");
@@ -89,7 +89,7 @@ namespace CodeGenerator.CMD_Handler
 
                     keeptrying = false;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
 
                 }
@@ -107,13 +107,13 @@ namespace CodeGenerator.CMD_Handler
             if (RunSeperateProcess == true)
             {
                 p = System.Diagnostics.Process.Start(@"C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode() + ".bat");
-                
+
             }
             else if (justCreateBatchFile == false)
             {
                 ExecuteCommand(@"call C:\CodeGenerator\CodeGenerator\bin\Debug\" + "batch_" + this.GetHashCode());
-            } 
-            
+            }
+
             MultipleCommands.Clear();
 
             return p;
@@ -121,7 +121,64 @@ namespace CodeGenerator.CMD_Handler
             //SetWorkingDirectory(oldwd);
         }
 
-        public void ExecuteCommand(string command, bool SupressErrorMsg = false)
+        //public void ExecuteCommand(string command, bool SupressErrorMsg = false)
+        //{
+        //    _ExecuteCommand(command, SupressErrorMsg, false);
+        //}
+        //public void ExecuteCommand(string command, bool SupressErrorMsg = false)
+        //{
+        //    _ExecuteCommand(command, SupressErrorMsg, false);
+        //}
+
+        public TimeSpan GetTotalTimeSinceStarted()
+        {
+            return process.TotalProcessorTime;
+        }
+        public bool IsProcessFinished()
+        {
+            bool ret = false;
+
+            try
+            {
+                ret  = process.HasExited; 
+            }
+            catch (System.InvalidOperationException e)
+            {
+
+                return true;
+            }
+
+
+            if (process == null)
+            {
+                return true;
+            }
+
+            return ret;
+        }
+        private void Process_Exited(object sender, EventArgs e)
+        {
+            process.Exited += Process_Exited;
+
+            Output = process.StandardOutput.ReadToEnd();
+            Error = process.StandardError.ReadToEnd();
+            while (Output == null)
+            {
+
+            }
+             
+
+            process.Close();
+
+        }
+
+        public void KillProcess()
+        {
+            process.Kill();
+            process.Close();
+        }
+
+        public void ExecuteCommand(string command, bool SupressErrorMsg = false, bool waitProcessToFinish = true)
         {
             //if this is a cd command, handle it differently
             if (Regex.IsMatch(command, @"^\s*cd\s*"))
@@ -135,6 +192,7 @@ namespace CodeGenerator.CMD_Handler
             int exitCode;
             //processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
             processInfo.Arguments = "/c " + command;
+             
 
             //processInfo.Arguments = "/c " + "oursource" + " /c " + "cd ../testmod" + " /c " + "ourcolcon";
 
@@ -153,6 +211,7 @@ namespace CodeGenerator.CMD_Handler
             //string output = "";
 
             process = Process.Start(processInfo);
+            
             /*
             process.OutputDataReceived += (sender, args) =>
             {
@@ -167,38 +226,49 @@ namespace CodeGenerator.CMD_Handler
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             */
-            if (!SupressErrorMsg)
+            if (waitProcessToFinish)
             {
-                Output = process.StandardOutput.ReadToEnd();
-                Error = process.StandardError.ReadToEnd();
+                if (!SupressErrorMsg)
+                {
+                    Output = process.StandardOutput.ReadToEnd();
+                    Error = process.StandardError.ReadToEnd();
+                }
+                else
+                {
+                    Output = "";
+                    Error = "";
+                }
+                process.WaitForExit();    // *** Read the streams ***
+                                          // Warning: This approach can lead to deadlocks, see Edit #2
+                                          //Output = process.StandardOutput.ReadToEnd();
+
+
+
+
+                while (Output == null)
+                {
+
+                }
+
+                exitCode = process.ExitCode;
+
+                process.Close();
             }
             else
             {
-                Output = "";
-                Error = ""; 
-            }
-            process.WaitForExit();
-
-            // *** Read the streams ***
-            // Warning: This approach can lead to deadlocks, see Edit #2
-            //Output = process.StandardOutput.ReadToEnd();
-
-             
-
-
-            while (Output == null)
-            {
-
+                process.Exited += Process_Exited;
             }
 
-            exitCode = process.ExitCode;
+
 #if DEBUG
             //Console.WriteLine("output>>" + (String.IsNullOrEmpty(Output) ? "(none)" : Output));
             //Console.WriteLine("error>>" + (String.IsNullOrEmpty(Error) ? "(none)" : Error));
             //Console.WriteLine("ExitCode: " + exitCode.ToString(), "ExecuteCommand");
 #endif
-            process.Close();
+
         }
+
+
 
         public void SetWorkingDirectory(string workingDirectory)
         {
@@ -221,5 +291,7 @@ namespace CodeGenerator.CMD_Handler
             }
 
         }
+
+
     }
 }

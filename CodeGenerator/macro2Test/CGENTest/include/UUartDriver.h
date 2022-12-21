@@ -9,10 +9,13 @@
 //###############################################
 
 
+#pragma once
 
 #include "AEUtilityAsService.h" 
 
 #include "AEPublishSubscribeManager.h" 
+
+#include "ActionRequestObjectArgTDU.h"
  
 #include "AE_TDUAsService.h" 
 
@@ -47,6 +50,39 @@ public:
 	}
 	UUartDriver_Service
 	
+	
+	protected: float SomeVar1; 
+public: float  GetSomeVar1()   const {return SomeVar1; }
+public:  void SetSomeVar1(float  _SomeVar1){SomeVar1 = _SomeVar1; }
+
+protected: int32_t somePer; 
+public: int32_t  GetsomePer()   const {return somePer; }
+public:  void SetsomePer(int32_t  _somePer){somePer = _somePer; }
+
+
+public: void UserInitialize(float _SomeVar1 , int32_t _somePer )
+	{
+		SomeVar1 =  _SomeVar1;
+somePer =  _somePer;
+
+		
+		//UserCode_SectionuserInited
+//UserCode_SectionuserInited_end
+		
+		userInitialized = true;
+	}
+private: bool userInitialized = false;
+protected: void CheckIfConfiguredProperly() const override  
+	{
+		//UUartDriver::CheckIfConfiguredProperly();
+		if (userInitialized == false)
+		{
+			// you did not initialize one of your AEobjects
+			AEAssertRuntime(userInitialized == true, "user did not call the UserInitailize function for  UUartDriver"); 
+		} 
+		 
+	}
+	
 protected: 
 	
 	//UserCode_Sectionprot
@@ -74,6 +110,8 @@ protected:
    {
 
          //UserCode_SectionTransmit
+	   
+	   AEPrint("from uart printing msg: %s \n", msg);
 //UserCode_SectionTransmit_end 
    }
   
