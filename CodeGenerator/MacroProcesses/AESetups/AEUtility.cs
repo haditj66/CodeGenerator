@@ -407,9 +407,20 @@ namespace CgenMin.MacroProcesses
 
         public abstract class AEUtilityService : AOWritableConstructible
     {
+        public bool FlowsFromSPB { get; internal set; }
+
+
 
 
         //protected UtilityService utService;
+        protected List<string> HeaderIncludesFromLibrary = new List<string>();
+
+        /// <summary>
+        /// Set all additional includes that this utility uses. It needs to be done here so that it can be included in the additionalincludes in the AEConfig file.
+        /// </summary>
+
+        protected virtual List<string> GetHeaderIncludesFromLibrary() { return new List<string>(); }
+
         protected List<ActionRequest> requests = new List<ActionRequest>();
 
         public ActionRequest GetRequestOfName(string requestName)
@@ -446,6 +457,8 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
             FromFileThisComesFrom = "";
             ServiceBufferArgPoolSize = serviceBuffer;
 
+            HeaderIncludesFromLibrary = GetHeaderIncludesFromLibrary();
+
             Priority = priority;
 
             int indUT = 1;
@@ -478,6 +491,9 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
             : base(fromLibrary,  instanceNameOfTDU, AOTypeEnum.UtilityService)
         {
             FromFileThisComesFrom = fromFile;
+
+            HeaderIncludesFromLibrary = GetHeaderIncludesFromLibrary();
+
             //UtilityService utService = null;
 
             //var filesToSearch = Directory.GetFiles(Path.Combine(fromDirectory));
@@ -544,6 +560,10 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
 
 
 
+
+
+
+
         public override string GenerateFunctionDefinesSection()
         {
             string ret = "";
@@ -575,6 +595,26 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
             ret += $"static {ClassName} {InstanceName}_L; {InstanceName}_L.Init(AEPriorities::{PriorityStr});"; ret += "\n";
             ret += $"{InstanceName} = &{InstanceName}_L;"; ret += "\n";
 
+            //if no arguments for user init contructor, call it here
+            string cppfuncStr = $"{InstanceName}->UserInitialize();";
+            if (this.TheCppFunctionArgs != null)
+            {
+                if (this.TheCppFunctionArgs.TheCppFunctionArgs.Length == 0)
+                { 
+                     ret += cppfuncStr; ret += "\n";
+                }
+                else
+                {
+                    ret += ""; ret += "\n";
+
+                }
+            }
+            else
+            {
+                ret += ""; ret += "\n";
+            }
+
+
             return ret;
         }
 
@@ -587,8 +627,16 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
 
         protected override string _GenerateAEConfigSection(int numOfAOOfThisSameTypeGeneratesAlready)
         {
+            string ret = "";
 
-            return this.SetAEConfig(numOfAOOfThisSameTypeGeneratesAlready);
+            ret += this.SetAEConfig(numOfAOOfThisSameTypeGeneratesAlready) + "\n";
+            foreach (var item in HeaderIncludesFromLibrary)
+            { 
+                ret += GetAdditionalIncludeInAEConfig(item) + "\n";
+            }
+
+
+            return ret;// this.SetAEConfig(numOfAOOfThisSameTypeGeneratesAlready);
         }
 
         public string GetFullTemplateTypeForBase()
@@ -685,14 +733,28 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
             string functionService1 = serv1 == null ? "" : $"void _{ServiceName1}({serv1.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName1} \n" + "   }\n";
             string functionService2 = serv2 == null ? "" : $"void _{ServiceName2}({serv2.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName2} \n" + "   }\n";
             string functionService3 = serv3 == null ? "" : $"void _{ServiceName3}({serv3.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName3} \n" + "   }\n";
-            string functionService4 = serv4 == null ? "" : $"void _{ServiceName4}({serv4.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName4} \n" + "   }\n\n" + updateFunction4;
-            string functionService5 = serv5 == null ? "" : $"void _{ServiceName5}({serv5.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName5} \n" + "   }\n\n" + updateFunction5;
-            string functionService6 = serv6 == null ? "" : $"void _{ServiceName6}({serv6.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName6} \n" + "   }\n\n" + updateFunction6;
+            string functionService4 = serv4 == null ? "" : $"void _{ServiceName4}({serv4.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName4} \n" + "   }\n\n" ;
+            string functionService5 = serv5 == null ? "" : $"void _{ServiceName5}({serv5.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName5} \n" + "   }\n\n" ;
+            string functionService6 = serv6 == null ? "" : $"void _{ServiceName6}({serv6.GetFuncArguments(true)}) \n" + "   {\n" + $"\n         ##UserCode_{ServiceName6} \n" + "   }\n\n" ;
+
+            functionService4 = serv4 == null ? "" : functionService4 + $"void _{ServiceName4}CancelCleanup() \n" + "   {\n" + $"\n         ##UserCode_{ServiceName4}cancel \n" + "   }\n\n" + updateFunction4;
+            functionService5 = serv5 == null ? "" : functionService5 + $"void _{ServiceName5}CancelCleanup() \n" + "   {\n" + $"\n         ##UserCode_{ServiceName5}cancel \n" + "   }\n\n" + updateFunction5;
+            functionService6 = serv6 == null ? "" : functionService6 + $"void _{ServiceName6}CancelCleanup() \n" + "   {\n" + $"\n         ##UserCode_{ServiceName6}cancel \n" + "   }\n\n" + updateFunction6;
+
+
+            //all includes
+            string AllIncludesHeaders = "";
+            foreach (var inc in HeaderIncludesFromLibrary)
+            {
+                AllIncludesHeaders += $"#include \"{inc}.h\"" + "\n";
+            }
+
 
             string contentesOut = AEInitializing.TheMacro2Session.GenerateFileOut("AERTOS/UtilityServiceClass",
     new MacroVar() { MacroName = "UtilityName", VariableValue = ClassName },
     new MacroVar() { MacroName = "PoolSize", VariableValue = this.ServiceBufferArgPoolSize.ToString() },
     new MacroVar() { MacroName = "BaseTemplate", VariableValue = $"{ GetFullTemplateTypeForBase() }" },
+    new MacroVar() { MacroName = "AllIncludesHeaders", VariableValue = $"{AllIncludesHeaders}" },
     new MacroVar() { MacroName = "Service1NameDef", VariableValue = $"{Service1NameDef}" },
     new MacroVar() { MacroName = "Service2NameDef", VariableValue = $"{Service2NameDef}" },
     new MacroVar() { MacroName = "Service3NameDef", VariableValue = $"{Service3NameDef}" },

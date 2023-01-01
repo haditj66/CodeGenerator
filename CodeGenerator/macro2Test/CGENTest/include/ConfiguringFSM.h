@@ -1,4 +1,4 @@
-//generated file: C:\CodeGenerator\CodeGenerator\macro2Test\CGENTest\include\ConfiguringFSM.h
+//generated file: C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest\include\ConfiguringFSM.h
 //**********************************************************************
 //this is an auto-generated file using the template file located in the directory of C:\CodeGenerator\CodeGenerator\bin\Debug\..\..\FileTemplates\Files
 //ONLY WRITE CODE IN THE UserCode_Section BLOCKS

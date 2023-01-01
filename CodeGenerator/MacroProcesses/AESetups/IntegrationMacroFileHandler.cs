@@ -25,7 +25,7 @@ namespace CodeGenerator.MacroProcesses.AESetups
              
             if (projChosen != null)
             {
-                tdependsStr = projChosen.LibrariesIDependOnStr_LIB;
+                tdependsStr = projChosen.LibrariesIDependOnStr;
             }
 
         }

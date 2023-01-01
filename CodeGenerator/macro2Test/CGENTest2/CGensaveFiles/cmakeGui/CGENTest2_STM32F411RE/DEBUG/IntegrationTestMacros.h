@@ -4,6 +4,13 @@
 
 #pragma once 
 
+#define AEITEST_END_TestsAfterTimer_CGENTest(timeInMilliBeforeEnd) 
+#define AEITEST_CGENTest(testName, thingToAssert, AssertionMessage) 
+#define AEITEST_CGENTest_MUST_PASS_THIS_MANY(testName, thingToAssert, AssertionMessage, passedOnlyAfterThisManyPasses) 
+#define AEITEST_CGENTest_IgnoreFirstTests(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum) 
+#define AEITEST_EndTestsIfFalseAssertion_CGENTest(testName, thingToAssert, AssertionMessage) 
+#define AEITEST_END_CGENTest 
+#define AEITEST_EXPECT_TEST_TO_RUN_CGENTest(testName) 
  
 
 #if BUILD_TESTS__TRUE

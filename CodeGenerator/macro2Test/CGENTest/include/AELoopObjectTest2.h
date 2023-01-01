@@ -1,4 +1,4 @@
-//generated file: C:\CodeGenerator\CodeGenerator\macro2Test\CGENTest\include\AELoopObjectTest2.h
+//generated file: C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest\include\AELoopObjectTest2.h
 //**********************************************************************
 //this is an auto-generated file using the template file located in the directory of C:\CodeGenerator\CodeGenerator\bin\Debug\..\..\FileTemplates\Files
 //ONLY WRITE CODE IN THE UserCode_Section BLOCKS
@@ -14,6 +14,8 @@
 #include  "AEObjects.h"   
 
 //UserCode_Sectionheader
+
+#include "SomeUtility.h"
 extern int StateTracker;
 //UserCode_Sectionheader_end
 

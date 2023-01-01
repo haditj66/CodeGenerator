@@ -19,6 +19,13 @@
 	inline void @ServiceName@_DoneWithRequest(Token* tokenOfRequest)\
 	{\
 		return this->DoneWithRequest@ServiceId@(tokenOfRequest); \
+	}\
+	inline Action@ServiceId@_RETURNTYPE_t @ServiceName@_WaitHereForFinish(int idOfAO, @FuncArguments@)\
+	{\
+		auto token = this->RunRequestWithWait@ServiceId@(idOfAO, @Arguments@);\
+		Action@ServiceId@_RETURNTYPE_t ret = this->WaitForRequestToFinish@ServiceId@(token);\
+		this->DoneWithRequest@ServiceId@(token);\
+		return ret;\
 	}
 	
 	#define @UtilityName@_@ServiceName@ void _@ServiceName@(int idOfAO, @FuncArguments@)

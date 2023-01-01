@@ -228,40 +228,20 @@ namespace CgenMin.MacroProcesses
             //          .ToArray(); 
 
 
-            //get all depending libraries
-            List<List<AEProject>> AlldependingProjectsByLayers = new List<List<AEProject>>();
-            int layer = 0;
-            List<AEProject> libdependLayer0 = aeProject.LibrariesIDependOn;
-            AlldependingProjectsByLayers.Add(libdependLayer0);
-            if (libdependLayer0.Count != 0)
-            { 
-                for (; ; )
-                {
-                    layer++;
-
-                    List<AEProject> libdependLayer = new List<AEProject>();
-                    foreach (var proj in AlldependingProjectsByLayers[layer - 1])
-                    {
-                        libdependLayer.AddRange(proj.LibrariesIDependOn);
-                    }
-
-                    if (libdependLayer.Count == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        AlldependingProjectsByLayers.Add(libdependLayer);
-                    } 
-                } 
+            //there needs to be at least one event. if there isnt, init a dummyevent.
+            //var anyEvts = AO.AllInstancesOfAO.FirstOrDefault(a => a.AOType == AOTypeEnum.Event);
+            if (AO.atLeastOneEvt == false)
+            {
+                DummyEVT.Init(1);
             }
+
 
 
 
             var tt = aeProject.ListOfTests;
             var eventsinlin = aeProject.EventsInLibrary;
             var peripheralslib = aeProject.PeripheralsInLibrary;
-            AEConfig aEConfig = aeProject.GenerateTestOfName(projectTest);
+            AEConfig aEConfig = aeProject.GenerateTestOfName(projectTest );
 
             //grab all FSMs and create their DOT files.
             foreach (var fsm in AO.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.SimpleFSM).Cast<AEFSM>())
@@ -326,6 +306,19 @@ namespace CgenMin.MacroProcesses
                 );
 
 
+            List<string> additionalwithParenthesis = new List<string>();
+            foreach (var addinc in aeProject.GetAnyAdditionalIncludeDirs())
+            {
+                additionalwithParenthesis.Add($"\"{addinc}\"");
+            }
+
+            List<string> additionalsrcwithParenthesis = new List<string>();
+            foreach (var adds in aeProject.GetAnyAdditionalSRCDirs())
+            {
+                additionalsrcwithParenthesis.Add($"\"{adds}\"");
+            }
+
+
             Console.WriteLine($"generating AEConfigProject.cmake ");
             WriteFileContents_FromCGENMMFile_ToFullPath(
             "AERTOS\\AEConfigProject",
@@ -333,10 +326,14 @@ namespace CgenMin.MacroProcesses
             true, false,
              new MacroVar() { MacroName = "TestNamesList", VariableValue = string.Join(" ", aeProject.ListOfTests) },
              new MacroVar() { MacroName = "LibrariesIDependOn", VariableValue = string.Join(" ", aeProject.LibrariesIDependOnStr_LIB) },
+             new MacroVar() { MacroName = "ProjectName", VariableValue =AEInitializing.RunningProjectName },
+             new MacroVar() { MacroName = "ProjectDir", VariableValue = AEInitializing.RunningProjectDir},
+             new MacroVar() { MacroName = "AnyAdditionalIncludeDirs", VariableValue = string.Join(" ", additionalwithParenthesis) },
+             new MacroVar() { MacroName = "AnyAdditionalSRCDirs", VariableValue = string.Join(" ", additionalsrcwithParenthesis) },
              new MacroVar() { MacroName = "DependsInit", VariableValue = string.Join(" ", AllDepends) }
             );
 
-
+ 
 
             //create testname.cpp file
             Console.WriteLine($"generating {projectTest}.cpp ");

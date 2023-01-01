@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodeGenerator.MacroProcesses.AESetups.SPBs
+namespace CodeGenerator.MacroProcesses.AESetups
 {
     public class I2C_RXCpltEVT : AEEventEVT<I2C_RXCpltEVT>
     { 
@@ -18,6 +18,34 @@ namespace CodeGenerator.MacroProcesses.AESetups.SPBs
          
     }
 
+    public class I2C_TXCpltEVT : AEEventEVT<I2C_TXCpltEVT>
+    {
+        public I2C_TXCpltEVT()
+            : base("I2C_RXCpltEVT",
+            "uint8_t forI2C;"
+            )
+        {
+        }
+
+    }
+
+    public class DummyEVT : AEEventEVT<DummyEVT>
+    {
+        public DummyEVT() :
+            base("DummyEVT",
+            ""
+            )
+        { }
+    }
+
+    public class SomeOther : AEEventSignal<SomeOther>
+    {
+        public SomeOther() :
+            base("SomeOther",
+            ""
+            )
+        {  } 
+    }
 
     public class Button1 : AEEventSignal<Button1>
     {

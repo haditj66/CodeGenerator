@@ -113,25 +113,25 @@ namespace CgenCmakeLibrary.FileHandlers
                         if (pv.Name == optsInteg.possibleValueSelection)
                         {
                             //write the macro that includes the implementation 
-                            File.AppendAllText(pathToIntegrationTestFile, "#if BUILD_TESTS__TRUE\n");
-                            File.AppendAllText(pathToIntegrationTestFile, "//** <h4>integration test enders: will end the test in various ways</h4>*// \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "//** the following will end the test after a certain time in milli has passed*// \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_TestsAfterTimer_" + pv.Name + "(timeInMilliBeforeEnd) _AEITEST_END_TestsAfterTimer(timeInMilliBeforeEnd)\n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "(testName, thingToAssert, AssertionMessage) _AEITEST(testName, thingToAssert, AssertionMessage,0,1) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_MUST_PASS_THIS_MANY(testName, thingToAssert, AssertionMessage, passedOnlyAfterThisManyPasses) _AEITEST(testName, thingToAssert, AssertionMessage, 0,passedOnlyAfterThisManyPasses) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_IgnoreFirstTests(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum) _AEITEST(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum,1) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EndTestsIfFalseAssertion_" + pv.Name + "(testName, thingToAssert, AssertionMessage) _AEITEST_EndTestsIfFalseAssertion(testName, thingToAssert, AssertionMessage) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_" + pv.Name + " _AEITEST_END\n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EXPECT_TEST_TO_RUN_" + pv.Name + "(testName) _AEITEST_EXPECT_TEST_TO_RUN(testName)\n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#else\n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_TestsAfterTimer_" + pv.Name + "(timeInMilliBeforeEnd) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "(testName, thingToAssert, AssertionMessage) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_MUST_PASS_THIS_MANY(testName, thingToAssert, AssertionMessage, passedOnlyAfterThisManyPasses) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_IgnoreFirstTests(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EndTestsIfFalseAssertion_" + pv.Name + "(testName, thingToAssert, AssertionMessage) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_" + pv.Name + " \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EXPECT_TEST_TO_RUN_" + pv.Name + "(testName) \n");
-                            File.AppendAllText(pathToIntegrationTestFile, "#endif\n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#if BUILD_TESTS__TRUE\n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "//** <h4>integration test enders: will end the test in various ways</h4>*// \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "//** the following will end the test after a certain time in milli has passed*// \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_TestsAfterTimer_" + pv.Name + "(timeInMilliBeforeEnd) _AEITEST_END_TestsAfterTimer(timeInMilliBeforeEnd)\n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "(testName, thingToAssert, AssertionMessage) _AEITEST(testName, thingToAssert, AssertionMessage,0,1) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_MUST_PASS_THIS_MANY(testName, thingToAssert, AssertionMessage, passedOnlyAfterThisManyPasses) _AEITEST(testName, thingToAssert, AssertionMessage, 0,passedOnlyAfterThisManyPasses) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_IgnoreFirstTests(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum) _AEITEST(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum,1) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EndTestsIfFalseAssertion_" + pv.Name + "(testName, thingToAssert, AssertionMessage) _AEITEST_EndTestsIfFalseAssertion(testName, thingToAssert, AssertionMessage) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_" + pv.Name + " _AEITEST_END\n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EXPECT_TEST_TO_RUN_" + pv.Name + "(testName) _AEITEST_EXPECT_TEST_TO_RUN(testName)\n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#else\n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_TestsAfterTimer_" + pv.Name + "(timeInMilliBeforeEnd) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "(testName, thingToAssert, AssertionMessage) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_MUST_PASS_THIS_MANY(testName, thingToAssert, AssertionMessage, passedOnlyAfterThisManyPasses) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_" + pv.Name + "_IgnoreFirstTests(testName, thingToAssert, AssertionMessage, ignoreFirstRunsNum) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EndTestsIfFalseAssertion_" + pv.Name + "(testName, thingToAssert, AssertionMessage) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_END_" + pv.Name + " \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#define AEITEST_EXPECT_TEST_TO_RUN_" + pv.Name + "(testName) \n");
+                            //File.AppendAllText(pathToIntegrationTestFile, "#endif\n");
                         }
                         else
                         {

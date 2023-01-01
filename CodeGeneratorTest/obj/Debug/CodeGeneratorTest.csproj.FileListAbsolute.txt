@@ -21,3 +21,5 @@ C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Microsoft.VisualStudio.TestPlatform
 C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
 C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
 C:\CodeGenerator\CodeGeneratorTest\obj\Debug\CodeGeneratorTest.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Stateless.dll
+C:\CodeGenerator\CodeGeneratorTest\bin\Debug\Stateless.xml

@@ -4,6 +4,14 @@ using System.Linq;
 
 namespace CgenMin.MacroProcesses
 {
+
+    public class AEClockTicksNotFromRtosTimer : AEClock
+    {
+        public AEClockTicksNotFromRtosTimer(string nameOfClock, int frequencyOfClock) 
+            : base(nameOfClock, frequencyOfClock)
+        {  
+        }
+    }
     public class AEClock : AO
     {
         public string NameOfClock { get; private set; }
@@ -15,7 +23,7 @@ namespace CgenMin.MacroProcesses
         List<Tuple<AESensor, AEClock_PrescalerEnum>> SensorsIFlowTo;
         List<Tuple<AEUtilityService, AEClock_PrescalerEnum>> TdusIFlowTo;
 
-        static int NumOfClocksMadeSoFar = 0;
+        protected static int NumOfClocksMadeSoFar = 0;
         int clockidNum;
         public AEClock(string nameOfClock, int frequencyOfClock, string nameOfClockCallBack, bool ticksFromRTOSTimer = true)
         : base($"clock{NumOfClocksMadeSoFar.ToString()}", AOTypeEnum.Clock)
@@ -24,11 +32,17 @@ namespace CgenMin.MacroProcesses
 
         }
 
-        public AEClock(string nameOfClock, int frequencyOfClock)
+        public AEClock(string nameOfClock, int frequencyOfClock,  bool ticksFromRTOSTimer = true)
 : base($"clock{NumOfClocksMadeSoFar.ToString()}", AOTypeEnum.Clock)
         {
-            _Init(nameOfClock, frequencyOfClock, "", false);
+            _Init(nameOfClock, frequencyOfClock, $"{nameOfClock}_cb", ticksFromRTOSTimer);
 
+        }
+
+        protected AEClock(string nameOfClock, int frequencyOfClock)
+    : base($"clock{NumOfClocksMadeSoFar.ToString()}", AOTypeEnum.Clock)
+        {
+            _Init(nameOfClock, frequencyOfClock, "", false); 
         }
 
         private void _Init(string nameOfClock, int frequencyOfClock, string nameOfClockCallBack, bool ticksFromRTOSTimer)

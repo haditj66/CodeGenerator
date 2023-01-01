@@ -124,9 +124,16 @@
     <Compile Include="MacroProcesses\AESetups\AEProject.cs" />
     <Compile Include="MacroProcesses\AESetups\AEConfig.cs" />
     <Compile Include="MacroProcesses\AESetups\AEEvent.cs" />
+    <Compile Include="MacroProcesses\AESetups\AEProjects\AECoreTests.cs" />
+    <Compile Include="MacroProcesses\AESetups\AEProjects\AEHalTests.cs" />
     <Compile Include="MacroProcesses\AESetups\AEProjects\AESamples.cs" />
     <Compile Include="MacroProcesses\AESetups\AEProjects\CGENTest.cs" />
     <Compile Include="MacroProcesses\AESetups\AEProjects\CGENTest2.cs" />
+    <Compile Include="MacroProcesses\AESetups\AEProjects\CGENTest3.cs" />
+    <Compile Include="MacroProcesses\AESetups\AEProjects\commonAOs.cs" />
+    <Compile Include="MacroProcesses\AESetups\AEProjects\commonEigenAOs.cs" />
+    <Compile Include="MacroProcesses\AESetups\AEProjects\commonHalAOs.cs" />
+    <Compile Include="MacroProcesses\AESetups\AEProjects\MotorDriverEncoder.cs" />
     <Compile Include="MacroProcesses\AESetups\AOWritableConstructible.cs" />
     <Compile Include="MacroProcesses\AESetups\AOWritableToAOClassContents.cs" />
     <Compile Include="MacroProcesses\AESetups\Extensions.cs" />

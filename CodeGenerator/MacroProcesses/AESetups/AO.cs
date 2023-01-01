@@ -13,7 +13,7 @@ namespace CgenMin.MacroProcesses
     {
         // look at file AESPBObservor.cpp at funciton _RefreshCheckStyle() for where this implementation makes a difference. 
         EachSPBTask,  //each spb has its own task that it will use to execute its refresh
-        ChainOfSPBsTask, // there is one "chain task" that will run all refreshs
+        //TODO:ChainOfSPBsTask, // there is one "chain task" that will run all refreshs
                          //there are no tasks involved and so everything is run within the interrupt(although doesnt need to be an interrupt, can also just be from a normal tick() of a clock).
                          //Currently this doesnt look to be any different than the 
                          //ChainOfSPBsTask so maybe use this for now intead of that one. Remeber that if you do infact use this in an interrupt, it should be a VERY quick spb
@@ -33,6 +33,22 @@ namespace CgenMin.MacroProcesses
         LoopObject,
         SimpleFSM,
         AEHal
+    }
+
+    public enum SPBChannelNum
+    {
+        CH0 = 0,
+        CH1 = 1,
+        CH2 = 2,
+        CH3 = 3,
+        CH4 = 4,
+        CH5 = 5,
+        CH6 = 6,
+        CH7 = 7,
+        CH8 = 8,
+        CH9 = 9,
+        CH10 = 10,
+
     }
 
 
@@ -72,6 +88,16 @@ namespace CgenMin.MacroProcesses
         Reference   // all data is not copied but instead a reference is passed. do this if you dont intend on changing the data that is passed in.
     }
 
+
+    public class SPBSubscription
+    {
+        public AESPBBase spbToSubTo;
+        public string NameOfSubbingInstanceName;
+        public string MemberFloatNameTo;
+        public int filterNumToSubToFromSPB;
+    }
+
+
     [System.AttributeUsage(System.AttributeTargets.All, Inherited = false, AllowMultiple = true)]
     public class AEEXETest : System.Attribute
     {
@@ -97,8 +123,8 @@ namespace CgenMin.MacroProcesses
 
     public abstract class AO
     {
-         
-        private static  List<string> listOfAdditionalIncludes = new List<string>();
+
+        private static List<string> listOfAdditionalIncludes = new List<string>();
         protected string GetAdditionalIncludeInAEConfig(string fileNameWithoutTheExt)
         {
             //return only if this file has not been included yet
@@ -117,8 +143,9 @@ namespace CgenMin.MacroProcesses
 
         }
 
+        public static bool atLeastOneEvt = false;
 
-        public static List<AO> AllInstancesOfAO = new List<AO>(); 
+        public static List<AO> AllInstancesOfAO = new List<AO>();
         public AOTypeEnum AOType { get; protected set; }
         public string ClassName;
         public string InstanceName;
@@ -127,7 +154,7 @@ namespace CgenMin.MacroProcesses
         {
             ClassName = GetType().Name;
 
-            InstanceName = instanceName.Trim(); 
+            InstanceName = instanceName.Trim();
             AOType = aOType;
 
             if (this.ClassName != "UpdateEVT")
@@ -136,11 +163,38 @@ namespace CgenMin.MacroProcesses
             }
         }
 
+
+        public List<SPBSubscription> AllSPBsISubTo { get { return allSPBsISubTo; } }
+        List<SPBSubscription> allSPBsISubTo = new List<SPBSubscription>();
+        public static bool[] IsFilterSPBSubbed = {false, false, false, false, false };
+
+        /// <summary>
+        /// Subscribe to the output of a spb
+        /// </summary>
+        /// <param name="spbToSubTo">spb to sub to</param>
+        /// <param name="MemberFloatNameTo">this is a member variable name that is of type float you want to have the subscription write to.</param>
+        /// <param name="filterNumToSubToFromSPB">if you want to subscribe to a filter that the spb outputs instead.</param>
+        public void SubscribeToSPB(AESPBBase spbToSubTo, string MemberFloatNameTo, int filterNumToSubToFromSPB = 0)
+        {
+            allSPBsISubTo.Add(new SPBSubscription() { 
+                spbToSubTo = spbToSubTo,
+                filterNumToSubToFromSPB = filterNumToSubToFromSPB, 
+                MemberFloatNameTo = MemberFloatNameTo,
+            NameOfSubbingInstanceName = this.InstanceName
+            });
+            if (filterNumToSubToFromSPB > 0)
+            {
+                IsFilterSPBSubbed[filterNumToSubToFromSPB - 1] = true;
+            }
+            
+
+        }
+
         public static string GetStyleOfSPBStr(StyleOfSPB styleOfSPB)
         {
             string ret = 
                 styleOfSPB == StyleOfSPB.ChainOfSPBsFromInterrupt ? "ChainOfSPBsFromInterrupt" :
-                styleOfSPB == StyleOfSPB.ChainOfSPBsTask ? "ChainOfSPBsTask" :
+                //TODO:styleOfSPB == StyleOfSPB.ChainOfSPBsTask ? "ChainOfSPBsTask" :
                 styleOfSPB == StyleOfSPB.EachSPBTask ? "EachSPBTask" : ""
                 ;
 
@@ -223,6 +277,19 @@ namespace CgenMin.MacroProcesses
             {
                 ret += ao.GenerateMainLinkSetupsSection();
             }
+            ret += $"\n";
+
+            //put any subscriptioins to any spbs here.
+            foreach (var ao in AllInstancesOfAO)
+            { 
+                foreach (var spbSub in ao.AllSPBsISubTo)
+                {
+                    //AE_SubscribeToSPB(encoderPosition_SPB, motorDriverSpeedControllerTDU, &motorDriverSpeedControllerTDU->CurrentPosition, 0);
+                    ret += $"AE_SubscribeToSPB({spbSub.spbToSubTo.InstanceName}, {spbSub.NameOfSubbingInstanceName}, &{spbSub.NameOfSubbingInstanceName}->{spbSub.MemberFloatNameTo}, {spbSub.filterNumToSubToFromSPB});"; ret += $"\n";
+                }
+            }
+
+
             return ret;
         }
          

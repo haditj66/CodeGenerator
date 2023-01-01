@@ -1,4 +1,4 @@
-﻿#define TESTING
+﻿//#define TESTING
 
 using System;
 using System.Collections.Generic;
@@ -268,7 +268,9 @@ namespace CodeGenerator
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy";
         //public static string envIronDirectory = @"C:\visualgdb_projects\AERTOSCopy\build\VSGDBCmakeNinja_armnoneabiid\Debug";
         //public static string envIronDirectory = @"C:\CodeGenerator\CodeGenerator\macro2Test\CGENTest";
-        public static string envIronDirectory = @"C:/AERTOS/AERTOS/src/AE/AESamples";
+        //public static string envIronDirectory = @"C:/AERTOS/AERTOS/src/AE/AESamples";
+        //public static string envIronDirectory = @"C:/Users/hadi/Documents/AERTOSProjects/test";
+        public static string envIronDirectory = @"C:/Users/hadi/Documents/AERTOSProjects/commonHalAOs";
         //public static string envIronDirectory = @"C:\QR_sync";
 
 
@@ -308,8 +310,9 @@ namespace CodeGenerator
         //static string[] command = "cmakegui".Split(' ');
         //static string[] command = "macro2 AEServiceMacro".Split(' ');
         //static string[] command = "macro2 AEInitializing".Split(' ');
-        //static string[] command = "aeinit".Split(' ');
-        //static string[] command = "aeselect CGENTest defaultTest".Split(' ');
+        //static string[] command = "aeinit test".Split(' ');
+        //static string[] command = "aeinit commonHalAOs".Split(' ');
+        //static string[] command = "aeselect CGENTest ".Split(' ');
         static string[] command = "aegenerate".Split(' ');
         //static string[] command = "aebuild".Split(' ');
         //static string[] command = "aeinit AESamples".Split(' ');
@@ -1271,6 +1274,10 @@ namespace CodeGenerator
                 false, false,
                  new MacroVar() { MacroName = "TestNamesList", VariableValue = string.Join(" ", "") },
                  new MacroVar() { MacroName = "LibrariesIDependOn", VariableValue = string.Join(" ", "") },
+                 new MacroVar() { MacroName = "ProjectName", VariableValue = string.Join(" ", "") },
+                 new MacroVar() { MacroName = "ProjectDir", VariableValue = string.Join(" ", "") },
+                 new MacroVar() { MacroName = "AnyAdditionalIncludeDirs", VariableValue = string.Join(" ", "") },
+                 new MacroVar() { MacroName = "AnyAdditionalSRCDirs", VariableValue = string.Join(" ", "") },
                  new MacroVar() { MacroName = "DependsInit", VariableValue = string.Join(" ", "") }
                 );
 
@@ -1345,7 +1352,7 @@ namespace CodeGenerator
             List<string> tdepends = new List<string>();
             if (projAlreadyExists != null)
             {
-                tdepends = projAlreadyExists.LibrariesIDependOnStr_LIB;
+                tdepends = projAlreadyExists.GetAllLibrariesIDependOnFlattenedSTR();
             }
             IntegrationMacroFileHandler integMacroFile = new IntegrationMacroFileHandler(opts.nameOfTheProject, tdepends, pathToProject, aEInitializing);
             integMacroFile.CreateAllIntegrationFilesTheFiles();
@@ -1410,14 +1417,26 @@ namespace CodeGenerator
 
             if (projAlreadyExists == null)
             {
-                Console.WriteLine($"creating { opts.nameOfTheProject}.cs at directory  C:/CodeGenerator/CodeGenerator/MacroProcesses/AESetups/AEProjects");
+
+                //just use the relative directory if in base directory
+                string basdir_ = AEProject.BaseAEDir.Replace("\\", "/"); 
+                string envIronDirectory_ = envIronDirectory.Replace("\\", "/");
+                //Console.WriteLine($"basdir_: {basdir_}");
+                //Console.WriteLine($"envIronDirectory_: {envIronDirectory_}");
+                //Console.WriteLine($"isSubDirOfPath(basdir_, envIronDirectory_): {isSubDirOfPath(basdir_, envIronDirectory_)}");
+                string DirOfProject = isSubDirOfPath(basdir_, envIronDirectory_) ?
+                    envIronDirectory_.Replace(basdir_ + "/", "") :
+                    envIronDirectory_;
+
+
+                Console.WriteLine($"creating { opts.nameOfTheProject}.cs at directory  {DirOfProject}");
                 //create a .cs class file that will start the project type 
                 aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
                     "AERTOS\\AEProjectCS",
                     Path.Combine(@"C:/CodeGenerator/CodeGenerator/MacroProcesses/AESetups/AEProjects", $"{opts.nameOfTheProject}.cs"),
                     false, false,
                      new MacroVar() { MacroName = "NameOfProject", VariableValue = opts.nameOfTheProject },
-                     new MacroVar() { MacroName = "DirOfProject", VariableValue = envIronDirectory }
+                     new MacroVar() { MacroName = "DirOfProject", VariableValue = DirOfProject }
                      );
 
 
@@ -2409,6 +2428,25 @@ namespace CodeGenerator
         //***************************************************************************************************  
 
 
+
+
+        public static bool isSubDirOfPath(string ParentDir, string SubDir)
+        {
+            DirectoryInfo di1 = new DirectoryInfo(ParentDir);
+            DirectoryInfo di2 = new DirectoryInfo(SubDir);
+            bool isParent = false;
+            while (di2.Parent != null)
+            {
+                if (di2.Parent.FullName == di1.FullName)
+                {
+                    isParent = true;
+                    break;
+                }
+                else di2 = di2.Parent;
+            }
+
+            return isParent;
+        }
 
 
         public static string GetAEProjectName()

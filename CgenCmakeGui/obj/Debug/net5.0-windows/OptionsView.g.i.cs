@@ -61,7 +61,7 @@ namespace CgenCmakeGui {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/CgenCmakeGui;V1.0.0.0;component/optionsview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/CgenCmakeGui;component/optionsview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\OptionsView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

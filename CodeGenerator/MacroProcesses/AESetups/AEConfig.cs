@@ -105,7 +105,7 @@ namespace CodeGenerator.MacroProcesses.AESetups
 
             var tt = AOObserver.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.Sensor ||
             a.AOType == AOTypeEnum.SPB).Cast<AOObserver>().ToList();
-            MAXNUMBEROF_FILTERS = tt.Count == 0 ? 1 : tt.Max(a => a.FiltersIflowTo.Count);
+            MAXNUMBEROF_FILTERS = tt.Count == 0 ? 1 : tt.Max(a => a.FiltersIflowTo.Count) == 0 ? 1 : tt.Max(a => a.FiltersIflowTo.Count);
 
             var ttt = AOObserver.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.Sensor)
                 .Cast<AOObserver>().ToList();
@@ -119,20 +119,62 @@ namespace CodeGenerator.MacroProcesses.AESetups
             var allspb = AO.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.SPB).Cast<AESPBBase>().ToList();
             MAXNUMBEROFINPUTSIGNALS_TO_A_SPB = allspb.Count == 0 ? 1 : allspb.Max(a => a.Channels.Count);
 
-            MAXNUMBEROFOUTPUTSIGNALS_TO_A_SPB = MAXNUMBEROFINPUTSIGNALS_TO_A_SPB;
+            var allspbsensorsAndFilters = AOObserver.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.Sensor ||
+            a.AOType == AOTypeEnum.SPB || a.AOType == AOTypeEnum.Filter).Cast<AOObserver>().ToList();
 
-            MAXNUM_OF_SUBSCRIBERS_To_A_SPB = 3; //TODO this one.
-            MAXNUM_OF_AE_SUBSCRIPTIONS_To_SPBs = 3; //TODO this one. 
+            MAXNUMBEROFOUTPUTSIGNALS_TO_A_SPB = 0;
+            if (allspbsensorsAndFilters.Count > 0)
+            {
+                MAXNUMBEROFOUTPUTSIGNALS_TO_A_SPB = allspbsensorsAndFilters.Max(a => a.NumSPBSIPointTo);// MAXNUMBEROFINPUTSIGNALS_TO_A_SPB;
+                 
+            }
+            MAXNUMBEROFOUTPUTSIGNALS_TO_A_SPB = MAXNUMBEROFINPUTSIGNALS_TO_A_SPB > MAXNUMBEROFOUTPUTSIGNALS_TO_A_SPB ? MAXNUMBEROFINPUTSIGNALS_TO_A_SPB : MAXNUMBEROFOUTPUTSIGNALS_TO_A_SPB;
 
-            TOTALMAXNUMBEROFOUTPUTSIGNALS_TO_ALL_SPBs = 25;//not mentioned
+
+            //spb flowing into spbs stuff
+            if (allspb.Count > 0)
+            {
+                MAX_OUTPUT_SIZE_OF_SPB_SET_TO_TDU =
+    allspb.FirstOrDefault(s => s.FlowsIntoTDU) == null ? 0
+    : allspb.Where(s => s.FlowsIntoTDU).Max(s => s.SizeOfOutput.SizeOfOutput);
+                 
+            }
+            else
+            {
+                MAX_OUTPUT_SIZE_OF_SPB_SET_TO_TDU = 0; 
+            }
+
+            var allUtilities = AO.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.UtilityService).Cast<AEUtilityService>().ToList();
+            if (allUtilities.Count > 0)
+            {
+                
+                NUM_OF_TDUS_THAT_FLOW_FROM_SPBS = allUtilities.Where(s => s.FlowsFromSPB).ToList().Count;
+            }
+            else
+            {
+                NUM_OF_TDUS_THAT_FLOW_FROM_SPBS = 0;
+            }
+
+
+            
+
+            MAXNUM_OF_SUBSCRIBERS_To_A_SPB = AO.AllInstancesOfAO.Max(a => a.AllSPBsISubTo.Count);  
+            MAXNUM_OF_AE_SUBSCRIPTIONS_To_SPBs = MAXNUM_OF_SUBSCRIBERS_To_A_SPB;
+            MAXNUM_OF_TOTAL_SPB_SUBSCRIPTIONS = AO.AllInstancesOfAO.Sum(a => a.AllSPBsISubTo.Count);
+
+            MAXNUM_OF_SUBSCRIBERS_To_A_SPB = MAXNUM_OF_SUBSCRIBERS_To_A_SPB == 0 ? 1 : MAXNUM_OF_SUBSCRIBERS_To_A_SPB;
+            MAXNUM_OF_AE_SUBSCRIPTIONS_To_SPBs = MAXNUM_OF_AE_SUBSCRIPTIONS_To_SPBs == 0 ? 1 : MAXNUM_OF_AE_SUBSCRIPTIONS_To_SPBs;
+            MAXNUM_OF_TOTAL_SPB_SUBSCRIPTIONS = MAXNUM_OF_TOTAL_SPB_SUBSCRIPTIONS == 0 ? 1 : MAXNUM_OF_TOTAL_SPB_SUBSCRIPTIONS;
+
+            TOTALMAXNUMBEROFOUTPUTSIGNALS_TO_ALL_SPBs = 10;//not mentioned
 
             MAXNUMOFTDUSSETTOTheSameSPB = 3;//not mentioned
 
-            SPB_OF_FILTER1_SUBSCRIBED = true; //TODO this one.
-            SPB_OF_FILTER2_SUBSCRIBED = true; //TODO this one.
-            SPB_OF_FILTER3_SUBSCRIBED = false; //TODO this one.
-            SPB_OF_FILTER4_SUBSCRIBED = false; //TODO this one.
-            SPB_OF_FILTER5_SUBSCRIBED = false; //TODO this one.
+            SPB_OF_FILTER1_SUBSCRIBED = AO.IsFilterSPBSubbed[0] == true;  
+            SPB_OF_FILTER2_SUBSCRIBED = AO.IsFilterSPBSubbed[1] == true;
+            SPB_OF_FILTER3_SUBSCRIBED = AO.IsFilterSPBSubbed[2] == true;
+            SPB_OF_FILTER4_SUBSCRIBED = AO.IsFilterSPBSubbed[3] == true;
+            SPB_OF_FILTER5_SUBSCRIBED = AO.IsFilterSPBSubbed[4] == true;
 
             configAE_USE_TDUs_AsService = 1;
             configAE_USE_U_AsService = 1;
@@ -170,6 +212,10 @@ namespace CodeGenerator.MacroProcesses.AESetups
         private int NUMOFACTIVEOBJECTS;
         private int HIGHEST_NUM_OF_EVT_INSTANCES;
 
+        //flowing to spb stuff
+        private int MAX_OUTPUT_SIZE_OF_SPB_SET_TO_TDU;
+        private int NUM_OF_TDUS_THAT_FLOW_FROM_SPBS;
+
 
         private int MAXSPB_CHAIN_POOLSIZE = 5;
         private int MAXNUMOFINTERPRETORS = 3;
@@ -188,6 +234,7 @@ namespace CodeGenerator.MacroProcesses.AESetups
 
         private int MAXNUM_OF_SUBSCRIBERS_To_A_SPB;
         private int MAXNUM_OF_AE_SUBSCRIPTIONS_To_SPBs;
+        private int MAXNUM_OF_TOTAL_SPB_SUBSCRIPTIONS;
 
         private int TOTALMAXNUMBEROFOUTPUTSIGNALS_TO_ALL_SPBs;
 

@@ -118,17 +118,27 @@ namespace CgenMin.MacroProcesses
     //PWM
     //====================================================================================================
 
+    public interface IPWM
+    {
+        Portenum PortofPWM { get;   }
+        PinEnum PinOfPWM { get;  }
+          string InstName { get;  }
+    }
 
-    public class PWMPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>
+
+
+    public class PWMPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>, IPWM
         where TDerived : PWMPERIPHERALBase<TDerived>, new()
     {
         public PWMPERIPHERALBase(int peripheralNum)
             : base($"PWMPERIPHERAL", "PWMPeripheral", peripheralNum)
         {
+            InstName = this.InstanceName;
         }
 
         public Portenum PortofPWM { get; protected set; }
         public PinEnum PinOfPWM { get; protected set; }
+        public string InstName { get; protected set; }
 
         public static TDerived Init(Portenum portofPWM, PinEnum pinOfPWM)
         {
@@ -466,18 +476,28 @@ namespace CgenMin.MacroProcesses
     //====================================================================================================
     //GPIO as an output
     //====================================================================================================
-    
-     
-    public class GPIOPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>
+
+
+    public interface IGPIO
+    {
+        Portenum Gpio_Port { get; }
+        PinEnum Gpio_Pin { get; }
+        string InstName { get; }
+    }
+
+    public class GPIOPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>, IGPIO
         where TDerived : GPIOPERIPHERALBase<TDerived>, new()
     {
         public GPIOPERIPHERALBase(int peripheralNum)
             : base($"GPIOPERIPHERAL", "GPIOPeripheral", peripheralNum)
         {
+            InstName = InstName;
         }
          
         public Portenum Gpio_Port { get; protected set; }
         public PinEnum Gpio_Pin { get; protected set; } 
+        public string InstName { get; }
+
         public static TDerived Init( 
             Portenum gpio_Port, PinEnum gpio_Pin 
             )

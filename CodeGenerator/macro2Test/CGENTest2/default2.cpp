@@ -17,17 +17,23 @@
 
 #include "AECore.h"
 #include "AE_Init.h" 
-#include "AEClock.h"
-#include "AEObservorSensorFilterOut.h"
+#include "AEClock.h" 
 #include "AEObjects.h" 
 
 DECLARE_ALL_AO_PTR
 
+static void clock1_callback(TimerHandle_t xTimerHandle);
+static uint32_t sensor1_data[1];
+static uint32_t sensor2_data[1];
+static uint32_t sensor3_data[1];
 
 
 
 
 //UserCode_Sectiona
+//#include  "DerivativeFilter.h"
+//#include "AELoopObject.h" 
+
 //UserCode_Sectiona_end
 
 void RunSelectedIntegrationTest_default2()
@@ -35,16 +41,44 @@ void RunSelectedIntegrationTest_default2()
 
 AE_Init();
  //UserCode_Sectionbeforemain
+	
+	 
 //UserCode_Sectionbeforemain_end
+
+static AEClock<AEObservorSensor, AEObservorInterpretorBaseDUMMY, 3, 0, 0, 0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0> clock1L(1000, clock1_callback);
+clock1 = &clock1L;
+
+static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor1L((uint32_t*) sensor1_data, SensorResolution::Resolution12Bit , 0 , 100);
+sensor1 = &sensor1L;
+
+static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor2L((uint32_t*) sensor2_data, SensorResolution::Resolution12Bit , 0 , 100);
+sensor2 = &sensor2L;
+
+static AEObservorSensorFilterOut< 2, Filter<DerivativeFilter, 2>,Filter<DerivativeFilter, 2> ,1  > sensor3L((uint32_t*) sensor3_data, SensorResolution::Resolution12Bit  );
+sensor3 = &sensor3L;
+
+static AverageSPB< false,  10> averageSPB1L; averageSPB1L.InitSPBObserver(StyleOfSPB::EachSPBTask); 
+averageSPB1 = &averageSPB1L;
+
+
+
+
+
+
 
 
 
 //UserCode_Sectionbeforelinks
 //UserCode_Sectionbeforelinks_end
+static float averageSPB1chBuffer1[10];
+averageSPB1->AddSignalFlowLinkToChannelWithCopy1(sensor1, averageSPB1chBuffer1, 2);
 
 
 //UserCode_Sectionbeforeclock
 //UserCode_Sectionbeforeclock_end
+clock1->SetObservorToClock(sensor1, AEClock_PrescalerEnum::PRESCALER1);
+clock1->SetObservorToClock(sensor2, AEClock_PrescalerEnum::PRESCALER1);
+clock1->SetObservorToClock(sensor3, AEClock_PrescalerEnum::PRESCALER1);
 
 
 //AEITEST_END_TestsAfterTimer_CGENTest2(5000);
@@ -59,7 +93,14 @@ AEAO::ConfigureAndStart();
 //UserCode_Sectionc_end
 
 
-
+static void clock1_callback(TimerHandle_t xTimerHandle) {  
+  //UserCode_Sectionclock1before
+//UserCode_Sectionclock1before_end 
+  
+ clock1->Tick(); 
+  //UserCode_Sectionclock1after
+//UserCode_Sectionclock1after_end 
+}
 
 
 #endif

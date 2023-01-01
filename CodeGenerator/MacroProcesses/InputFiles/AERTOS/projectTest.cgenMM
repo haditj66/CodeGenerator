@@ -7,8 +7,7 @@
 
 #include "AECore.h"
 #include "AE_Init.h" 
-#include "AEClock.h"
-#include "AEObservorSensorFilterOut.h"
+#include "AEClock.h" 
 #include "AEObjects.h" 
 
 DECLARE_ALL_AO_PTR

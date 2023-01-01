@@ -35,15 +35,15 @@
 #define AOPRIORITYLOWEST 5
 #define AOPRIORITYMEDIUM 10
 #define AOPRIORITYHIGHEST 29
-#define NUMOFACTIVEOBJECTS 1
+#define NUMOFACTIVEOBJECTS 5
 #define HIGHEST_NUM_OF_EVT_INSTANCES 2
 #define MAXSPB_CHAIN_POOLSIZE 5
 #define MAXNUMOFINTERPRETORS 3
 #define MAXNUMOFOBSERVERINFLUENCES 2
-#define MAXNUMOFOBSERVORS 1
-#define MAXNUMOFSENSORS 1
-#define MAXNUMBEROF_FILTERS 1
-#define MAXNUMBEROF_FILTERS_From_A_Sensor 1
+#define MAXNUMOFOBSERVORS 5
+#define MAXNUMOFSENSORS 4
+#define MAXNUMBEROF_FILTERS 2
+#define MAXNUMBEROF_FILTERS_From_A_Sensor 2
 #define MaxNumOfAELoops 3
 #define MAXNUMBEROFINPUTSIGNALS_TO_A_SPB 1
 #define MAXNUMBEROFOUTPUTSIGNALS_TO_A_SPB 1
@@ -73,6 +73,28 @@
 
 #define Event1 I2C_RXCpltEVT
 #define Event1Size 10
+
+#define ClockType1 AEClock<AEObservorSensor, AEObservorInterpretorBaseDUMMY, 3, 0, 0, 0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0,0, 0, 0> 
+#define ClockName1 clock1 
+
+#define SensorName1 sensor1
+
+#define SensorName2 sensor2
+
+#define SensorName3 sensor3
+
+#define AOInclude1 AverageSPB
+#define TemplateToAO1 template<bool isSubscribable, uint32_t CHANNELCOUNTBUFFER1, TEMPLATESPB_Filters>
+#define ClassNameOfAO1 AverageSPB
+#define TypeOfAO1_1 AverageSPB< false,  10>
+#define InstanceNameOfAO1_1 averageSPB1
+
+#define AnyOtherNeededIncludes1 DerivativeFilter 
+
+
+
+
+
 
 
 

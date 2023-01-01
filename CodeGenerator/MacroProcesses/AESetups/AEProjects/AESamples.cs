@@ -14,6 +14,7 @@ namespace AESamplesProject
     public class AESamples : AEProject
     {
 
+
         [AEEXETest]
         public void SPBSamples()
         {
@@ -39,6 +40,16 @@ namespace AESamplesProject
         protected override List<AEHal> _GetPeripheralsInLibrary()
         {
             return null;
+        }
+
+        protected override List<string> _GetAnyAdditionalIncludeDirs()
+        {
+            return new List<string>() { };
+        }
+
+        protected override List<string> _GetAnyAdditionalSRCDirs()
+        {
+            return new List<string>() { };
         }
 
         //protected override List<string> _GetListOfTests()

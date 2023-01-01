@@ -34,6 +34,7 @@ namespace CgenMin.MacroProcesses
                 UseMacro1 = useMacro1;
             }
         }
+         
 
         public AOWritableToAOClassContents(string fromLibraryName, string instanceName, AOTypeEnum aOType) : 
             base(  instanceName, aOType)

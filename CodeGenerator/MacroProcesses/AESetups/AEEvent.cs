@@ -21,8 +21,8 @@ namespace CgenMin.MacroProcesses
         int sigID = 0;
 
         static List<AEEvent> AllAEEvents = new List<AEEvent>();
-        public AEEvent(string fromLibrary, string ClassName, bool isASignal,  params string[] eventDefinition) 
-            : base(fromLibrary,  ClassName + "_", AOTypeEnum.Event)
+        public AEEvent( string ClassName, bool isASignal,  params string[] eventDefinition) 
+            : base(AEInitializing.RunningProjectName,  ClassName + "_", AOTypeEnum.Event)
         {
             IsASignal = isASignal;
             EventDefinition = eventDefinition;
@@ -173,8 +173,8 @@ namespace CgenMin.MacroProcesses
 
         static TDerived _instance;
 
-        protected AEEventBase(string fromLibrary, string ClassName, bool isSignal, params string[] eventProperties) 
-            : base(fromLibrary, ClassName, isSignal,  eventProperties)
+        protected AEEventBase(  string ClassName, bool isSignal, params string[] eventProperties) 
+            : base(  ClassName, isSignal,  eventProperties)
         {
         }
 
@@ -217,17 +217,19 @@ namespace CgenMin.MacroProcesses
     public abstract class AEEventEVT<TDerived> : AEEventBase<TDerived>
 where TDerived : AEEventBase<TDerived>, new()
     {
+        
         protected AEEventEVT(string ClassName, params string[] eventProperties)
-         : base(AEInitializing.RunningProjectName, ClassName, false, eventProperties)
+         : base(  ClassName, false, eventProperties)
         {
+            AO.atLeastOneEvt = true;
         }
     }
 
     public abstract class AEEventSignal<TDerived> : AEEventBase<TDerived>
 where TDerived : AEEventBase<TDerived>, new()
     {
-        protected AEEventSignal(string fromLibrary, string ClassName, params string[] eventProperties)
-         : base(fromLibrary, ClassName, true, eventProperties)
+        protected AEEventSignal(  string ClassName, params string[] eventProperties)
+         : base( ClassName, true, eventProperties)
         {
         }
     }

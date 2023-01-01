@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CodeGenerator.ProblemHandler;
+using System.Collections.Generic;
 
 namespace CgenMin.MacroProcesses
 {
@@ -29,7 +30,7 @@ namespace CgenMin.MacroProcesses
 
         public AESensor(string nameOfSensor, SensorResolution sensorResolution,
         float mapsToAFLoatOfLowerBound = 0,
-        float mapsToAFLoatOfUpperBound = 0) : base("nothing", nameOfSensor, AOTypeEnum.Sensor)//"AEObservorSensorFilterOut",
+        float mapsToAFLoatOfUpperBound = 0) : base(AEInitializing.RunningProjectName, nameOfSensor, AOTypeEnum.Sensor)//"AEObservorSensorFilterOut",
         {  
             TheSensorResolution = sensorResolution;
             MapsToAFLoatOfLowerBound = mapsToAFLoatOfLowerBound;
@@ -45,7 +46,24 @@ namespace CgenMin.MacroProcesses
             ADC_IMSetTo = adcImSetTo.ADCInstName; 
         }
 
- 
+
+        public AESensor FlowIntoSPB(AESPBBase spbToFlowTo, SPBChannelNum toChannel, LinkTypeEnum linkType)
+        {
+            NumSPBSIPointTo++;
+
+            ProblemHandle problemHandle = new ProblemHandle();
+            if ((int)toChannel >= spbToFlowTo.Channels.Count )
+            { 
+                problemHandle.ThereisAProblem($"you tried to connect to a channel that spb {spbToFlowTo.ClassName} does not have");
+            }
+
+            spbToFlowTo.Channels[(int)toChannel].AOThatLinksToThisChannel = this;
+            spbToFlowTo.Channels[(int)toChannel].AOFilterID_ThatLinksToThisChannel = 0;
+            spbToFlowTo.Channels[(int)toChannel].LinkType = linkType;
+
+            return this;
+        }
+
 
 
         protected override string _GenerateAEConfigSection(int numOfAOOfThisSameTypeGeneratesAlready)

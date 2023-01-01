@@ -6,13 +6,13 @@
 
 
 if(((${_arg_ONLY_CREATE_LIBRARY} STREQUAL 0 )))
-Cgen_Start(CGEN_PROJECT_DIRECTORY "${INTEGRATION_TARGET_DIRECTORY}")
+Cgen_Start(CGEN_PROJECT_DIRECTORY "C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest")
 
  
 Cgen_Option(
         NAME INTEGRATION_TESTS
         DESCRIPTION "choose an integration test directory to build"
-        POSSIBLEVALUES ${INTEGRATION_TARGET_NAME}   
+        POSSIBLEVALUES CGENTest 
         CONSTRICTS_LATER_OPTIONS
 )
 
@@ -27,10 +27,10 @@ if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/AEConfigProjectUser.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/AEConfigProjectUser.cmake")
 endif()
 
-CREATE_TARGET_INTEGRATIONEXE(NAME_OF_TARGET ${INTEGRATION_TARGET_NAME}
-LOCATION_OF_TARGET ${INTEGRATION_TARGET_DIRECTORY}
+CREATE_TARGET_INTEGRATIONEXE(NAME_OF_TARGET CGENTest
+LOCATION_OF_TARGET "C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest"
 LibrariesToLinkTo AECoreLib 
-LIST_OF_TESTS default2 defaultTest SPBSamples
+LIST_OF_TESTS defaultTest 
 ) 
 
 

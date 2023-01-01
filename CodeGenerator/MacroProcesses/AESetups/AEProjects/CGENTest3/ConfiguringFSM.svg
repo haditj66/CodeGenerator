@@ -1,0 +1,24 @@
+digraph {
+compound=true;
+node [shape=Mrecord]
+rankdir="LR"
+"Idle" [label="Idle|entry / Function\nexit / Function"];
+"SettingTopLimit" [label="SettingTopLimit|entry / Function\nexit / Function"];
+"SettingBottomLimit" [label="SettingBottomLimit|entry / Function\nexit / Function"];
+"EXIT_FSM" [label="EXIT_FSM"];
+
+"Idle" -> "Idle" [style="solid", label="UpdateEVT / Function"];
+"Idle" -> "Idle" [style="solid", label="Button1 / "];
+"Idle" -> "Idle" [style="solid", label="Button2 / "];
+"Idle" -> "SettingTopLimit" [style="solid", label="Button3"];
+"SettingTopLimit" -> "SettingTopLimit" [style="solid", label="UpdateEVT / Function"];
+"SettingTopLimit" -> "SettingTopLimit" [style="solid", label="Button1 / "];
+"SettingTopLimit" -> "SettingTopLimit" [style="solid", label="Button2 / "];
+"SettingTopLimit" -> "SettingBottomLimit" [style="solid", label="Button3"];
+"SettingBottomLimit" -> "SettingBottomLimit" [style="solid", label="UpdateEVT / Function"];
+"SettingBottomLimit" -> "SettingBottomLimit" [style="solid", label="Button1 / "];
+"SettingBottomLimit" -> "SettingBottomLimit" [style="solid", label="Button2 / "];
+"SettingBottomLimit" -> "EXIT_FSM" [style="solid", label="Button3"];
+ init [label="", shape=point];
+ init -> "Idle"[style = "solid"]
+}

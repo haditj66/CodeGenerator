@@ -4,9 +4,22 @@
 
 
 
+#Cgen_Start(CGEN_PROJECT_DIRECTORY "C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest")
+
+MATH(EXPR _arg_ONLY_CREATE_LIBRARY "${_arg_ONLY_CREATE_LIBRARY}+1")
+include("C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest/AEConfigProject.cmake")
+MATH(EXPR _arg_ONLY_CREATE_LIBRARY "${_arg_ONLY_CREATE_LIBRARY}-1")
+
+#CREATE_TARGET_INTEGRATIONEXE(NAME_OF_TARGET CGENTest
+#LOCATION_OF_TARGET "C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest"
+#LibrariesToLinkTo AECoreLib 
+#ONLY_CREATE_LIBRARY TRUE
+#)  
+#Cgen_End_Session()
+ 
 
 CREATE_TARGET_INTEGRATIONEXE(NAME_OF_TARGET ${INTEGRATION_TARGET_NAME}
 LOCATION_OF_TARGET ${INTEGRATION_TARGET_DIRECTORY}
-LibrariesToLinkTo AECoreLib 
-LIST_OF_TESTS default2 defaultTest SPBSamples
+LibrariesToLinkTo AECoreLib CGENTest_lib
+LIST_OF_TESTS default2
 ) 

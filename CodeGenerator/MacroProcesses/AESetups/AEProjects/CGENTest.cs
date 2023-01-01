@@ -6,6 +6,7 @@
 
 
 using CgenMin.MacroProcesses;
+using CodeGenerator.MacroProcesses.AESetups;
 using CodeGenerator.MacroProcesses.AESetups.SPBs;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace CGENTestProject
     public class DerivativeFilter : AEFilter
     {
         public DerivativeFilter()
-            : base("CGENTest",   2, false)
+            : base("CGENTest",   2)
         {
 
         }
@@ -67,7 +68,7 @@ namespace CGENTestProject
     public class AdderSPB : AESPBBase
     {
         public AdderSPB(string nameOfSPB, StyleOfSPB styleOfSPB, bool isSubscribable, int numOfChannels, SPBChannelUserDefinedCountBuffer channelAllSame)
-            : base("CGENTest", nameOfSPB, styleOfSPB,  "", "", isSubscribable, new SizeOfOutput_IfUserDefined(1, false), numOfChannels, channelAllSame)
+            : base("CGENTest", nameOfSPB, styleOfSPB,  "", "", isSubscribable, new SizeOfSPBOutput(1, false), numOfChannels, channelAllSame)
         {
 
         }
@@ -79,7 +80,7 @@ namespace CGENTestProject
     public class AverageSPB : AESPBBase
     {
         public AverageSPB(string nameOfSPB, StyleOfSPB styleOfSPB, string templateType, bool isSubscribable, SPBChannelUserDefinedCountBuffer ch1)
-            : base("CGENTest", nameOfSPB, styleOfSPB, "", templateType, isSubscribable, new SizeOfOutput_IfUserDefined(1, false), ch1)
+            : base("CGENTest", nameOfSPB, styleOfSPB, "", templateType, isSubscribable, new SizeOfSPBOutput(1, false), ch1)
         {
 
         }
@@ -89,7 +90,10 @@ namespace CGENTestProject
     public class ThreeDimensionalVector : AESPBBase
     {
         public ThreeDimensionalVector(string nameOfSPB, StyleOfSPB styleOfSPB, bool isSubscribable, int countBufferForAll3Channels)
-            : base("CGENTest", nameOfSPB, styleOfSPB, "", "", isSubscribable, new SizeOfOutput_IfUserDefined(4, false), new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels), new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels), new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels))
+            : base("CGENTest", nameOfSPB, styleOfSPB, "", "", isSubscribable, new SizeOfSPBOutput(4, false), 
+                  new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels), 
+                  new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels), 
+                  new SPBChannelUserDefinedCountBuffer(countBufferForAll3Channels))
         {
 
         }
@@ -224,31 +228,31 @@ namespace CGENTestProject
                 .FlowIntoSensor(sensor1, AEClock_PrescalerEnum.PRESCALER1)
                 .FlowIntoFilter(new DerivativeFilter())
                 .FlowIntoFilter(new DerivativeFilter())
-                .FlowIntoSPB(averageSPB1, 0, LinkTypeEnum.Copy);
+                .FlowIntoSPB(averageSPB1, SPBChannelNum.CH0, LinkTypeEnum.Copy);
 
             aEClock
                 .FlowIntoSensor(sensor2, AEClock_PrescalerEnum.PRESCALER1)
                 .FlowIntoFilter(new DerivativeFilter())
                 .FlowIntoFilter(new DerivativeFilter())
-                .FlowIntoSPB(averageSPB2, 0, LinkTypeEnum.Copy);
+                .FlowIntoSPB(averageSPB2, SPBChannelNum.CH0, LinkTypeEnum.Copy);
             aEClock
                 .FlowIntoSensor(sensor3, AEClock_PrescalerEnum.PRESCALER1)
                 .FlowIntoFilter(new DerivativeFilter())
                 .FlowIntoFilter(new DerivativeFilter())
-                .FlowIntoSPB(averageSPB3, 0, LinkTypeEnum.Copy);
+                .FlowIntoSPB(averageSPB3, SPBChannelNum.CH0, LinkTypeEnum.Copy);
 
 
             averageSPB1
              .FlowIntoFilter(new DerivativeFilter())
-             .FlowIntoSPB(adderSPB, 0, LinkTypeEnum.Copy);
+             .FlowIntoSPB(adderSPB, SPBChannelNum.CH0, LinkTypeEnum.Copy);
 
             averageSPB2
              .FlowIntoFilter(new DerivativeFilter())
-             .FlowIntoSPB(adderSPB, 1, LinkTypeEnum.Copy);
+             .FlowIntoSPB(adderSPB, SPBChannelNum.CH1, LinkTypeEnum.Copy);
 
             averageSPB3
              .FlowIntoFilter(new DerivativeFilter())
-             .FlowIntoSPB(adderSPB, 2, LinkTypeEnum.Copy);
+             .FlowIntoSPB(adderSPB, SPBChannelNum.CH2, LinkTypeEnum.Copy);
 
 
             //var rr = averageSPB1.GenerateAEConfigSection();
@@ -291,6 +295,16 @@ namespace CGENTestProject
         protected override string _GetDirectoryOfLibrary()
         {
             return @"C:/CodeGenerator/CodeGenerator/macro2Test/CGENTest";
+        }
+
+        protected override List<string> _GetAnyAdditionalIncludeDirs()
+        {
+            return new List<string>() { };
+        }
+
+        protected override List<string> _GetAnyAdditionalSRCDirs()
+        {
+            return new List<string>() { };
         }
     }
 

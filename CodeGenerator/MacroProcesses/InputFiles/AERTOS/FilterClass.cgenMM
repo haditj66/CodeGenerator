@@ -7,9 +7,9 @@
 ##UserCode_header
 
 @Template@
-class @FilterName@ : public Filter<@FilterName@, @PastBufferSize@>
+class @FilterName@ //: public Filter<@FilterName@@TemplateArgs@, @PastBufferSize@>
 {
-  //template<class TFilterDerived, uint16_t PastDataBufferSize>
+  @IncludeFriendTemplate@template<class TFilterDerived, uint16_t PastDataBufferSize>
 	friend class Filter;
 
 public:
@@ -23,6 +23,10 @@ protected:
 ##UserCode_prot
 	
 	void InitializeImpl(float samplingPeriodOfObservorInSeconds);
+
+	const float*  PastDataCircularBuffer;
+	float SamplingPeriodOfObservorInSeconds;
+	uint16_t PastDataBufferSize;
 
 private:
 	float RunFilter(float newestInput);

@@ -11,10 +11,20 @@ namespace CgenMin.MacroProcesses
         public AESensor SensorIOriginateFrom { get; protected set; }
         public AESPBBase SPBIOriginateFrom { get; protected set; }
 
+
+        public int NumSPBSIPointTo { get; protected set; }
+
+        protected virtual CppFunctionArgs SetcppConstructorArgs()
+        {
+            return null;
+        }
+         
+
         public AOObserver(string fromeLibraryName,  string instanceName, AOTypeEnum aotype) 
-            : base(fromeLibraryName,  instanceName, aotype)
+            : base(fromeLibraryName,  instanceName, aotype, null)
         {
             FiltersIflowTo = new List<AEFilter>();
+            this.TheCppFunctionArgs = SetcppConstructorArgs();
 
             if (aotype == AOTypeEnum.SPB)
             {

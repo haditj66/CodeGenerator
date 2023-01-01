@@ -1,4 +1,5 @@
 ﻿using CodeGenerator.ProblemHandler;
+using System;
 
 namespace CgenMin.MacroProcesses
 {
@@ -18,19 +19,21 @@ namespace CgenMin.MacroProcesses
 
     public class CppFunctionArg
     {
-        public CppFunctionArg(CppTypeEnum type, string name, bool isPublicSet = true)
+        public CppFunctionArg(CppTypeEnum type, string name, bool isPublicSet = true, string defaultvalue = "")
         {
             Type = type;
             Name = name;
             _TypeStr = null;
             IsPublicSet = isPublicSet;
+            Defaultvalue = defaultvalue;
         }
 
-        public CppFunctionArg(string type, string name, bool isPublicSet = true)
+        public CppFunctionArg(string type, string name, bool isPublicSet = true, string defaultvalue = "")
         {
-            _TypeStr = type; 
+            _TypeStr = type;
             Name = name;
             IsPublicSet = isPublicSet;
+            Defaultvalue = defaultvalue;
         }
 
         public string TypeStr { get { return CppTypeEnumToStr(Type); } }
@@ -38,6 +41,7 @@ namespace CgenMin.MacroProcesses
         public CppTypeEnum Type { get; }
         public string Name { get; }
         public bool IsPublicSet { get; }
+        public string Defaultvalue { get; }
 
         public string GetPropertyFunctions()
         {
@@ -115,6 +119,84 @@ namespace CgenMin.MacroProcesses
     }
 
 
+    public class CppFunctionArgWithValue<TargTyp1> : CppFunctionArg
+    { 
+        public TargTyp1 ValueOfArg1;
+         
+        public CppFunctionArgWithValue(string name, TargTyp1 value, bool isPublicSet = true)
+            : base(getType<TargTyp1>(), name, isPublicSet, "")
+        {
+            ValueOfArg1 = value;
+        }
+
+
+        public static CppTypeEnum getType<Targ>()
+        {
+            CppTypeEnum ret =
+                typeof(Targ) == typeof(float) ?
+                CppTypeEnum.float_t :
+                typeof(Targ) == typeof(bool) ?
+                CppTypeEnum.bool_t :
+                typeof(Targ) == typeof(byte) ?
+                CppTypeEnum.int8_t :
+                typeof(Targ) == typeof(Int16) ?
+                CppTypeEnum.int16_t :
+                typeof(Targ) == typeof(Int32) ?
+                CppTypeEnum.int32_t :
+                typeof(Targ) == typeof(byte) ?
+                CppTypeEnum.uint8_t :
+                typeof(Targ) == typeof(UInt16) ?
+                CppTypeEnum.uint16_t :
+                typeof(Targ) == typeof(UInt32) ?
+                CppTypeEnum.uint32_t
+
+                : CppTypeEnum.int32_t;
+
+            return ret;
+
+        }
+
+    }
+
+
+
+    public class CppFunctionArgsWithValue<TargTyp1, TargTyp2, TargTyp3> : CppFunctionArgs
+    {
+        public CppFunctionArgsWithValue(
+            string name1, TargTyp1 value1, 
+            string name2, TargTyp2 value2, 
+            string name3, TargTyp3 value3, 
+            bool isPublicSet1 = true, bool isPublicSet2 = true, bool isPublicSet3 = true)
+            : base(new CppFunctionArgWithValue<TargTyp1>(name1, value1, isPublicSet1),
+                   new CppFunctionArgWithValue<TargTyp2>(name2, value2, isPublicSet2),
+                   new CppFunctionArgWithValue<TargTyp3>(name3, value3, isPublicSet3))
+        {
+        }
+
+    }
+    public class CppFunctionArgsWithValue<TargTyp1, TargTyp2> : CppFunctionArgs
+    {
+        public CppFunctionArgsWithValue(
+            string name1, TargTyp1 value1,
+            string name2, TargTyp2 value2, 
+            bool isPublicSet1 = true, bool isPublicSet2 = true )
+            : base(new CppFunctionArgWithValue<TargTyp1>(name1, value1, isPublicSet1),
+                   new CppFunctionArgWithValue<TargTyp2>(name2, value2, isPublicSet2) )
+        {
+        }
+
+    }
+
+    public class CppFunctionArgsWithValue<TargTyp1> : CppFunctionArgs
+    {
+        public CppFunctionArgsWithValue(string name, TargTyp1 value, bool isPublicSet = true ) 
+            : base(new CppFunctionArgWithValue<TargTyp1>(name,value, isPublicSet))
+        {
+        } 
+
+    }
+
+
     public class CppFunctionArgs
     {
 
@@ -125,19 +207,36 @@ namespace CgenMin.MacroProcesses
         }
 
 
-        public string GetContructorArgs()
+        private string _GetContructorArgs(bool withTypes)
         {
             string ret = "";
             if (TheCppFunctionArgs.Length > 0)
             {
-                ret += $"{TheCppFunctionArgs[0].TypeStr} _{TheCppFunctionArgs[0].Name} ";
+                string typeName = withTypes ? $"{TheCppFunctionArgs[0].TypeStr}" : "";
+                string defualtStr = TheCppFunctionArgs[0].Defaultvalue == "" ? "" : $" = {TheCppFunctionArgs[0].Defaultvalue}";
+                ret += $"{typeName} _{TheCppFunctionArgs[0].Name} {defualtStr}";
             }
             for (int i = 1; i < TheCppFunctionArgs.Length; i++)
             {
-                ret += $", {TheCppFunctionArgs[i].TypeStr} _{TheCppFunctionArgs[i].Name} ";
+                string typeName = withTypes ? $"{TheCppFunctionArgs[i].TypeStr}" : "";
+                string defualtStr = TheCppFunctionArgs[i].Defaultvalue == "" ? "" : $" = {TheCppFunctionArgs[i].Defaultvalue}";
+                ret += $", {typeName} _{TheCppFunctionArgs[i].Name} {defualtStr}";
             }
 
             return ret;
+        }
+
+
+        public string GetContructorArgs()
+        { 
+
+            return _GetContructorArgs(true);
+        }
+
+
+        public string GetContructorArgsWithoutTypes()
+        {
+            return _GetContructorArgs(false);
         }
 
 
@@ -171,10 +270,12 @@ namespace CgenMin.MacroProcesses
 
     public abstract class AOWritableConstructible : AOWritableToAOClassContents
     {
-        public CppFunctionArgs TheCppFunctionArgs { get; }
-        public AOWritableConstructible(string fromLibrary,  string instanceNameOfTDU,   AOTypeEnum aOTypeEnum, CppFunctionArgs cppFunctionArgs = null) 
-            : base(fromLibrary,  instanceNameOfTDU, aOTypeEnum)
-        { 
+        public CppFunctionArgs TheCppFunctionArgs { get; protected set; }
+         
+
+        public AOWritableConstructible(string fromLibrary, string instanceNameOfTDU, AOTypeEnum aOTypeEnum, CppFunctionArgs cppFunctionArgs = null)
+            : base(fromLibrary, instanceNameOfTDU, aOTypeEnum)
+        {
             TheCppFunctionArgs = cppFunctionArgs;
         }
 
@@ -183,7 +284,7 @@ namespace CgenMin.MacroProcesses
         public string GetInitializationFunction()
         {
 
-            string ret = TheCppFunctionArgs == null ? "" : 
+            string ret = TheCppFunctionArgs == null ? "" :
                 AEInitializing.TheMacro2Session.GenerateFileOut("AERTOS\\UserInitialize",
                 new MacroVar() { MacroName = "ClassName", VariableValue = ClassName },
                 new MacroVar() { MacroName = "CTORArgs", VariableValue = TheCppFunctionArgs.GetContructorArgs() },

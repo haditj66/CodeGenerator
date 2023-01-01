@@ -7,6 +7,7 @@
 
 using CgenMin.MacroProcesses;
 using CGENTestProject;
+using CodeGenerator.MacroProcesses.AESetups;
 using CodeGenerator.MacroProcesses.AESetups.SPBs;
 using System.Collections.Generic;
 
@@ -19,6 +20,32 @@ namespace CGENTest2Project
         [AEEXETest]
         public void default2()
         {
+
+            AEClock aEClock = new AEClock("clock1", 1000, "clock1_callback");
+            AESensor sensor1 = new AESensor("sensor1", SensorResolution.Resolution12Bit, 0, 100);
+            AESensor sensor2 = new AESensor("sensor2", SensorResolution.Resolution12Bit, 0, 100);
+            AESensor sensor3 = new AESensor("sensor3", SensorResolution.Resolution12Bit);
+
+
+
+            AverageSPB averageSPB1 = new AverageSPB("averageSPB1", StyleOfSPB.EachSPBTask, " ", false, new SPBChannelUserDefinedCountBuffer(10));
+
+            aEClock
+    .FlowIntoSensor(sensor1, AEClock_PrescalerEnum.PRESCALER1)
+    .FlowIntoFilter(new DerivativeFilter())
+    .FlowIntoFilter(new DerivativeFilter())
+    .FlowIntoSPB(averageSPB1, SPBChannelNum.CH0, LinkTypeEnum.Copy);
+
+            aEClock
+                .FlowIntoSensor(sensor2, AEClock_PrescalerEnum.PRESCALER1)
+                .FlowIntoFilter(new DerivativeFilter())
+                .FlowIntoFilter(new DerivativeFilter());
+               // .FlowIntoSPB(averageSPB2, 0, LinkTypeEnum.Copy);
+            aEClock
+                .FlowIntoSensor(sensor3, AEClock_PrescalerEnum.PRESCALER1)
+                .FlowIntoFilter(new DerivativeFilter())
+                .FlowIntoFilter(new DerivativeFilter());
+                //.FlowIntoSPB(averageSPB3, 0, LinkTypeEnum.Copy);
 
         }
 
@@ -34,7 +61,7 @@ namespace CGENTest2Project
 
 
         protected override List<AEProject> _GetLibrariesIDependOn()
-        { 
+        {
             return new List<AEProject>() {(AEProject) new CGENTest()};
         }
         protected override List<AEHal> _GetPeripheralsInLibrary()
@@ -42,7 +69,15 @@ namespace CGENTest2Project
             return null;
         }
 
-        
+        protected override List<string> _GetAnyAdditionalIncludeDirs()
+        {
+            return new List<string>() { };
+        }
+
+        protected override List<string> _GetAnyAdditionalSRCDirs()
+        {
+            return new List<string>() { };
+        }
 
     }
 }
