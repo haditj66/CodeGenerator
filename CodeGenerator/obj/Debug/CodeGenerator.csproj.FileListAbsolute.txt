@@ -35,3 +35,4 @@ C:\CodeGenerator\CodeGenerator\Lib\bin\Debug\Stateless.xml
 C:\CodeGenerator\CodeGenerator\Lib\bin\Debug\cgen.dll.config
 C:\CodeGenerator\CodeGenerator\Lib\bin\Debug\cgen.dll
 C:\CodeGenerator\CodeGenerator\obj\Debug\cgen.exe
+C:\CodeGenerator\CodeGenerator\obj\Debug\CodeGenerator.csproj.AssemblyReference.cache
