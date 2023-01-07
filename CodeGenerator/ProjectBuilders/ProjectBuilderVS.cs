@@ -16,7 +16,11 @@ using CodeGenerator.FileTemplates;
 using CodeGenerator.GitHandlerForLibraries;
 using CodeGenerator.ProblemHandler;
 using CodeGenerator.ProjectBuilders.FileDependentImporters;
-using ConsoleApp2.CPPRefactoring;
+//using ConsoleApp2.CPPRefactoring;
+
+
+#if NOTDEPRECATED_GENERATE_AND_DEGENERATE
+
 
 namespace CodeGenerator.ProjectBuilders
 {
@@ -454,3 +458,6 @@ namespace CodeGenerator.ProjectBuilders
         }
     }
 }
+
+
+#endif

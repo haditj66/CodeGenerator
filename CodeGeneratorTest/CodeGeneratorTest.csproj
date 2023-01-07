@@ -63,10 +63,6 @@
       <Project>{8ccce98b-937f-40d8-80bb-72c7f20dfee5}</Project>
       <Name>CodeGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CodeGenerator\ConsoleApp2\CPPParser.csproj">
-      <Project>{1f805e85-0449-4037-8fb7-082163ae14ff}</Project>
-      <Name>CPPParser</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="x64\libclang.dll" />

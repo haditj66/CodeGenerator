@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CodeGenerator.IDESettingXMLs;
-using ConsoleApp2.CPPRefactoring;
+//using ConsoleApp2.CPPRefactoring;
 
 namespace CodeGenerator.ProjectBuilders.FileDependentImporters
 {

@@ -20,24 +20,24 @@ using System.Diagnostics;
 using CodeGenerator.CMD_Handler;
 using ExtensionMethods;
 using System.Reflection;
-using ClangSharp;
+//using ClangSharp;
 using CodeGenerator.FileTemplates;
 using CodeGenerator.FileTemplatesMacros;
 using CodeGenerator.GitHandlerForLibraries;
 using CodeGenerator.IDESettingXMLs.IAR_XMLs;
 using CodeGenerator.ProblemHandler;
 using CommandLine.Text;
-using ConsoleApp2;
-using ConsoleApp2.CPPRefactoring;
-using ConsoleApp2.MyClangWrapperClasses;
-using ConsoleApp2.MyClangWrapperClasses.CXCursors;
-using ConsoleApp2.MyClangWrapperClasses.CXCursors.MyCursorKinds;
-using ConsoleApp2.Parsing;
-using CPPParser;
+//using ConsoleApp2;
+//using ConsoleApp2.CPPRefactoring;
+//using ConsoleApp2.MyClangWrapperClasses;
+//using ConsoleApp2.MyClangWrapperClasses.CXCursors;
+//using ConsoleApp2.MyClangWrapperClasses.CXCursors.MyCursorKinds;
+//using ConsoleApp2.Parsing;
+//using CPPParser;
 using Extensions;
 using Project = CodeGenerator.IDESettingXMLs.VisualStudioXMLs.Project;
 using CodeGenerator.FileTemplates.GeneralMacoTemplate;
-using MyLibClangVisitors.ConsoleApp2;
+//using MyLibClangVisitors.ConsoleApp2;
 using System.Threading;
 using CgenMin.MacroProcesses;
 using CodeGenerator.MacroProcesses.AESetups;
@@ -364,12 +364,13 @@ namespace CodeGenerator
 .WithParsed<aegenerateOptions>(opts => aegenerate(opts))
 .WithParsed<aeserialOptions>(opts => aeserial(opts))
 .WithParsed<aebuildOptions>(opts => aebuild(opts))
-.WithParsed<ConfigOptions>(opts => Config(opts))
+//.WithParsed<ConfigOptions>(opts => Config(opts))
 .WithParsed<ProjectsOptions>(opts => Projects(opts))
 .WithParsed<MacroOptions>(opts => Macro(opts))
 .WithParsed<cmakeguiOptions>(opts => cmakegui(opts))
 .WithParsed<post_compileOptions>(opts => post_compile(opts))
-.WithParsed<ProjConfigOptions>(opts => ProjConfig(opts));
+//.WithParsed<ProjConfigOptions>(opts => ProjConfig(opts))
+;
 
             };
 
@@ -414,7 +415,7 @@ namespace CodeGenerator
         }
 
 
-
+#if NOTDEPRECATED_GENERATE_AND_DEGENERATE
 
         #region Config command ***************************************************************************
         //***************************************************************************************************  
@@ -838,7 +839,7 @@ namespace CodeGenerator
         }
 
         #endregion
-
+#endif
 
 
         #region Sync command ***************************************************************************
@@ -1730,7 +1731,7 @@ namespace CodeGenerator
             //add_compile_definitions(INTEGRATION_TEST_CHOSEN = "AESamples")
             //set(INTEGRATION_TESTS_FOR_AESamples SPBSamples)
 
-
+             
 
             string ProjectName = GetAEProjectName();
             string ProjectTest = GetAEProjectTestName();
@@ -1752,6 +1753,8 @@ namespace CodeGenerator
         }
 
         #endregion
+
+
         #region aeserial command ***************************************************************************
 
         static ParserResult<object> aeserial(aeserialOptions opts)
@@ -2581,7 +2584,7 @@ namespace CodeGenerator
 
         }
 
-
+        #if NOTDEPRECATED_GENERATE_AND_DEGENERATE
         public static ProjectBuilderVS CreateProjectBuilderVS()
         {
 
@@ -2597,9 +2600,9 @@ namespace CodeGenerator
             return new ProjectBuilderVS(settingConfig);
 
         }
+#endif
 
-
-        #endregion
+#endregion
 
 
 
