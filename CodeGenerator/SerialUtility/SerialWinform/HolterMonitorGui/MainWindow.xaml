@@ -1,0 +1,18 @@
+﻿<Window x:Class="HolterMonitorGui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HolterMonitorGui"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <TextBox x:Name="ReceiveTextBox" HorizontalAlignment="Left" Height="299" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="275"/>
+        <Button x:Name="Button1" Content="Button1" HorizontalAlignment="Left" Margin="362,60,0,0" VerticalAlignment="Top" Width="75" Background="#FFDDDDDD" Click="Button1_Click"/>
+        <Button x:Name="Button2" Content="Button2" HorizontalAlignment="Left" Margin="362,112,0,0" VerticalAlignment="Top" Width="75" Click="Button2_Click"/>
+        <Button x:Name="Button3" Content="Button3" HorizontalAlignment="Left" Margin="362,162,0,0" VerticalAlignment="Top" Width="75" Click="Button3_Click"/>
+        <Button x:Name="Button4" Content="Button4" HorizontalAlignment="Left" Margin="362,208,0,0" VerticalAlignment="Top" Width="75" Click="Button4_Click"/>
+        <Button x:Name="Button5" Content="Button5" HorizontalAlignment="Left" Margin="362,244,0,0" VerticalAlignment="Top" Width="75" Click="Button5_Click"/>
+
+    </Grid>
+</Window>

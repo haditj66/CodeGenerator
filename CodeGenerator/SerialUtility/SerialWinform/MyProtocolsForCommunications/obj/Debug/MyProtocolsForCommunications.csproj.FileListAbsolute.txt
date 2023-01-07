@@ -1,0 +1,26 @@
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\MyProtocolsForCommunications.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\MyProtocolsForCommunications.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\SequenceFinderLibrary.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\SequenceFinderLibrary.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.csproj.CoreCompileInputs.cache
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.csproj.CopyComplete
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\MatFileHandler.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\System.ValueTuple.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\MatFileHandler.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\bin\Debug\MatFileHandler.xml
+C:\Users\hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\MyProtocolsForCommunications.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\MyProtocolsForCommunications.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\SequenceFinderLibrary.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\MatFileHandler.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\System.ValueTuple.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\SequenceFinderLibrary.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\MatFileHandler.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\bin\Debug\MatFileHandler.xml
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.csproj.CopyComplete
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\MyProtocolsForCommunications\obj\Debug\MyProtocolsForCommunications.pdb

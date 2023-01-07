@@ -1,0 +1,15 @@
+﻿
+
+this protocol will have states as follows
+1. Idle: this will have all data send to the idle handler.
+transitions to a: 
+	UploadingData state only when a sequence of "bbbbbbbbbbbbbbbbbbbbbbbbbbbbb" is found
+
+2.UploadingData: when in this state, all data is not handled and will instead be ignored completely.
+transitions to a: 
+	OpeningPacket state only when a sequence of "starting" is found
+	Idle		  state only when a sequence of "qqqqqqqqqqqqqqqqqqqqqqqqqqqq" is found
+
+3.OpeningPacket: when in this state, all data is handled by OpeningPacket data handler
+transitions to a: 
+	UploadingData state only when a sequence of "finished" is found. a SendDataRecievedHandler will also then be sent

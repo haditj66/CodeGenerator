@@ -1,0 +1,26 @@
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\ClassLibrary2.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\ClassLibrary2.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\obj\Debug\MyUartLibrary.csproj.CoreCompileInputs.cache
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\obj\Debug\ClassLibrary2.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\obj\Debug\ClassLibrary2.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\SequenceFinderLibrary.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\SequenceFinderLibrary.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\obj\Debug\MyUartLibrary.csproj.CopyComplete
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\MatFileHandler.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\System.ValueTuple.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\MatFileHandler.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\bin\Debug\MatFileHandler.xml
+C:\Users\hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\ClassLibrary2\obj\Debug\MyUartLibrary.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\ClassLibrary2.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\ClassLibrary2.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\SequenceFinderLibrary.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\MatFileHandler.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\System.ValueTuple.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\SequenceFinderLibrary.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\MatFileHandler.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\bin\Debug\MatFileHandler.xml
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\obj\Debug\MyUartLibrary.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\obj\Debug\MyUartLibrary.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\obj\Debug\MyUartLibrary.csproj.CopyComplete
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\obj\Debug\ClassLibrary2.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\ClassLibrary2\obj\Debug\ClassLibrary2.pdb

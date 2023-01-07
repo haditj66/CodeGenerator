@@ -1,0 +1,22 @@
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\bin\Debug\SequenceFinderLibrary.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\bin\Debug\SequenceFinderLibrary.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.csproj.CoreCompileInputs.cache
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\bin\Debug\MatFileHandler.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\bin\Debug\System.ValueTuple.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\bin\Debug\MatFileHandler.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\bin\Debug\MatFileHandler.xml
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.csproj.CopyComplete
+C:\Users\hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\bin\Debug\SequenceFinderLibrary.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\bin\Debug\SequenceFinderLibrary.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\bin\Debug\MatFileHandler.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\bin\Debug\System.ValueTuple.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\bin\Debug\MatFileHandler.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\bin\Debug\MatFileHandler.xml
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.csproj.CopyComplete
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\SequenceFinderLibrary\obj\Debug\SequenceFinderLibrary.pdb

@@ -1,0 +1,16 @@
+DirOfProject: C:/AERTOSProjects/commonHalAOs
+ProjectName: commonHalAOs
+ProjectTestName: dataupload1VarTest
+RunName: run1
+sizeOfVar1: 100
+sizeOfVar2: 1
+sizeOfVar3: 1
+sizeOfVar4: 1
+sizeOfVar5: 1
+sizeOfVar6: 1
+sizeOfVar7: 1
+sizeOfVar8: 1
+NumOfVars: 1
+ComPort: 3
+BufferThisManyBeforeCallback: 500
+BaudRate: 460800

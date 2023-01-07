@@ -1,0 +1,101 @@
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe.config
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\MainWindow.g.cs
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\App.g.cs
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.cache
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.lref
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\MainWindow.baml
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.g.resources
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.Properties.Resources.resources
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.GenerateResource.Cache
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CoreCompileInputs.cache
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.exe
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\ClassLibrary2.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\ClassLibrary2.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CopyComplete
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\MatFileHandler.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\System.ValueTuple.dll
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\MatFileHandler.pdb
+C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\bin\Debug\MatFileHandler.xml
+C:\Users\hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\Serial stuff\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\MainWindow.g.cs
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\App.g.cs
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.cache
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.lref
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.exe
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.pdb
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe.config
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.pdb
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\ClassLibrary2.dll
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.dll
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.dll
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\System.ValueTuple.dll
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\ClassLibrary2.pdb
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.pdb
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.pdb
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\MatFileHandler.pdb
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\bin\Debug\MatFileHandler.xml
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\MainWindow.baml
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.g.resources
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.Properties.Resources.resources
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.GenerateResource.cache
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CodeGenerator\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CopyComplete
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe.config
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\HolterMonitorGui.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\ClassLibrary2.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\System.ValueTuple.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\ClassLibrary2.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\MatFileHandler.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\bin\Debug\MatFileHandler.xml
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\MainWindow.g.cs
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\App.g.cs
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.lref
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\MainWindow.baml
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.g.resources
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.Properties.Resources.resources
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.GenerateResource.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CopyComplete
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.exe
+C:\CodeGenerator\CodeGenerator\SerialUtility\serial try winform\HolterMonitorGui\obj\Debug\HolterMonitorGui.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe.config
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\HolterMonitorGui.exe
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\HolterMonitorGui.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\ClassLibrary2.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\System.ValueTuple.dll
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\ClassLibrary2.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\MyProtocolsForCommunications.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\SequenceFinderLibrary.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\MatFileHandler.pdb
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\bin\Debug\MatFileHandler.xml
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.AssemblyReference.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\MainWindow.g.cs
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\App.g.cs
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui_MarkupCompile.lref
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\MainWindow.baml
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.g.resources
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.Properties.Resources.resources
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.GenerateResource.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CoreCompileInputs.cache
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.csproj.CopyComplete
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.exe
+C:\CodeGenerator\CodeGenerator\SerialUtility\SerialWinform\HolterMonitorGui\obj\Debug\HolterMonitorGui.pdb
