@@ -55,19 +55,19 @@ namespace CgenMin.MacroProcesses
     }
 
 
-    public class ADCPERIPHERAL1_CH1  : ADCPERIPHERALBase<ADCPERIPHERAL1_CH1> 
-    { 
+    public class ADCPERIPHERAL1_CH1 : ADCPERIPHERALBase<ADCPERIPHERAL1_CH1>
+    {
         public ADCPERIPHERAL1_CH1()
-            : base(1,1)
-        { } 
+            : base(1, 1)
+        { }
 
     }
 
-    public class ADCPERIPHERAL1_CH2 : ADCPERIPHERALBase<ADCPERIPHERAL1_CH2> 
+    public class ADCPERIPHERAL1_CH2 : ADCPERIPHERALBase<ADCPERIPHERAL1_CH2>
     {
         public ADCPERIPHERAL1_CH2()
             : base(1, 2)
-        {  }
+        { }
 
     }
     public class ADCPERIPHERAL1_CH3 : ADCPERIPHERALBase<ADCPERIPHERAL1_CH3>
@@ -120,9 +120,9 @@ namespace CgenMin.MacroProcesses
 
     public interface IPWM
     {
-        Portenum PortofPWM { get;   }
-        PinEnum PinOfPWM { get;  }
-          string InstName { get;  }
+        Portenum PortofPWM { get; }
+        PinEnum PinOfPWM { get; }
+        string InstName { get; }
     }
 
 
@@ -162,13 +162,13 @@ namespace CgenMin.MacroProcesses
 
 
 
-    public class PWMPERIPHERAL1 : PWMPERIPHERALBase<PWMPERIPHERAL1> 
-    { 
-        public PWMPERIPHERAL1 ()
+    public class PWMPERIPHERAL1 : PWMPERIPHERALBase<PWMPERIPHERAL1>
+    {
+        public PWMPERIPHERAL1()
             : base(1)
-        { 
+        {
         }
-         
+
     }
 
     public class PWMPERIPHERAL2 : PWMPERIPHERALBase<PWMPERIPHERAL2>
@@ -176,7 +176,7 @@ namespace CgenMin.MacroProcesses
         public PWMPERIPHERAL2()
             : base(2)
         {
-        } 
+        }
     }
     public class PWMPERIPHERAL3 : PWMPERIPHERALBase<PWMPERIPHERAL3>
     {
@@ -184,7 +184,7 @@ namespace CgenMin.MacroProcesses
             : base(3)
         {
         }
-    }   
+    }
     public class PWMPERIPHERAL4 : PWMPERIPHERALBase<PWMPERIPHERAL4>
     {
         public PWMPERIPHERAL4()
@@ -206,29 +206,43 @@ namespace CgenMin.MacroProcesses
     //UART
     //====================================================================================================
 
+
+    public interface IUART
+    {
+          BaudRatesEnum BaudRate { get;   }
+            int ReceiveMsgSizeInBytes { get;  }
+          Portenum UART_TX_Port { get;   }
+          PinEnum UART_TX_Pin { get;   }
+          Portenum UART_RX_Port { get;  }
+          PinEnum UART_RX_Pin { get;  }
+        string InstName { get; }
+    }
+
     //BaudRate, ReceiveMsgSize, UART_TX_Port, UART_TX_Pin, UART_RX_Port, UART_RX_Pin
     //#define UARTPERIPHERAL2 UARTPeripheral<115200, 2, PortD, PIN5, PortD, PIN6>// PortA, PIN3>////460800 * 2
     //#define UARTPERIPHERAL2_Name uart1
-   public enum BaudRatesEnum
+    public enum BaudRatesEnum
     {
-        T_110 =110, T_300= 300, T_600=600, T_1200=1200, T_2400=2400, T_4800=4800, T_9600=9600, T_14400=14400, T_19200=19200, T_38400=38400, T_57600 = 57600, T_115200 = 115200, T_128000 = 128000, T_256000 = 256000
+        T_110 = 110, T_300 = 300, T_600 = 600, T_1200 = 1200, T_2400 = 2400, T_4800 = 4800, T_9600 = 9600, T_14400 = 14400, T_19200 = 19200, T_38400 = 38400, T_57600 = 57600, T_115200 = 115200, T_128000 = 128000, T_256000 = 256000, T_460800 = 460800, T_921600 = 921600
     }
 
-    public class UARTPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>
+    public class UARTPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>, IUART
         where TDerived : UARTPERIPHERALBase<TDerived>, new()
     {
         public UARTPERIPHERALBase(int peripheralNum)
             : base($"UARTPERIPHERAL", "UARTPeripheral", peripheralNum)
         {
+            InstName = InstanceName;
         }
-         
+
         public BaudRatesEnum BaudRate { get; protected set; }
         public int ReceiveMsgSizeInBytes { get; protected set; }
         public Portenum UART_TX_Port { get; protected set; }
         public PinEnum UART_TX_Pin { get; protected set; }
         public Portenum UART_RX_Port { get; protected set; }
         public PinEnum UART_RX_Pin { get; protected set; }
-        public static TDerived Init(BaudRatesEnum baudRate, int receiveMsgSizeInBytes, Portenum uART_TX_Port, PinEnum uART_TX_Pin, Portenum uART_RX_Port, PinEnum uART_RX_Pin )
+        public string InstName { get; }
+        public static TDerived Init(BaudRatesEnum baudRate, int receiveMsgSizeInBytes, Portenum uART_TX_Port, PinEnum uART_TX_Pin, Portenum uART_RX_Port, PinEnum uART_RX_Pin)
         {
             TDerived inst = _PInit();
 
@@ -237,7 +251,7 @@ namespace CgenMin.MacroProcesses
             inst.UART_TX_Port = uART_TX_Port;
             inst.UART_TX_Pin = uART_TX_Pin;
             inst.UART_RX_Port = uART_RX_Port;
-            inst.UART_RX_Pin = uART_RX_Pin; 
+            inst.UART_RX_Pin = uART_RX_Pin;
             return inst;
         }
 
@@ -251,7 +265,7 @@ namespace CgenMin.MacroProcesses
             return ret;
         }
     }
-     
+
     public class UARTPERIPHERAL1 : UARTPERIPHERALBase<UARTPERIPHERAL1>
     {
         public UARTPERIPHERAL1()
@@ -393,14 +407,30 @@ namespace CgenMin.MacroProcesses
     //#define templateargsForI2C WhichInstanceOfI2C, I2C_SCL_Port, I2C_SCL_Pin, I2C_SDA_Port, I2C_SDA_Pin, Clockspeed
 
 
-    public class I2CPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>
+
+ 
+
+
+    public interface II2C
+    {
+        string InstName { get; }
+        int ClockSpeedFreq { get; }
+        Portenum DataLine_Port { get; }
+        PinEnum DataLine_Pin { get; }
+        Portenum Clock_Port { get; }
+        PinEnum Clock_Pin { get; }
+    }
+
+    public class I2CPERIPHERALBase<TDerived> : AEHalWithOutChannel<TDerived>, II2C
         where TDerived : I2CPERIPHERALBase<TDerived>, new()
     {
         public I2CPERIPHERALBase(int peripheralNum)
-            : base($"I2CPERIPHERAL", "I2CPeripheral", peripheralNum) 
+            : base($"I2CPERIPHERAL", "I2CPeripheral", peripheralNum)
         {
+            InstName = this.InstanceName;
         }
-         
+
+        public string InstName { get; protected set; }
         public int ClockSpeedFreq { get; protected set; }
         public Portenum DataLine_Port { get; protected set; }
         public PinEnum DataLine_Pin { get; protected set; }
@@ -417,7 +447,7 @@ namespace CgenMin.MacroProcesses
             inst.DataLine_Port = dataLine_Port;
             inst.DataLine_Pin = dataLine_Pin;
             inst.Clock_Port = clock_Port;
-            inst.Clock_Pin = clock_Pin; 
+            inst.Clock_Pin = clock_Pin;
             return inst;
         }
 
@@ -436,13 +466,13 @@ namespace CgenMin.MacroProcesses
     {
         public I2CPERIPHERAL1()
             : base(1)
-        {}  
-    }  
+        { }
+    }
     public class I2CPERIPHERAL2 : I2CPERIPHERALBase<I2CPERIPHERAL2>
     {
         public I2CPERIPHERAL2()
             : base(2)
-        {}  
+        { }
     }
     public class I2CPERIPHERAL3 : I2CPERIPHERALBase<I2CPERIPHERAL3>
     {
@@ -491,21 +521,21 @@ namespace CgenMin.MacroProcesses
         public GPIOPERIPHERALBase(int peripheralNum)
             : base($"GPIOPERIPHERAL", "GPIOPeripheral", peripheralNum)
         {
-            InstName = InstName;
+            InstName = InstanceName;
         }
-         
+
         public Portenum Gpio_Port { get; protected set; }
-        public PinEnum Gpio_Pin { get; protected set; } 
+        public PinEnum Gpio_Pin { get; protected set; }
         public string InstName { get; }
 
-        public static TDerived Init( 
-            Portenum gpio_Port, PinEnum gpio_Pin 
+        public static TDerived Init(
+            Portenum gpio_Port, PinEnum gpio_Pin
             )
         {
-            TDerived inst = _PInit(); 
+            TDerived inst = _PInit();
 
             inst.Gpio_Port = gpio_Port;
-            inst.Gpio_Pin = gpio_Pin; 
+            inst.Gpio_Pin = gpio_Pin;
             return inst;
         }
 

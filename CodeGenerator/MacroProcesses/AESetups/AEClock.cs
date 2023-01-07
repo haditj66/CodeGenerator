@@ -22,20 +22,21 @@ namespace CgenMin.MacroProcesses
 
         List<Tuple<AESensor, AEClock_PrescalerEnum>> SensorsIFlowTo;
         List<Tuple<AEUtilityService, AEClock_PrescalerEnum>> TdusIFlowTo;
+        public List<Tuple<AEUtilityService, AEClock_PrescalerEnum>> GetTdusIFlowTo() { return TdusIFlowTo; }
 
         protected static int NumOfClocksMadeSoFar = 0;
         int clockidNum;
-        public AEClock(string nameOfClock, int frequencyOfClock, string nameOfClockCallBack, bool ticksFromRTOSTimer = true)
-        : base($"clock{NumOfClocksMadeSoFar.ToString()}", AOTypeEnum.Clock)
-        {
-            _Init(nameOfClock, frequencyOfClock, nameOfClockCallBack, ticksFromRTOSTimer);
+        //public AEClock(string nameOfClock, int frequencyOfClock, string nameOfClockCallBack, bool ticksFromRTOSTimer = true)
+        //: base($"clock{NumOfClocksMadeSoFar.ToString()}", AOTypeEnum.Clock)
+        //{
+        //    _Init(nameOfClock, frequencyOfClock, nameOfClockCallBack, ticksFromRTOSTimer);
 
-        }
+        //}
 
         public AEClock(string nameOfClock, int frequencyOfClock,  bool ticksFromRTOSTimer = true)
 : base($"clock{NumOfClocksMadeSoFar.ToString()}", AOTypeEnum.Clock)
         {
-            _Init(nameOfClock, frequencyOfClock, $"{nameOfClock}_cb", ticksFromRTOSTimer);
+            _Init(nameOfClock, frequencyOfClock, $"{nameOfClock}_callback", ticksFromRTOSTimer);
 
         }
 
@@ -70,7 +71,7 @@ namespace CgenMin.MacroProcesses
 
         public void FlowIntoTDU(AEUtilityService UtilityOfTdu, AEClock_PrescalerEnum prescaler)
         {
-
+            
             TdusIFlowTo.Add(new Tuple<AEUtilityService, AEClock_PrescalerEnum>(UtilityOfTdu, prescaler));
             //TdusIFlowTo.ClockIAmFrom = this;
 
@@ -102,6 +103,11 @@ namespace CgenMin.MacroProcesses
             {
                 ret += $"static AEClock{GetTemplateType} {NameOfClock}L({FrequencyOfClock.ToString()}, {NameOfClockCallBack});" + "\n";
                 ret += $"{NameOfClock} = &{NameOfClock}L;" + "\n";
+            }
+            else
+            {
+                ret += $"static AEClock{GetTemplateType} {NameOfClock}L({FrequencyOfClock.ToString()} );" + "\n";
+                ret += $"{NameOfClock} = &{NameOfClock}L;" + "\n"; 
             }
 
             return ret;

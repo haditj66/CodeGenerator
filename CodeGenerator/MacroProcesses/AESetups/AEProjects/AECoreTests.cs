@@ -228,11 +228,11 @@ namespace AECoreTestsProject
 		[AEEXETest]
         public void testSPB()
         {
-            AEClock aEClock = new AEClock("clock1", 1000, "clock1_callback");
+            AEClock aEClock = new AEClock("clock1", 1000 );
 
-            AESensor aESensor1 = new AESensor("sensor1", SensorResolution.Resolution12Bit);
-            AESensor aESensor2 = new AESensor("sensor2", SensorResolution.Resolution12Bit);
-            AESensor aESensor3 = new AESensor("sensor3", SensorResolution.Resolution12Bit);
+            AESensor aESensor1 = new AESensor("sensor1", SensorResolution.Resolution12Bit, SensorDataType.uint16_T);
+            AESensor aESensor2 = new AESensor("sensor2", SensorResolution.Resolution12Bit, SensorDataType.uint16_T);
+            AESensor aESensor3 = new AESensor("sensor3", SensorResolution.Resolution12Bit, SensorDataType.uint16_T);
 
             AverageSPB averageSPB1 = new AverageSPB("averageSPB1", StyleOfSPB.EachSPBTask, "", false, new SPBChannelUserDefinedCountBuffer(10));
             AverageSPB averageSPB2 = new AverageSPB("averageSPB2", StyleOfSPB.EachSPBTask, "", false, new SPBChannelUserDefinedCountBuffer(10));
@@ -258,11 +258,11 @@ namespace AECoreTestsProject
         [AEEXETest]
         public void testFilters()
         {
-            AEClock aEClock = new AEClock("clock1", 100, "clock1_callback");
+            AEClock aEClock = new AEClock("clock1", 100 );
 
-            AESensor aESensor1 = new AESensor("sensor1", SensorResolution.Resolution16Bit);
-            AESensor aESensor2 = new AESensor("sensor2", SensorResolution.Resolution16Bit);
-            AESensor aESensor3 = new AESensor("sensor3", SensorResolution.Resolution16Bit);
+            AESensor aESensor1 = new AESensor("sensor1", SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor2 = new AESensor("sensor2", SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor3 = new AESensor("sensor3", SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
             
 
             ThreeDimensionalVector velocitySPB = new ThreeDimensionalVector("velocitySPB", StyleOfSPB.EachSPBTask, false);
@@ -323,7 +323,7 @@ namespace AECoreTestsProject
         [AEEXETest]
         public void testTDU()
         {
-            AEClock aEClock = new AEClock("clockforTdu", 1000, "clockforTdu_cb");
+            AEClock aEClock = new AEClock("clockforTdu", 1000 );
 
             UARTDriverTDU uARTDriver = new UARTDriverTDU("uartDriverTDU", AEPriorities.MediumPriority);
 

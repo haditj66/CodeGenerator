@@ -118,6 +118,8 @@ namespace CgenMin.MacroProcesses
         }
 
 
+        public static string ProjectTestName { get; set; }
+
 
         public override void RunProcess()
         {
@@ -134,7 +136,7 @@ namespace CgenMin.MacroProcesses
             const string off = "Off";
             const char space = ' ';
 
-
+            ProjectTestName = projectTest;
 
             //            var rxEvent = new I2C_RXCpltEVT(10);
             //            var updEvent = new UpdateEVT(10);

@@ -96,6 +96,11 @@ namespace CodeGenerator
         [Verb("aegenerate", HelpText = "aertos utility to generate current selected aertos project")]
         public class aegenerateOptions
         {
+        }  
+
+        [Verb("aeserial", HelpText = "aertos utility to launch the serial utility. This needs to be runnning to read uploaded data from a running AE device.")]
+        public class aeserialOptions
+        {
         }
 
         [Verb("aebuild", HelpText = "aertos utility to build projects. This will build dependencies in the proper order.")]
@@ -114,48 +119,30 @@ namespace CodeGenerator
         {
         }
 
-        [Verb("generate", HelpText = "generate the code")]
-        public class GenerateOptions
-        {
+        //[Verb("generate", HelpText = "generate the code")]
+        //public class GenerateOptions
+        //{
 
-            [Option(HelpText = "only build the configurations for the dependent libraries and not importing all files")]
-            public bool config { get; set; }
+        //    [Option(HelpText = "only build the configurations for the dependent libraries and not importing all files")]
+        //    public bool config { get; set; }
 
-            [Option(HelpText = "This will use git to go to switch to an appropriate version when fetching other libraries. use this when you have a library that has been changed and you want to use a past version of that library.")]
-            public bool git { get; set; }
+        //    [Option(HelpText = "This will use git to go to switch to an appropriate version when fetching other libraries. use this when you have a library that has been changed and you want to use a past version of that library.")]
+        //    public bool git { get; set; }
 
-            [Option('i', HelpText = "This will ignore all files that are anywhere in this filter. use this when you have 3rd party files that are shared within ALL libraries.")]
-            public string ignoreFilesInFilter { get; set; }
+        //    [Option('i', HelpText = "This will ignore all files that are anywhere in this filter. use this when you have 3rd party files that are shared within ALL libraries.")]
+        //    public string ignoreFilesInFilter { get; set; }
 
-            /*
-            [Option('t', Separator = ':')]
-            public IEnumerable<string> Types { get; set; }
+ 
+        //}
 
-            [Option('r', Separator = ' ', HelpText = "the file that has the list of all files you want to generate code into")]
-            public IEnumerable<string> IncludeFiles { get; set; }
+        //[Verb("degenerate", HelpText = "degenerate the code")]
+        //public class DegenerateOptions
+        //{
 
-            [Option('d', Separator = ' ', HelpText = "directories that have all files you want to generate code into")]
-            public IEnumerable<string> IncludeDirectories { get; set; }
+        //    [Option('r', Separator = ' ')]
+        //    public IEnumerable<string> IncludeFiles { get; set; }
 
-            [Option(Default = false)]
-            public bool AIEnabled { get; set; }
-
-            [Value(1, Min = 1, Max = 3)]
-            public IEnumerable<string> StringSeq { get; set; }
-
-            [Value(2)]
-            public double DoubleValue { get; set; }
-            */
-        }
-
-        [Verb("degenerate", HelpText = "degenerate the code")]
-        public class DegenerateOptions
-        {
-
-            [Option('r', Separator = ' ')]
-            public IEnumerable<string> IncludeFiles { get; set; }
-
-        }
+        //}
 
         [Verb("sync", HelpText = "sync to other project from you main VS project")]
         public class SyncOptions
@@ -241,6 +228,8 @@ namespace CodeGenerator
         public static string PATHTOCONFIGTEST = DIRECTORYOFTHISCG + "..\\..\\..\\..\\ConfigTest"; //@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\ConfigTest";
         public static string PATHTOCMAKEGUI = DIRECTORYOFTHISCG + "..\\..\\..\\..\\CgenCmakeGui";
 
+        public static string PATHTO_SERIAL_UTILITY = DIRECTORYOFTHISCG + "\\..\\..\\..\\CodeGenerator\\SerialUtility\\SerialWinform\\HolterMonitorGui";
+
 #if TESTING
         //public static string envIronDirectory = @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1AA";//
         //public static string envIronDirectory =   @"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\Module1A";//
@@ -314,6 +303,7 @@ namespace CodeGenerator
         //static string[] command = "aeinit commonHalAOs".Split(' ');
         //static string[] command = "aeselect CGENTest ".Split(' ');
         static string[] command = "aegenerate".Split(' ');
+        //static string[] command = "aeserial".Split(' ');
         //static string[] command = "aebuild".Split(' ');
         //static string[] command = "aeinit AESamples".Split(' ');
         //static string[] command = "post_compile".Split(' ');
@@ -362,9 +352,9 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments<GenerateOptions, Macro2Options, aeinitOptions, aeselectOptions, aegenerateOptions, aebuildOptions, DegenerateOptions, InitOptions, QRInitOptions, SyncOptions, ConfigOptions, ProjectsOptions, MacroOptions, ProjConfigOptions, post_compileOptions, cmakeguiOptions>(command)
-.WithParsed<GenerateOptions>(opts => Generate(opts))
-.WithParsed<DegenerateOptions>(opts => Degenerate(opts))
+                Parser.Default.ParseArguments< Macro2Options, aeinitOptions, aeselectOptions, aegenerateOptions, aeserialOptions, aebuildOptions,   InitOptions, QRInitOptions, SyncOptions, ConfigOptions, ProjectsOptions, MacroOptions, ProjConfigOptions, post_compileOptions, cmakeguiOptions>(command)
+//.WithParsed<GenerateOptions>(opts => Generate(opts))
+//.WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
 .WithParsed<InitOptions>(opts => Init(opts))
 .WithParsed<QRInitOptions>(opts => QRInit(opts))
@@ -372,6 +362,7 @@ namespace CodeGenerator
 .WithParsed<aeinitOptions>(opts => aeinit(opts))
 .WithParsed<aeselectOptions>(opts => aeselect(opts))
 .WithParsed<aegenerateOptions>(opts => aegenerate(opts))
+.WithParsed<aeserialOptions>(opts => aeserial(opts))
 .WithParsed<aebuildOptions>(opts => aebuild(opts))
 .WithParsed<ConfigOptions>(opts => Config(opts))
 .WithParsed<ProjectsOptions>(opts => Projects(opts))
@@ -1753,6 +1744,23 @@ namespace CodeGenerator
         }
 
         #endregion
+        #region aeserial command ***************************************************************************
+
+        static ParserResult<object> aeserial(aeserialOptions opts)
+        {
+            ProblemHandle prob = new ProblemHandle();
+
+            string pathToconfexe = Path.Combine(CodeGenerator.Program.PATHTO_SERIAL_UTILITY, "bin", "Debug");//, "HolterMonitorGui.exe");
+            CMDHandler cMDHandler = new CMDHandler(pathToconfexe);
+
+            cMDHandler.ExecuteCommand("HolterMonitorGui.exe");
+
+
+
+            return null;
+        }
+
+        #endregion
 
 
 
@@ -1838,6 +1846,8 @@ namespace CodeGenerator
 
         #endregion
 
+
+#if NOTDEPRECATED_GENERATE_AND_DEGENERATE
 
         #region Generate command ***************************************************************************
         //***************************************************************************************************  
@@ -1996,7 +2006,7 @@ namespace CodeGenerator
         }
 
         #endregion
-
+#endif
 
 
 

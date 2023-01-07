@@ -119,13 +119,34 @@ namespace CgenMin.MacroProcesses
     }
 
 
-    public class CppFunctionArgWithValue<TargTyp1> : CppFunctionArg
+    public class CppFunctionArgWithValue<TargTyp1> : CppFunctionArg 
     { 
         public TargTyp1 ValueOfArg1;
+
+        public string GetValueOfArgStr()
+        {
+            if (getType<TargTyp1>() == CppTypeEnum.float_t)
+            {
+                //FloatInTemplateWorkAround<15161, 20> 
+                int numOFDecimalsToTheLeft = 0;
+                float asdfe = (float)(object)(TargTyp1)ValueOfArg1; 
+                while (asdfe % 1 != 0)
+                {
+                    numOFDecimalsToTheLeft++; 
+                    asdfe *= 10;
+                }
+
+                return $"FloatInTemplateWorkAround<{asdfe.ToString("0." + new string('#', 339))}, {numOFDecimalsToTheLeft}>";
+            }
+            else
+            {
+                return ValueOfArg1.ToString();
+            }
+        }
          
         public CppFunctionArgWithValue(string name, TargTyp1 value, bool isPublicSet = true)
             : base(getType<TargTyp1>(), name, isPublicSet, "")
-        {
+        { 
             ValueOfArg1 = value;
         }
 

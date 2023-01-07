@@ -6,10 +6,320 @@
 
 using CgenMin.MacroProcesses;
 using CodeGenerator.MacroProcesses.AESetups;
+using CodeGenerator.ProblemHandler;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace commonHalAOsProject
 {
+
+
+
+    public class UploadDataUartRx1 : AEEventSignal<UploadDataUartRx1>
+    {
+        public UploadDataUartRx1() :
+            base("UploadDataUartRx1",
+            ""
+            )
+        { }
+    }
+    public class UploadDataUartRx2 : AEEventSignal<UploadDataUartRx2>
+    {
+        public UploadDataUartRx2() :
+            base("UploadDataUartRx2",
+            ""
+            )
+        { }
+    }
+
+    public class UploadDataToPcU : AEUtilityService
+    {
+        private string RunName;
+
+        public List<int> SizeOfVars { get; }
+
+        public int NumOfVars { get; }
+
+        private int ComPort;
+        private int BufferThisManyBeforeCallback;
+        private int BaudRate;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="instanceNameOfTDU"></param>
+        /// <param name="serviceBuffersize"></param>
+        /// <param name="priority"></param>
+        /// <param name="poolSizeOfSignals"></param>
+        /// <param name="comPort">serial port of your usb to serial connection.</param>
+        /// <param name="uartIuse"></param>
+        /// <param name="bufferThisManyBeforeCallback">this deals with the buffer that the serial utility will have before it actually triggers the callback to 
+        /// process the data. NOTE: CHechIfPcConnected service WILL NOT WORK IF THIS VALUE IS NOT 17 !! a higher value may be needed if the utility cannot keep
+        /// up with the frequency of data coming in. </param>
+        /// <param name="runName">you can save different runs</param>
+        /// <param name="sizeOfVar">size of variables you will be uploading. for example you could upload 5 variables with the second variable being of array size 20</param>
+        public UploadDataToPcU(string instanceNameOfTDU, int serviceBuffersize, AEPriorities priority, int poolSizeOfSignals, int comPort, IUART uartIuse, int bufferThisManyBeforeCallback = 17, string runName = "defaultRun", params int[] sizeOfVar)
+            : base("commonHalAOs", instanceNameOfTDU, priority, serviceBuffersize,
+                  new CppFunctionArgs(
+                        new CppFunctionArg("AEUART*", "uartPeripheralToUse")
+                        ),
+                  new ActionRequest("UploadDataToPC", ServiceType.TDU, "bool", "char*", "DataToSend", "uint16_t", "SizeOfData"),
+                  new ActionRequest("CheckIfThereIsPCConnection", ServiceType.TDU, "bool", "bool", "placeHolderArg")
+                  )
+        {
+
+            ComPort = comPort;
+            RunName = runName;
+             
+
+            BaudRate = (int)uartIuse.BaudRate;
+
+            BufferThisManyBeforeCallback = bufferThisManyBeforeCallback;
+
+            UploadDataUartRx1.Init(poolSizeOfSignals);
+            UploadDataUartRx2.Init(poolSizeOfSignals);
+
+
+            SizeOfVars = sizeOfVar.ToList();
+            NumOfVars = sizeOfVar.Length;
+            int sizeOfVar1 = NumOfVars > 0 ? sizeOfVar[0] : 1;
+            int sizeOfVar2 = NumOfVars > 1 ? sizeOfVar[1] : 1;
+            int sizeOfVar3 = NumOfVars > 2 ? sizeOfVar[2] : 1;
+            int sizeOfVar4 = NumOfVars > 3 ? sizeOfVar[3] : 1;
+            int sizeOfVar5 = NumOfVars > 4 ? sizeOfVar[4] : 1;
+            int sizeOfVar6 = NumOfVars > 5 ? sizeOfVar[5] : 1;
+            int sizeOfVar7 = NumOfVars > 6 ? sizeOfVar[6] : 1;
+            int sizeOfVar8 = NumOfVars > 7 ? sizeOfVar[7] : 1;
+
+
+            string toWrite = "";
+            toWrite += $"DirOfProject: {AEInitializing.RunningProjectDir}"; toWrite += "\n";
+            toWrite += $"ProjectName: {AEInitializing.RunningProjectName}"; toWrite += "\n";
+            toWrite += $"ProjectTestName: {AEInitializing.ProjectTestName}"; toWrite += "\n";
+            toWrite += $"RunName: {RunName}"; toWrite += "\n";
+
+            toWrite += $"sizeOfVar1: {sizeOfVar1}"; toWrite += "\n";
+            toWrite += $"sizeOfVar2: {sizeOfVar2}"; toWrite += "\n";
+            toWrite += $"sizeOfVar3: {sizeOfVar3}"; toWrite += "\n";
+            toWrite += $"sizeOfVar4: {sizeOfVar4}"; toWrite += "\n";
+            toWrite += $"sizeOfVar5: {sizeOfVar5}"; toWrite += "\n";
+            toWrite += $"sizeOfVar6: {sizeOfVar6}"; toWrite += "\n";
+            toWrite += $"sizeOfVar7: {sizeOfVar7}"; toWrite += "\n";
+            toWrite += $"sizeOfVar8: {sizeOfVar8}"; toWrite += "\n";
+
+            toWrite += $"NumOfVars: {NumOfVars}"; toWrite += "\n";
+
+            toWrite += $"ComPort: {ComPort}"; toWrite += "\n";
+            toWrite += $"BufferThisManyBeforeCallback: {BufferThisManyBeforeCallback}"; toWrite += "\n";
+            toWrite += $"BaudRate: {BaudRate}"; toWrite += "\n";
+
+            //send all data to the text file 
+            string pathToconfFile = Path.Combine(CodeGenerator.Program.PATHTO_SERIAL_UTILITY, "bin", "Debug", "SerialUtilConf.txt");
+
+            File.Create(pathToconfFile).Close();
+            //delete everything first
+            File.WriteAllText(pathToconfFile, "");
+            File.WriteAllText(pathToconfFile, toWrite);
+        }
+    }
+
+
+
+    public class DataToPC_SPB
+    {
+
+        protected class DataToPC1_SPB : AESPBBase
+        {
+            public DataToPC1_SPB(string nameOfSPB, StyleOfSPB styleOfSPB, UploadDataToPcU uploadDataIUse, int sizeOfVar1)
+                : base("commonHalAOs", nameOfSPB, styleOfSPB, "", "", false, new SizeOfSPBOutput(1, false),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar1)
+                      )
+            {
+
+
+            }
+
+            protected override CppFunctionArgs SetcppConstructorArgs()
+            {
+                return new CppFunctionArgs(new CppFunctionArg("UploadDataToPcU*","uploadDataUToUse", false));
+            }
+        }
+
+
+        protected class DataToPC2_SPB : AESPBBase
+        {
+            public DataToPC2_SPB(string nameOfSPB, StyleOfSPB styleOfSPB, UploadDataToPcU uploadDataIUse, int sizeOfVar1, int sizeOfVar2)
+                : base("commonHalAOs", nameOfSPB, styleOfSPB, "", "", false, new SizeOfSPBOutput(1, false),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar1),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar2)
+                      )
+            {
+
+
+            }
+            protected override CppFunctionArgs SetcppConstructorArgs()
+            {
+                return new CppFunctionArgs(new CppFunctionArg("UploadDataToPcU*", "uploadDataUToUse", false));
+            }
+        }
+
+        protected class DataToPC3_SPB : AESPBBase
+        {
+            public DataToPC3_SPB(string nameOfSPB, StyleOfSPB styleOfSPB, UploadDataToPcU uploadDataIUse, int sizeOfVar1, int sizeOfVar2, int sizeOfVar3)
+                : base("commonHalAOs", nameOfSPB, styleOfSPB, "", "", false, new SizeOfSPBOutput(1, false),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar1),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar2),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar3)
+                      )
+            {
+
+
+            }
+            protected override CppFunctionArgs SetcppConstructorArgs()
+            {
+                return new CppFunctionArgs(new CppFunctionArg("UploadDataToPcU*", "uploadDataUToUse", false));
+            }
+        }
+
+        protected class DataToPC4_SPB : AESPBBase
+        {
+            public DataToPC4_SPB(string nameOfSPB, StyleOfSPB styleOfSPB, UploadDataToPcU uploadDataIUse, int sizeOfVar1, int sizeOfVar2, int sizeOfVar3, int sizeOfVar4)
+                : base("commonHalAOs", nameOfSPB, styleOfSPB, "", "", false, new SizeOfSPBOutput(1, false),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar1),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar2),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar3),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar4)
+                      )
+            {
+
+
+            }
+            protected override CppFunctionArgs SetcppConstructorArgs()
+            {
+                return new CppFunctionArgs(new CppFunctionArg("UploadDataToPcU*", "uploadDataUToUse", false));
+            }
+        }
+        protected class DataToPC5_SPB : AESPBBase
+        {
+            public DataToPC5_SPB(string nameOfSPB, StyleOfSPB styleOfSPB, UploadDataToPcU uploadDataIUse, int sizeOfVar1, int sizeOfVar2, int sizeOfVar3, int sizeOfVar4, int sizeOfVar5)
+                : base("commonHalAOs", nameOfSPB, styleOfSPB, "", "", false, new SizeOfSPBOutput(1, false),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar1),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar2),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar3),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar4),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar5)
+                      )
+            {
+
+
+            }
+            protected override CppFunctionArgs SetcppConstructorArgs()
+            {
+                return new CppFunctionArgs(new CppFunctionArg("UploadDataToPcU*", "uploadDataUToUse", false));
+            }
+        }
+        protected class DataToPC6_SPB : AESPBBase
+        {
+            public DataToPC6_SPB(string nameOfSPB, StyleOfSPB styleOfSPB, UploadDataToPcU uploadDataIUse, int sizeOfVar1, int sizeOfVar2, int sizeOfVar3, int sizeOfVar4, int sizeOfVar5, int sizeOfVar6)
+                : base("commonHalAOs", nameOfSPB, styleOfSPB, "", "", false, new SizeOfSPBOutput(1, false),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar1),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar2),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar3),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar4),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar5),
+                      new SPBChannelUserDefinedCountBuffer(sizeOfVar6)
+                      )
+            {
+
+
+            }
+            protected override CppFunctionArgs SetcppConstructorArgs()
+            {
+                return new CppFunctionArgs(new CppFunctionArg("UploadDataToPcU*", "uploadDataUToUse", false));
+            }
+        }
+
+        public static AESPBBase GetDataToPC_SPB(string nameOfSPB, StyleOfSPB styleOfSPB, UploadDataToPcU uploadDataIUse)
+ 
+        {
+            AESPBBase ret = null;
+
+
+            var ch = new List<SPBChannelUserDefinedCountBuffer>();
+            int ind = 0;
+            for (int i = 0; i < uploadDataIUse.NumOfVars; i++)
+            {
+                ch.Add(new SPBChannelUserDefinedCountBuffer(uploadDataIUse.SizeOfVars[ind]));
+                ind++;
+            }
+
+
+            if (uploadDataIUse.NumOfVars == 6)
+            {
+                ret = new DataToPC6_SPB(nameOfSPB, styleOfSPB, uploadDataIUse
+                    , uploadDataIUse.SizeOfVars[0]
+                    , uploadDataIUse.SizeOfVars[1]
+                    , uploadDataIUse.SizeOfVars[2]
+                    , uploadDataIUse.SizeOfVars[3]
+                    , uploadDataIUse.SizeOfVars[4]
+                    , uploadDataIUse.SizeOfVars[5]
+                    );
+            }
+           else if (uploadDataIUse.NumOfVars == 5)
+            {
+                ret = new DataToPC5_SPB(nameOfSPB, styleOfSPB, uploadDataIUse
+                    , uploadDataIUse.SizeOfVars[0]
+                    , uploadDataIUse.SizeOfVars[1]
+                    , uploadDataIUse.SizeOfVars[2]
+                    , uploadDataIUse.SizeOfVars[3]
+                    , uploadDataIUse.SizeOfVars[4]
+                    );
+            }
+
+            else if (uploadDataIUse.NumOfVars == 4)
+            {
+                ret = new DataToPC4_SPB(nameOfSPB, styleOfSPB, uploadDataIUse
+                    , uploadDataIUse.SizeOfVars[0]
+                    , uploadDataIUse.SizeOfVars[1]
+                    , uploadDataIUse.SizeOfVars[2]
+                    , uploadDataIUse.SizeOfVars[3] 
+                    );
+            }
+            else if (uploadDataIUse.NumOfVars == 3)
+            {
+                ret = new DataToPC3_SPB(nameOfSPB, styleOfSPB, uploadDataIUse
+                    , uploadDataIUse.SizeOfVars[0]
+                    , uploadDataIUse.SizeOfVars[1]
+                    , uploadDataIUse.SizeOfVars[2] 
+                    );
+            }
+            else if (uploadDataIUse.NumOfVars == 2)
+            {
+                ret = new DataToPC2_SPB(nameOfSPB, styleOfSPB, uploadDataIUse
+                    , uploadDataIUse.SizeOfVars[0]
+                    , uploadDataIUse.SizeOfVars[1] 
+                    );
+            }
+            else if (uploadDataIUse.NumOfVars == 1)
+            {
+                ret = new DataToPC1_SPB(nameOfSPB, styleOfSPB, uploadDataIUse
+                    , uploadDataIUse.SizeOfVars[0] 
+                    );
+            }
+            else
+            {
+                ProblemHandle problemHandle = new ProblemHandle();
+                problemHandle.ThereisAProblem("DataToPC_SPB does not support input channels (as in number of variables) that are greater than 6");
+            }
+
+
+            return ret;
+        }
+}
+
+     
+
 
 
     public class MotorDriverPWMU : AEUtilityService
@@ -59,13 +369,39 @@ namespace commonHalAOsProject
     }
 
 
+    public class UARTDriverU : AEUtilityService
+    {
+        public UARTDriverU(string instanceNameOfTDU, int serviceBuffersize, AEPriorities priority)
+            : base("commonHalAOs", instanceNameOfTDU, priority, serviceBuffersize,
+                  new CppFunctionArgs(
+                        new CppFunctionArg("AEUART*", "uartThisUses", false)
+                        ),
+                  new ActionRequest("TransmitMsg", ServiceType.Normal, "AENull", "const char*", "msg", "uint32_t", "lengthOfMsg")
+                  )
+        { }
+
+        protected override List<string> GetHeaderIncludesFromLibrary() { return new List<string>() { "GPIOsNeededForMotor" }; }
+
+    }
+
+
+    public class ButtonChanged : AEEventEVT<ButtonChanged>
+    {
+        public ButtonChanged() :
+            base("ButtonChanged",
+            "uint8_t ForButton;", "bool isButtonWentDown;"
+            )
+        { }
+    }
+
+
     public class I2CTXCmplt1 : AEEventSignal<I2CTXCmplt1>
     {
         public I2CTXCmplt1() :
             base("I2CTXCmplt1",
             ""
             )
-        {    }
+        { }
     }
     public class I2CTXCmplt2 : AEEventSignal<I2CTXCmplt2>
     {
@@ -141,6 +477,16 @@ namespace commonHalAOsProject
         { }
     }
 
+    public class LoopObjectTest : AELoopObject
+    {
+        public LoopObjectTest(string instanceName, AEPriorities priority, int freqOfLoop)
+            : base("commonHalAOs", instanceName, priority, freqOfLoop, null)
+        {
+
+        }
+    }
+
+
 
     public class commonHalAOs : AEProject
     {
@@ -149,39 +495,106 @@ namespace commonHalAOsProject
         [AEEXETest]
         public void defaultTest()
         {
-            AEClock aEClock = new AEClock("clocl1",1000, "clocl1_cb");
+            AEClock aEClock = new AEClock("clocl1", 100 );
 
-            MotorDriverPWMU motorDriverU = new MotorDriverPWMU("motorDriverpwmU",10, AEPriorities.MediumPriority);
+
+            UploadDataToPcU uploadDataToPcU = new UploadDataToPcU 
+                ("uploadDataToPcU", 10, AEPriorities.MediumPriority, 10, 3, UARTPERIPHERAL2.Instance, 17, "run1", 1, 20, 1, 1, 1, 1, 1, 1);
+             
+            //UARTDriverU uARTDriverU = new UARTDriverU("uARTDriverU", 10, AEPriorities.MediumPriority);
+
+            MotorDriverPWMU motorDriverU = new MotorDriverPWMU("motorDriverpwmU", 10, AEPriorities.MediumPriority);
             MotorDriverU motorDriverU1 = new MotorDriverU("motorDriverU", 10, AEPriorities.MediumPriority);
 
             //I2CDriverU i2CDriverU = new I2CDriverU("i2CDriverU", 10, AEPriorities.MediumPriority);
 
-            aEClock.FlowIntoTDU(motorDriverU,AEClock_PrescalerEnum.PRESCALER1);
+            LoopObjectTest loopObjectTest = new LoopObjectTest("loopObjectTest", AEPriorities.MediumPriority, 10);
+
+            aEClock.FlowIntoTDU(motorDriverU, AEClock_PrescalerEnum.PRESCALER1);
+            aEClock.FlowIntoTDU(uploadDataToPcU, AEClock_PrescalerEnum.PRESCALER64);
+ 
         }
+
+        [AEEXETest]
+        public void datauploadTest()
+        {
+            AEClock aEClock = new AEClock("clocl1", 100 ); 
+            AEClock aEClock2 = new AEClock("clocl2", 1000 ); 
+
+
+            UploadDataToPcU uploadDataToPcU = new UploadDataToPcU
+                ("uploadDataToPcU", 10, AEPriorities.MediumPriority,10, 3, UARTPERIPHERAL2.Instance, 17, "run1", 1, 32, 1); 
+
+            var dataToPC_SPB = DataToPC_SPB.GetDataToPC_SPB("dataToPC_SPB", StyleOfSPB.EachSPBTask, uploadDataToPcU);
+
+            AESensor aESensor1 = new AESensor("aESensor1", SensorResolution.Resolution16Bit, SensorDataType.int16_T);
+            AESensor aESensor2 = new AESensor("aESensor2", SensorResolution.Resolution16Bit, SensorDataType.int16_T);
+            AESensor aESensor3 = new AESensor("aESensor3", SensorResolution.Resolution16Bit, SensorDataType.int16_T);
+
+            aEClock2.FlowIntoTDU(uploadDataToPcU, AEClock_PrescalerEnum.PRESCALER1);
+
+            aEClock
+                .FlowIntoSensor(aESensor1, AEClock_PrescalerEnum.PRESCALER64)
+                .FlowIntoSPB(dataToPC_SPB, SPBChannelNum.CH0, LinkTypeEnum.Copy);
+
+            aEClock
+                .FlowIntoSensor(aESensor2, AEClock_PrescalerEnum.PRESCALER2)
+                .FlowIntoSPB(dataToPC_SPB, SPBChannelNum.CH1, LinkTypeEnum.Copy);
+
+            aEClock
+                .FlowIntoSensor(aESensor3, AEClock_PrescalerEnum.PRESCALER64)
+                .FlowIntoSPB(dataToPC_SPB, SPBChannelNum.CH2, LinkTypeEnum.Copy);
+        }
+        [AEEXETest]
+        public void dataupload1VarTest()
+        {
+            AEClock aEClock = new AEClock("clocl1", 1000);
+            AEClock aEClock2 = new AEClock("clocl2", 1000);
+
+
+            UploadDataToPcU uploadDataToPcU = new UploadDataToPcU
+                ("uploadDataToPcU", 10, AEPriorities.MediumPriority, 10, 3, UARTPERIPHERAL2.Instance, 500, "run1", 100);
+
+            var dataToPC_SPB = DataToPC_SPB.GetDataToPC_SPB("dataToPC_SPB", StyleOfSPB.EachSPBTask, uploadDataToPcU);
+
+            AESensor aESensor1 = new AESensor("aESensor1", SensorResolution.Resolution16Bit, SensorDataType.int16_T); 
+
+            aEClock2.FlowIntoTDU(uploadDataToPcU, AEClock_PrescalerEnum.PRESCALER1);
+
+            aEClock
+                .FlowIntoSensor(aESensor1, AEClock_PrescalerEnum.PRESCALER16)
+                .FlowIntoSPB(dataToPC_SPB, SPBChannelNum.CH0, LinkTypeEnum.Copy);
+             
+        }
+
 
         protected override string _GetDirectoryOfLibrary()
         {
-            return @"commonHalAOs"; 
+            return @"commonHalAOs";
         }
 
         protected override List<AEEvent> _GetEventsInLibrary()
         {
-            return new List<AEEvent>() { 
+            return new List<AEEvent>() {
             I2CTXCmplt1.Init(3),
-            I2CTXCmplt2.Init(3),            
+            I2CTXCmplt2.Init(3),
             I2CRXCmplt1.Init(3),
-            I2CRXCmplt2.Init(3)
+            I2CRXCmplt2.Init(3),
+            ButtonChanged.Init(5)
             };
         }
 
-		protected override List<AEHal> _GetPeripheralsInLibrary()
+        protected override List<AEHal> _GetPeripheralsInLibrary()
         {
-		//ADCPERIPHERAL1_CH1.Init(Portenum.PortB, PinEnum.PIN0)
+            //ADCPERIPHERAL1_CH1.Init(Portenum.PortB, PinEnum.PIN0)
             return new List<AEHal>() {
                 PWMPERIPHERAL1.Init(Portenum.PortD, PinEnum.PIN13),
                 GPIOPERIPHERAL1.Init(Portenum.PortD, PinEnum.PIN10),
                 GPIOPERIPHERAL2.Init(Portenum.PortD, PinEnum.PIN9),
-                GPIOPERIPHERAL3.Init(Portenum.PortD, PinEnum.PIN8)
+                GPIOPERIPHERAL3.Init(Portenum.PortD, PinEnum.PIN8),
+                GPIOPERIPHERAL_INPUT1.Init(Portenum.PortD, PinEnum.PIN3),
+                UARTPERIPHERAL2.Init(BaudRatesEnum.T_460800,1,Portenum.PortA, PinEnum.PIN2, Portenum.PortA, PinEnum.PIN3)
+
             };
         }
 
@@ -189,8 +602,8 @@ namespace commonHalAOsProject
         {
             return new List<AEProject>() { };
         }
-		
-		protected override List<string> _GetAnyAdditionalIncludeDirs()
+
+        protected override List<string> _GetAnyAdditionalIncludeDirs()
         {
             return new List<string>() { };
         }
@@ -201,7 +614,7 @@ namespace commonHalAOsProject
         }
 
     }
-	
-	
-	
+
+
+
 }

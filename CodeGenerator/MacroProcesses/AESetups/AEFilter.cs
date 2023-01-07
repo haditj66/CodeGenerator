@@ -17,10 +17,10 @@ namespace CgenMin.MacroProcesses
             : base(fromeLibraryName, filterSamplingNum)//isUserInputedFilterSampling)
         {
             ProblemHandle problemHandle = new ProblemHandle();
-            if (typeof(TargTyp1) == typeof(float) || typeof(TargTyp2) == typeof(float) || typeof(TargTyp3) == typeof(float))
-            {
-                problemHandle.ThereisAProblem("the argument type of the tempalte arg type cannot be a float.");
-            }
+            //if (typeof(TargTyp1) == typeof(float) || typeof(TargTyp2) == typeof(float) || typeof(TargTyp3) == typeof(float))
+            //{
+            //    problemHandle.ThereisAProblem("the argument type of the tempalte arg type cannot be a float.");
+            //}
             cppFunctionArgs = new CppFunctionArgsWithValue<TargTyp1, TargTyp2, TargTyp3>(
                nameOfConstructorArg1, arg1Value, 
                nameOfConstructorArg2, arg2Value,  
@@ -42,6 +42,48 @@ namespace CgenMin.MacroProcesses
             var rr3 = ((CppFunctionArgWithValue<TargTyp3>)(cppFunctionArgs.TheCppFunctionArgs[2])).ValueOfArg1;
             return $"{rr1}, {rr2}, {rr3}";
         }
+
+        public override string GetFloatWorkAroundDec()
+        {
+            if (cppFunctionArgs == null)
+            { return ""; }
+
+            string FloatWorkAroundDec = "";
+            string FloatWorkAroundDef = "";
+            foreach (var cpparg in this.cppFunctionArgs.TheCppFunctionArgs)//TheCppFunctionArgs.TheCppFunctionArgs)
+            {
+                if (cpparg.Type == CppTypeEnum.float_t)
+                {
+                    // float G_name;
+                    FloatWorkAroundDec += $"float G_{cpparg.Name}; \n";
+                    // _name T_name;
+                    // G_name =  T_name.GetValue();
+                    FloatWorkAroundDef += $"_{cpparg.Name} T_{cpparg.Name}; \n G_{cpparg.Name} =  T_{cpparg.Name}.GetValue(); \n";
+                }
+            }
+            return FloatWorkAroundDec;
+        }
+
+        public override string GetFloatWorkAroundDef()
+        {
+            if (cppFunctionArgs == null)
+            { return ""; }
+
+            string FloatWorkAroundDec = "";
+            string FloatWorkAroundDef = "";
+            foreach (var cpparg in this.cppFunctionArgs.TheCppFunctionArgs)//TheCppFunctionArgs.TheCppFunctionArgs)
+            {
+                if (cpparg.Type == CppTypeEnum.float_t)
+                {
+                    // float G_name;
+                    FloatWorkAroundDec += $"float G_{cpparg.Name}; \n";
+                    // _name T_name;
+                    // G_name =  T_name.GetValue();
+                    FloatWorkAroundDef += $"_{cpparg.Name} T_{cpparg.Name}; \n G_{cpparg.Name} =  T_{cpparg.Name}.GetValue(); \n";
+                }
+            }
+            return FloatWorkAroundDef;
+        }
     }
 
     public abstract class AEFilter_ConstructorArg<TargTyp1, TargTyp2 > : AEFilter
@@ -56,10 +98,10 @@ namespace CgenMin.MacroProcesses
             : base(fromeLibraryName, filterSamplingNum)//, isUserInputedFilterSampling)
         {
             ProblemHandle problemHandle = new ProblemHandle();
-            if (typeof(TargTyp1) == typeof(float) || typeof(TargTyp2) == typeof(float)  )
-            {
-                problemHandle.ThereisAProblem("the argument type of the tempalte arg type cannot be a float.");
-            }
+            //if (typeof(TargTyp1) == typeof(float) || typeof(TargTyp2) == typeof(float)  )
+            //{
+            //    problemHandle.ThereisAProblem("the argument type of the tempalte arg type cannot be a float.");
+            //}
             cppFunctionArgs = new CppFunctionArgsWithValue<TargTyp1, TargTyp2 >(
                nameOfConstructorArg1, arg1Value,
                nameOfConstructorArg2, arg2Value, false, false);
@@ -79,6 +121,48 @@ namespace CgenMin.MacroProcesses
             var rr2 = ((CppFunctionArgWithValue<TargTyp2>)(cppFunctionArgs.TheCppFunctionArgs[1])).ValueOfArg1; 
             return $"{rr1}, {rr2} ";
         }
+
+        public override string GetFloatWorkAroundDec()
+        {
+            if (cppFunctionArgs == null)
+            { return ""; }
+
+            string FloatWorkAroundDec = "";
+            string FloatWorkAroundDef = "";
+            foreach (var cpparg in this.cppFunctionArgs.TheCppFunctionArgs)//TheCppFunctionArgs.TheCppFunctionArgs)
+            {
+                if (cpparg.Type == CppTypeEnum.float_t)
+                {
+                    // float G_name;
+                    FloatWorkAroundDec += $"float G_{cpparg.Name}; \n";
+                    // _name T_name;
+                    // G_name =  T_name.GetValue();
+                    FloatWorkAroundDef += $"_{cpparg.Name} T_{cpparg.Name}; \n G_{cpparg.Name} =  T_{cpparg.Name}.GetValue(); \n";
+                }
+            }
+            return FloatWorkAroundDec;
+        }
+
+        public override string GetFloatWorkAroundDef()
+        {
+            if (cppFunctionArgs == null)
+            { return ""; }
+
+            string FloatWorkAroundDec = "";
+            string FloatWorkAroundDef = "";
+            foreach (var cpparg in this.cppFunctionArgs.TheCppFunctionArgs)//TheCppFunctionArgs.TheCppFunctionArgs)
+            {
+                if (cpparg.Type == CppTypeEnum.float_t)
+                {
+                    // float G_name;
+                    FloatWorkAroundDec += $"float G_{cpparg.Name}; \n";
+                    // _name T_name;
+                    // G_name =  T_name.GetValue();
+                    FloatWorkAroundDef += $"_{cpparg.Name} T_{cpparg.Name}; \n G_{cpparg.Name} =  T_{cpparg.Name}.GetValue(); \n";
+                }
+            }
+            return FloatWorkAroundDef;
+        }
     }
 
     public abstract class AEFilter_ConstructorArg<TargTyp1> : AEFilter
@@ -90,10 +174,10 @@ namespace CgenMin.MacroProcesses
             : base(fromeLibraryName, filterSamplingNum)//, isUserInputedFilterSampling)
         {
             ProblemHandle problemHandle = new ProblemHandle();
-            if (typeof(TargTyp1) == typeof(float))
-            {
-                problemHandle.ThereisAProblem("the argument type of the tempalte arg1 type cannot be a float.");
-            }
+            //if (typeof(TargTyp1) == typeof(float))
+            //{
+            //    problemHandle.ThereisAProblem("the argument type of the tempalte arg1 type cannot be a float.");
+            //}
              cppFunctionArgs = new CppFunctionArgsWithValue<TargTyp1>(
                 nameOfConstructorArg1, arg1Value, false);
         } 
@@ -104,13 +188,60 @@ namespace CgenMin.MacroProcesses
 
         public override string GetAdditionalTemplateTypes()
         {
-            return cppFunctionArgs.GetContructorArgs();
+            string ret = cppFunctionArgs.GetContructorArgs(); 
+            return ret.Replace("float","class");
         }
         public override string GetAdditionalTemplateValues()
         {
-            var rr = ((CppFunctionArgWithValue<TargTyp1>)(cppFunctionArgs.TheCppFunctionArgs[0])).ValueOfArg1;
+            var rr = ((CppFunctionArgWithValue<TargTyp1>)(cppFunctionArgs.TheCppFunctionArgs[0])).GetValueOfArgStr();
+
+
+
             return $"{rr}";
         }
+
+        public override string GetFloatWorkAroundDec()
+        {
+            if (cppFunctionArgs == null)
+            { return ""; }
+
+            string FloatWorkAroundDec = "";
+            string FloatWorkAroundDef = "";
+            foreach (var cpparg in this.cppFunctionArgs.TheCppFunctionArgs)//TheCppFunctionArgs.TheCppFunctionArgs)
+            {
+                if (cpparg.Type == CppTypeEnum.float_t)
+                {
+                    // float G_name;
+                    FloatWorkAroundDec += $"float G_{cpparg.Name}; \n";
+                    // _name T_name;
+                    // G_name =  T_name.GetValue();
+                    FloatWorkAroundDef += $"_{cpparg.Name} T_{cpparg.Name}; \n G_{cpparg.Name} =  T_{cpparg.Name}.GetValue(); \n";
+                }
+            }
+            return FloatWorkAroundDec;
+        }
+
+        public override string GetFloatWorkAroundDef()
+        {
+            if (cppFunctionArgs == null)
+            { return ""; }
+
+            string FloatWorkAroundDec = "";
+            string FloatWorkAroundDef = ""; 
+            foreach (var cpparg in this.cppFunctionArgs.TheCppFunctionArgs)//TheCppFunctionArgs.TheCppFunctionArgs)
+            {
+                if (cpparg.Type == CppTypeEnum.float_t)
+                {
+                    // float G_name;
+                    FloatWorkAroundDec += $"float G_{cpparg.Name}; \n";
+                    // _name T_name;
+                    // G_name =  T_name.GetValue();
+                    FloatWorkAroundDef += $"_{cpparg.Name} T_{cpparg.Name}; \n G_{cpparg.Name} =  T_{cpparg.Name}.GetValue(); \n";
+                }
+            }
+            return FloatWorkAroundDef; 
+        }
+
     }
 
     public abstract class AEFilter : AOObserver
@@ -205,7 +336,16 @@ namespace CgenMin.MacroProcesses
             return "";
         }
 
-        
+        public virtual string GetFloatWorkAroundDec()
+        {
+            return "";
+        }
+
+        public virtual string GetFloatWorkAroundDef()
+        {
+            return "";
+        }
+
         protected override List<RelativeDirPathWrite> _WriteTheContentedToFiles()
         {
             List<RelativeDirPathWrite> ret = new List<RelativeDirPathWrite>();
@@ -228,7 +368,10 @@ namespace CgenMin.MacroProcesses
                 $"<{GetAdditionalTemplateArgs()}>" :
                 $"<{GetFullTemplateArgs()},  {GetAdditionalTemplateArgs()}>";
 
-
+            //get cpp args and look for any that were floats
+            string FloatWorkAroundDec = GetFloatWorkAroundDec();
+            string FloatWorkAroundDef = GetFloatWorkAroundDef();
+ 
             string IncludeFriendTemplate = "";// TemplateArgs != "" ? "" : "//";
 
             string contentesOut = AEInitializing.TheMacro2Session.GenerateFileOut("AERTOS/FilterClass",
@@ -236,6 +379,8 @@ namespace CgenMin.MacroProcesses
     new MacroVar() { MacroName = "PastBufferSize", VariableValue = FilterSamplingNum.ToString() },
     new MacroVar() { MacroName = "Template", VariableValue = Template },
     new MacroVar() { MacroName = "TemplateArgs", VariableValue = TemplateArgs },
+    new MacroVar() { MacroName = "FloatWorkAroundDec", VariableValue = FloatWorkAroundDec },
+    new MacroVar() { MacroName = "FloatWorkAroundDef", VariableValue = FloatWorkAroundDef },
     new MacroVar() { MacroName = "IncludeFriendTemplate", VariableValue = IncludeFriendTemplate }
     );
             ret.Add(new RelativeDirPathWrite($"{ClassName}", ".h", "include", contentesOut, true));

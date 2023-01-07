@@ -175,9 +175,9 @@ namespace CgenMin.MacroProcesses
             get
             {
                 return
-Priority == AEPriorities.LowPriority ? "LowPriority" :
+Priority == AEPriorities.LowPriority ? "LowestPriority" :
 Priority == AEPriorities.MediumPriority ? "MediumPriority" :
-Priority == AEPriorities.HighPriority ? "HighPriority" : "";
+Priority == AEPriorities.HighPriority ? "HighestPriority" : "";
             }
         }
 

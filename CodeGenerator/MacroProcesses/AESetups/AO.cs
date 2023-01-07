@@ -66,8 +66,17 @@ namespace CgenMin.MacroProcesses
         Resolution12Bit = 12,
         Resolution16Bit = 16,
         Resolution32Bit = 32,
-        Resolution64Bit = 64
+        Resolution64Bit = 64 
+    };
 
+    public enum SensorDataType
+    {
+        int32_T,
+        int16_T,
+        int8_T,
+        uint32_T,
+        uint16_T,
+        uint8_T 
     };
 
     public enum AEClock_PrescalerEnum

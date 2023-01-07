@@ -67,7 +67,7 @@ namespace CodeGenerator.FileTemplates
             //if that file does not exist, then create the file
             if (!File.Exists(pathToGeneratedFile))
             {
-                File.Create(pathToGeneratedFile);
+                File.Create(pathToGeneratedFile).Close();
 
             }
             //wait for file to be ccreated

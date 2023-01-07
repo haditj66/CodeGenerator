@@ -43,17 +43,17 @@ namespace commonEigenAOsProject
 		[AEEXETest]
         public void defaultTest()
         {
-            AEClock aEClock = new AEClock("clock1",100,"clock1cb");
+            AEClock aEClock = new AEClock("clock1",100 );
 
-            AESensor aESensor1 = new AESensor("sens1",SensorResolution.Resolution16Bit);
-            AESensor aESensor2 = new AESensor("sens2",SensorResolution.Resolution16Bit);
-            AESensor aESensor3 = new AESensor("sens3",SensorResolution.Resolution16Bit);
-            AESensor aESensor4 = new AESensor("sens4",SensorResolution.Resolution16Bit);
-            AESensor aESensor5 = new AESensor("sens5",SensorResolution.Resolution16Bit);
-            AESensor aESensor6 = new AESensor("sens6",SensorResolution.Resolution16Bit);
-            AESensor aESensor7 = new AESensor("sens7",SensorResolution.Resolution16Bit);
-            AESensor aESensor8 = new AESensor("sens8",SensorResolution.Resolution16Bit);
-            AESensor aESensor9 = new AESensor("sens9",SensorResolution.Resolution16Bit);
+            AESensor aESensor1 = new AESensor("sens1",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor2 = new AESensor("sens2",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor3 = new AESensor("sens3",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor4 = new AESensor("sens4",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor5 = new AESensor("sens5",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor6 = new AESensor("sens6",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor7 = new AESensor("sens7",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor8 = new AESensor("sens8",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
+            AESensor aESensor9 = new AESensor("sens9",SensorResolution.Resolution16Bit, SensorDataType.uint16_T);
             
 
             PoseEulerAngles_SPB poseEulerAngles_SPB = new PoseEulerAngles_SPB(  "poseEulerAngles_SPB",StyleOfSPB.EachSPBTask, false);

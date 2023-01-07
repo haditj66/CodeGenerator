@@ -14,6 +14,26 @@ namespace commonAOsProject
 {
 
 
+
+
+
+    public class GainFilter : AEFilter_ConstructorArg<float>
+    {
+        public GainFilter(float arg1Value)
+            : base("gain", arg1Value, "commonAOs", 1)
+        {
+        }
+    }
+
+    public class AddOrSubFilter : AEFilter_ConstructorArg<float>
+    {
+        public AddOrSubFilter(float arg1Value)
+            : base("valuetoSum", arg1Value, "commonAOs", 1)
+        {
+        }
+    }
+
+
     public class AngularDerivativeDiscreteFilter : AEFilter_ConstructorArg<int, int>
     {
         public AngularDerivativeDiscreteFilter(int CountsPerRevolution, int MinimumAngularVelocitytobeConsideredZero)
@@ -161,7 +181,8 @@ namespace commonAOsProject
 		[AEEXETest]//====================================================================================================================================================================================
         public void defaultTest()
         {
-            AEClock aEClock = new AEClock("clock1", 1000, "clock1_callback");
+            AddOrSubFilter addOrSubFilter = new AddOrSubFilter(3);
+            AEClock aEClock = new AEClock("clock1", 1000 );
             AESensor sensor1 = new AESensor("sensor1", SensorResolution.Resolution12Bit, 0, 100);
             aEClock.FlowIntoSensor(sensor1, AEClock_PrescalerEnum.PRESCALER1)
                 .FlowIntoFilter(new AngularDerivativeDiscreteFilter(20, 10))

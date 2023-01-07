@@ -21,10 +21,10 @@ namespace CGENTest2Project
         public void default2()
         {
 
-            AEClock aEClock = new AEClock("clock1", 1000, "clock1_callback");
-            AESensor sensor1 = new AESensor("sensor1", SensorResolution.Resolution12Bit, 0, 100);
-            AESensor sensor2 = new AESensor("sensor2", SensorResolution.Resolution12Bit, 0, 100);
-            AESensor sensor3 = new AESensor("sensor3", SensorResolution.Resolution12Bit);
+            AEClock aEClock = new AEClock("clock1", 1000 );
+            AESensor sensor1 = new AESensor("sensor1", SensorResolution.Resolution12Bit, SensorDataType.uint16_T, 0, 100);
+            AESensor sensor2 = new AESensor("sensor2", SensorResolution.Resolution12Bit, SensorDataType.uint16_T, 0, 100);
+            AESensor sensor3 = new AESensor("sensor3", SensorResolution.Resolution12Bit, SensorDataType.uint16_T);
 
 
 

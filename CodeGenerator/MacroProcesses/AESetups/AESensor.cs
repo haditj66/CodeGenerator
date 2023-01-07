@@ -7,6 +7,7 @@ namespace CgenMin.MacroProcesses
     {
         //public string NameOfSensor { get; }
         public SensorResolution TheSensorResolution { get; }
+        public SensorDataType TheSensorDataType { get; }
         public float MapsToAFLoatOfLowerBound { get; }
         public float MapsToAFLoatOfUpperBound { get; }
 
@@ -21,6 +22,23 @@ namespace CgenMin.MacroProcesses
                     TheSensorResolution == SensorResolution.Resolution64Bit ? "Resolution64Bit" : "";
             }
         }
+
+        public string SensorDataTypeSTR
+        {
+            get
+            {
+                return
+                    TheSensorDataType == SensorDataType.int32_T ? "int32_t" :
+                    TheSensorDataType == SensorDataType.int16_T ? "int16_t" :
+                    TheSensorDataType == SensorDataType.int8_T ?  "int8_t" :
+                    TheSensorDataType == SensorDataType.uint32_T ? "uint32_t" :
+                    TheSensorDataType == SensorDataType.uint16_T ? "uint16_t" :
+                    TheSensorDataType == SensorDataType.uint8_T ? "uint8_t" :  "";
+            }
+        } 
+
+
+        
         public AEClock ClockIAmFrom { get; internal set; }
         public string ADC_IMSetTo;
 
@@ -28,22 +46,25 @@ namespace CgenMin.MacroProcesses
         public static int numOfSensorsSoFar = 0;
         public int SensorId = 0;
 
-        public AESensor(string nameOfSensor, SensorResolution sensorResolution,
+        public AESensor(string nameOfSensor, SensorResolution sensorResolution, SensorDataType theSensorDataType,
         float mapsToAFLoatOfLowerBound = 0,
         float mapsToAFLoatOfUpperBound = 0) : base(AEInitializing.RunningProjectName, nameOfSensor, AOTypeEnum.Sensor)//"AEObservorSensorFilterOut",
         {  
             TheSensorResolution = sensorResolution;
+            TheSensorDataType = theSensorDataType;
             MapsToAFLoatOfLowerBound = mapsToAFLoatOfLowerBound;
             MapsToAFLoatOfUpperBound = mapsToAFLoatOfUpperBound;
             ADC_IMSetTo = "";
             numOfSensorsSoFar++;
             SensorId = numOfSensorsSoFar;
+
+             
         }
         public AESensor(string nameOfSensor, IADC adcImSetTo,
         float mapsToAFLoatOfLowerBound = 0,
-        float mapsToAFLoatOfUpperBound = 0) : this(nameOfSensor, SensorResolution.Resolution16Bit, mapsToAFLoatOfLowerBound, mapsToAFLoatOfUpperBound)
+        float mapsToAFLoatOfUpperBound = 0) : this(nameOfSensor, SensorResolution.Resolution16Bit, SensorDataType.uint16_T, mapsToAFLoatOfLowerBound, mapsToAFLoatOfUpperBound)
         { 
-            ADC_IMSetTo = adcImSetTo.ADCInstName; 
+            ADC_IMSetTo = adcImSetTo.ADCInstName;
         }
 
 
@@ -86,7 +107,7 @@ namespace CgenMin.MacroProcesses
 
             if (string.IsNullOrEmpty(ADC_IMSetTo))
             {
-                ret += $"static uint32_t {InstanceName}_data[1];"; ret += "\n";
+                ret += $"static {SensorDataTypeSTR} {InstanceName}_data[1];"; ret += "\n";
             }
 
 
@@ -103,11 +124,11 @@ namespace CgenMin.MacroProcesses
 
             if (string.IsNullOrEmpty(ADC_IMSetTo))
             {
-                ret += $"static AEObservorSensorFilterOut<{this.GetFilterTemplateArgsValues()}> {InstanceName}L((uint32_t*) {InstanceName}_data, SensorResolution::{TheSensorResolutionStr} {maplowerBoundStr} {mapupperBoundStr});"; ret += "\n";
+                ret += $"static AEObservorSensorFilterOut<{this.GetFilterTemplateArgsValues()}> {InstanceName}L(({SensorDataTypeSTR}*) {InstanceName}_data, SensorResolution::{TheSensorResolutionStr} {maplowerBoundStr} {mapupperBoundStr});"; ret += "\n";
             }
             else
             {
-                ret += $"static AEObservorSensorFilterOut<{this.GetFilterTemplateArgsValues()}> {InstanceName}L((uint16_t*) {ADC_IMSetTo}->GetADCDataAddress(), SensorResolution::{TheSensorResolutionStr} {maplowerBoundStr} {mapupperBoundStr});"; ret += "\n";
+                ret += $"static AEObservorSensorFilterOut<{this.GetFilterTemplateArgsValues()}> {InstanceName}L(({SensorDataTypeSTR}*) {ADC_IMSetTo}->GetADCDataAddress(), SensorResolution::{TheSensorResolutionStr} {maplowerBoundStr} {mapupperBoundStr});"; ret += "\n";
             }
             ret += $"{InstanceName} = &{InstanceName}L;"; ret += "\n";
 

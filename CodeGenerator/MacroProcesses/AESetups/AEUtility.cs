@@ -1,4 +1,5 @@
 ﻿using CodeGenerator.MacroProcesses;
+using CodeGenerator.ProblemHandler;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -423,6 +424,26 @@ namespace CgenMin.MacroProcesses
 
         protected List<ActionRequest> requests = new List<ActionRequest>();
 
+
+        public bool isSetToClock()
+        {
+            var allClocks = AO.AllInstancesOfAO.Where(a => a.AOType == AOTypeEnum.Clock).Cast<AEClock>().ToList();
+            if (allClocks.Count > 0)
+            {
+                foreach (var cl in allClocks)
+                {
+                    cl.GetTdusIFlowTo().FirstOrDefault(t => t.Item1.InstanceName == this.InstanceName);
+                    if (cl != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+
         public ActionRequest GetRequestOfName(string requestName)
         {
             return requests.FirstOrDefault(r => r.ServiceName == requestName);
@@ -435,9 +456,9 @@ namespace CgenMin.MacroProcesses
             get
             {
                 return
-Priority == AEPriorities.LowPriority ? "LowPriority" :
+Priority == AEPriorities.LowPriority ? "LowestPriority" :
 Priority == AEPriorities.MediumPriority ? "MediumPriority" :
-Priority == AEPriorities.HighPriority ? "HighPriority" : "";
+Priority == AEPriorities.HighPriority ? "HighestPriority" : "";
             }
         }
 
@@ -577,8 +598,22 @@ Priority == AEPriorities.HighPriority ? "HighPriority" : "";
             return ret;
         }
 
+
         public override string GenerateMainClockSetupsSection()
         {
+
+
+            //assert that it is set to a clock or a spb if it has any tdus
+            if ((this.FlowsFromSPB || this.isSetToClock()) == false)
+            {
+                var tt = this.requests.FirstOrDefault(r => r.TheServiceType == ServiceType.TDU);
+                if (tt != null)
+                {
+                    ProblemHandle problemHandle = new ProblemHandle();
+                    problemHandle.ThereisAProblem($"The utility object of instance name {this.InstanceName} is not set to a clock or spb even though it has a tdu service type");
+                }
+            } 
+
             string ret = "";
             //nothing
             return ret;
