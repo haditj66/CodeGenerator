@@ -289,7 +289,8 @@ namespace CgenMin.MacroProcesses
                 fromInputFile = Path.ChangeExtension(fromInputFile, "cgenMM");
             }
 
-            string GenFileDir = Path.Combine(Program.DIRECTORYOFTHISCG, "../../MacroProcesses/InputFiles", fromInputFile);
+            //string GenFileDir = Path.Combine(Program.DIRECTORYOFTHISCG, "../../MacroProcesses/InputFiles", fromInputFile);
+            string GenFileDir = Path.Combine(@"C:\CodeGenerator\CodeGenerator\bin\Debug","../../MacroProcesses/InputFiles", fromInputFile);
             string fileContents = this.GrabFileContents(GenFileDir);
 
             //go through and replace macro variables.

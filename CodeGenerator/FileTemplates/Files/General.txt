@@ -1,4 +1,4 @@
-//generated file: C:/AERTOSProjects/commonHalAOs\include\DataToPC1_SPB.h
+//generated file: C:/AERTOS/AERTOS/src/AE/AECoreTests\include\AELoopObjectTest.h
 //**********************************************************************
 //this is an auto-generated file using the template file located in the directory of C:\CodeGenerator\CodeGenerator\bin\Debug\..\..\FileTemplates\Files
 //ONLY WRITE CODE IN THE UserCode_Section BLOCKS
@@ -9,78 +9,41 @@
 //###############################################
 
 #pragma once
-
-
-#include "AESPBObservorOutputType.h"
-#include "AEUtils.h"
-#include "FreeRTOS.h"
-#include "AEFilter.h"
-
-#include "AEIntegrationTesting.h"
+ 
+#include "AELoopObject.h" 
+#include  "AEObjects.h"   
 
 ##UserCode_header
 
-template<bool isSubscribable, uint32_t CHANNELCOUNTBUFFER1, TEMPLATESPB_Filters>
-	class DataToPC1_SPB :
-		public AESPBObservorOutputType <1, 1, isSubscribable,
-TEMPLATESPB_FilterParams,
-CHANNELCOUNTBUFFER1, false>
+class AELoopObjectTest : public AELoopObject
+{
+	
+public:
+	AELoopObjectTest() { 
+		  ##UserCode_ctor
+	} 
+	
+ ##UserCode_public
+	
+
+
+protected: 
+	
+		void StartAOLoopObject()  override
 	{
-	public:
-		DataToPC1_SPB();
-		
-		##UserCode_public
-
-
-	protected: UploadDataToPcU* uploadDataUToUse; 
-public: UploadDataToPcU*  GetuploadDataUToUse()   const {return uploadDataUToUse; }
-
-
-public: void UserInitialize(UploadDataToPcU* _uploadDataUToUse )
-	{
-		uploadDataUToUse =  _uploadDataUToUse;
-
-		
-		##UserCode_userInited
-		
-		userInitialized = true;
-	}
-private: bool userInitialized = false;
-protected: void CheckIfConfiguredProperly() const override  
-	{
-		//DataToPC1_SPB::CheckIfConfiguredProperly();
-		if (userInitialized == false)
-		{
-			// you did not initialize one of your AEobjects
-			AEAssertRuntime(userInitialized == true, "user did not call the UserInitailize function for  DataToPC1_SPB"); 
-		} 
-		 
+//		AELoopSubscribe(Button1, AELoopObject1Test, Button1_Callback);
+		##UserCode_startae
 	}
 	
-	private:
-	##UserCode_private
+	void Update() override {
+		
+		##UserCode_update
+		 
+	} 
+	
+	##UserCode_protect
+	
+};
 
-		void RefreshOVERRIDE(float OutputSignal[1]) override;
 
-	};
-
-
-##UserCode_func
-
-
-template<bool isSubscribable, uint32_t CHANNELCOUNTBUFFER1, TEMPLATESPB_FiltersFunctionParams>
-	inline DataToPC1_SPB< isSubscribable,  CHANNELCOUNTBUFFER1, TEMPLATESPB_FilterParams>::DataToPC1_SPB()
-	{
-		##UserCode_ctor
-	}
-
-template<bool isSubscribable, uint32_t CHANNELCOUNTBUFFER1, TEMPLATESPB_FiltersFunctionParams>
-	inline void DataToPC1_SPB< isSubscribable,  CHANNELCOUNTBUFFER1, TEMPLATESPB_FilterParams>::RefreshOVERRIDE(float OutputSignal[1])
-	{
-
-		float* ch1 = this->InputChannels[0]->ChannelSignalBufferSingle; 
-
- 
-		##UserCode_refresh
-	}
-
+##UserCode_funcs

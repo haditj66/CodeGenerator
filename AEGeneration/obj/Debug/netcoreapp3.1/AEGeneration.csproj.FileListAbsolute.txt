@@ -1,0 +1,5 @@
+C:\CodeGenerator\AEGeneration\obj\Debug\netcoreapp3.1\AEGeneration.csproj.AssemblyReference.cache
+C:\CodeGenerator\AEGeneration\obj\Debug\netcoreapp3.1\AEGeneration.GeneratedMSBuildEditorConfig.editorconfig
+C:\CodeGenerator\AEGeneration\obj\Debug\netcoreapp3.1\AEGeneration.AssemblyInfoInputs.cache
+C:\CodeGenerator\AEGeneration\obj\Debug\netcoreapp3.1\AEGeneration.AssemblyInfo.cs
+C:\CodeGenerator\AEGeneration\obj\Debug\netcoreapp3.1\AEGeneration.csproj.CoreCompileInputs.cache

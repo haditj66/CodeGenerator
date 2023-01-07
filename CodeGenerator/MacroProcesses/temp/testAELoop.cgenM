@@ -33,6 +33,11 @@ void RunSelectedIntegrationTest_testAELoop()
 AE_Init();
  ##UserCode_beforemain
 
+
+
+
+
+
 static AELoopObjectTest objectTest_l;
 objectTest = &objectTest_l;
 objectTest->InitObject(10, AEPriorities::MediumPriority);
@@ -40,6 +45,7 @@ objectTest->InitObject(10, AEPriorities::MediumPriority);
 
 
 ##UserCode_beforelinks
+
 
 
 ##UserCode_beforeclock

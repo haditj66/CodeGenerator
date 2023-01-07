@@ -1,4 +1,4 @@
-﻿//#define TESTING
+﻿#define TESTING
 
 using System;
 using System.Collections.Generic;
@@ -96,7 +96,7 @@ namespace CodeGenerator
         [Verb("aegenerate", HelpText = "aertos utility to generate current selected aertos project")]
         public class aegenerateOptions
         {
-        }  
+        }
 
         [Verb("aeserial", HelpText = "aertos utility to launch the serial utility. This needs to be runnning to read uploaded data from a running AE device.")]
         public class aeserialOptions
@@ -132,7 +132,7 @@ namespace CodeGenerator
         //    [Option('i', HelpText = "This will ignore all files that are anywhere in this filter. use this when you have 3rd party files that are shared within ALL libraries.")]
         //    public string ignoreFilesInFilter { get; set; }
 
- 
+
         //}
 
         //[Verb("degenerate", HelpText = "degenerate the code")]
@@ -352,7 +352,7 @@ namespace CodeGenerator
 
             Action RunParser = () =>
             {
-                Parser.Default.ParseArguments< Macro2Options, aeinitOptions, aeselectOptions, aegenerateOptions, aeserialOptions, aebuildOptions,   InitOptions, QRInitOptions, SyncOptions, ConfigOptions, ProjectsOptions, MacroOptions, ProjConfigOptions, post_compileOptions, cmakeguiOptions>(command)
+                Parser.Default.ParseArguments<Macro2Options, aeinitOptions, aeselectOptions, aegenerateOptions, aeserialOptions, aebuildOptions, InitOptions, QRInitOptions, SyncOptions, ConfigOptions, ProjectsOptions, MacroOptions, ProjConfigOptions, post_compileOptions, cmakeguiOptions>(command)
 //.WithParsed<GenerateOptions>(opts => Generate(opts))
 //.WithParsed<DegenerateOptions>(opts => Degenerate(opts))
 .WithParsed<SyncOptions>(opts => Sync(opts))
@@ -1290,6 +1290,11 @@ namespace CodeGenerator
             if (Directory.Exists(PathToThis) == false)
             { Directory.CreateDirectory(PathToThis); }
 
+            PathToThis = Path.Combine(pathToProject, "src");
+            //root/src======================================================
+            if (Directory.Exists(PathToThis) == false)
+            { Directory.CreateDirectory(PathToThis); }
+
 
             PathToThis = Path.Combine(pathToProject, "conf");
             //root/conf======================================================
@@ -1410,7 +1415,7 @@ namespace CodeGenerator
             {
 
                 //just use the relative directory if in base directory
-                string basdir_ = AEProject.BaseAEDir.Replace("\\", "/"); 
+                string basdir_ = AEProject.BaseAEDir.Replace("\\", "/");
                 string envIronDirectory_ = envIronDirectory.Replace("\\", "/");
                 //Console.WriteLine($"basdir_: {basdir_}");
                 //Console.WriteLine($"envIronDirectory_: {envIronDirectory_}");
@@ -1420,11 +1425,14 @@ namespace CodeGenerator
                     envIronDirectory_;
 
 
+
+                string PathToconfcs = Path.Combine(envIronDirectory, "conf");
+
                 Console.WriteLine($"creating { opts.nameOfTheProject}.cs at directory  {DirOfProject}");
                 //create a .cs class file that will start the project type 
                 aEInitializing.WriteFileContents_FromCGENMMFile_ToFullPath(
                     "AERTOS\\AEProjectCS",
-                    Path.Combine(@"C:/CodeGenerator/CodeGenerator/MacroProcesses/AESetups/AEProjects", $"{opts.nameOfTheProject}.cs"),
+                    Path.Combine(PathToconfcs, $"{opts.nameOfTheProject}.cs"),
                     false, false,
                      new MacroVar() { MacroName = "NameOfProject", VariableValue = opts.nameOfTheProject },
                      new MacroVar() { MacroName = "DirOfProject", VariableValue = DirOfProject }
@@ -1664,7 +1672,7 @@ namespace CodeGenerator
                 cMDToBuildTargetsForUser.SetMultipleCommands($"{VISUALGDB_DIR_PATH} {target}");
                 cMDToBuildTargets.SetMultipleCommands($"echo built target {target}.press any key to build next target");
                 cMDToBuildTargetsForUser.SetMultipleCommands($"echo built target {target}.press any key to build next target");
-                
+
                 //cMDToBuildTargets.ExecuteMultipleCommands_InSeperateProcess();
 
 
@@ -1865,7 +1873,7 @@ namespace CodeGenerator
                 }
             }
 
-            #region --config 
+        #region --config 
             if (opts.config)
             {
                 //first make sure that a project exists here
@@ -1923,7 +1931,7 @@ namespace CodeGenerator
 
                 return null;
             }
-            #endregion
+        #endregion
 
 
             //first make sure that a project exists here

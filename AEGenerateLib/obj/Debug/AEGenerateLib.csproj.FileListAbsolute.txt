@@ -1,0 +1,2 @@
+C:\CodeGenerator\AEGenerateLib\obj\Debug\AEGenerateLib.csproj.AssemblyReference.cache
+C:\CodeGenerator\AEGenerateLib\obj\Debug\AEGenerateLib.csproj.CoreCompileInputs.cache

@@ -36,7 +36,8 @@ namespace CodeGenerator.FileTemplates
             MacroLoopGroups = new List<MacroGroupLoop>();//new List<List<Macro>>();
             UserCodes = new List<UserCode>();
 
-            PathTOFileTemplate = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\..\\..\\FileTemplates\\Files"; //@"C:\Users\Hadi\OneDrive\Documents\VisualStudioprojects\Projects\cSharp\CodeGenerator\CodeGenerator\CodeGenerator\FileTemplates\Files";
+            //PathTOFileTemplate = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\..\\..\\FileTemplates\\Files";
+            PathTOFileTemplate = @"C:\CodeGenerator\CodeGenerator\bin\Debug" + "\\..\\..\\FileTemplates\\Files";
             TemplateOutputDestination = templateOutputDestination;
             Debug.Assert(nameOfTemplateFile.Contains("."), "name of file needs an extension");
             NameOfTemplateFile = nameOfTemplateFile;
