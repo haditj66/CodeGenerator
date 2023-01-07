@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CgenMin.MacroProcesses;
 using CodeGenerator.CMD_Handler;
@@ -15,6 +16,16 @@ namespace Extensions
 {
     public static class restOfExtensions
     {
+
+        public static bool IsAnEmptyLine(this string lineToCheck)
+        {
+            if (Regex.IsMatch(lineToCheck, @"^\s*$"))
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         public static string ToString(this PinEnum pinEnum)
         {
