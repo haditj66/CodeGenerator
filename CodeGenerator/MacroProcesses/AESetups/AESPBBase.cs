@@ -97,8 +97,9 @@ namespace CgenMin.MacroProcesses
             return this;
         }
 
-        public void FlowIntoTDU(AEUtilityService tduToFlowTo)
+        public void FlowIntoTDU(AEUtilityService tduToFlowTo, int fromFilter = 0)
         {
+            tduToFlowTo.FilterNumIFlowFrom = fromFilter;
             tduToFlowTo.FlowsFromSPB = true;
             FlowsIntoTDU = true;
             TDUsToFlowTo.Add(tduToFlowTo);
@@ -523,7 +524,8 @@ namespace CgenMin.MacroProcesses
 
             foreach (var tdu in TDUsToFlowTo)
             {
-                ret += $"{tdu.InstanceName}->SetToSPBTick({this.InstanceName});"; ret += "\n";
+                
+                   ret += $"{tdu.InstanceName}->SetToSPBTick({this.InstanceName}, {tdu.FilterNumIFlowFrom});"; ret += "\n";
             }
 
             return ret;

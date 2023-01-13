@@ -127,7 +127,7 @@ namespace CgenMin.MacroProcesses
                 foreach (var item in AllAEEvents)
                 {
                     //dont do this for signals
-                    if (IsASignal == false)
+                    if (item.IsASignal == false)
                     {
                         string ArgSection = string.Join("\n", item.EventDefinition);
                         Allcontents.Add(AEInitializing.TheMacro2Session.GenerateFileOut("AERTOS/AEEvent",
@@ -193,6 +193,13 @@ namespace CgenMin.MacroProcesses
         
         public static AEEvent Init(int eventPoolSize)
         {
+            //if this is a depending library, make this always be one.
+            if (AEInitializing.DependingLib == true)
+            {
+                eventPoolSize = 1;
+            }
+
+
             _Init(eventPoolSize);
             //_instance.EventPoolSize = eventPoolSize;
             return (AEEvent)_instance;

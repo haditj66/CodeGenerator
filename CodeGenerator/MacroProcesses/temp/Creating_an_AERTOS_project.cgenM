@@ -1,5 +1,7 @@
-
-# Upload Data To PC
+##Macro1 
+ ##LoopIncrement1 
+ ##ToFile C:\AERTOS\doc\Creating_an_AERTOS_project.md 
+# Creating an AERTOS project
 <!--  
 ##UserCode_a
 -->
@@ -33,6 +35,26 @@
 ### Page Contents
 - [Overview](#overview)
 
+- [CGEN commands for AERTOS](#cgen-commands-for-aertos)
+
+- [The Config file](#the-config-file)
+
+- [AEConfig](#aeconfig)
+
+- [ProjectTests](#projecttests)
+
+- [Declaring events in project](#declaring-events-in-project)
+
+- [peripheral declaration](#peripheral-declaration)
+
+- [Libraries project depends on](#libraries-project-depends-on)
+
+- [additional include and src files](#additional-include-and-src-files)
+
+- [write your own cmake for a project](#write-your-own-cmake-for-a-project)
+
+- [the cmakegui for cmake options](#the-cmakegui-for-cmake-options)
+
 
 
 <!--  
@@ -42,6 +64,46 @@
 ## Overview
 <!--  
  ##UserCode_overview
+-->
+## CGEN commands for AERTOS
+<!--  
+ ##UserCode_cgencommandsforaertos
+-->
+## The Config file
+<!--  
+ ##UserCode_theconfigfile
+-->
+## AEConfig
+<!--  
+ ##UserCode_aeconfig
+-->
+## ProjectTests
+<!--  
+ ##UserCode_projecttests
+-->
+## Declaring events in project
+<!--  
+ ##UserCode_declaringeventsinproject
+-->
+## peripheral declaration
+<!--  
+ ##UserCode_peripheraldeclaration
+-->
+## Libraries project depends on
+<!--  
+ ##UserCode_librariesprojectdependson
+-->
+## additional include and src files
+<!--  
+ ##UserCode_additionalincludeandsrcfiles
+-->
+## write your own cmake for a project
+<!--  
+ ##UserCode_writeyourowncmakeforaproject
+-->
+## the cmakegui for cmake options
+<!--  
+ ##UserCode_thecmakeguiforcmakeoptions
 -->
 
 

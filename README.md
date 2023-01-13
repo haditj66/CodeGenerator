@@ -1,14 +1,25 @@
+
 # CodeGenerator
 
-- paste cgen project in c:/ drive directory so that it looks like this 
-C:\CodeGenerator\CgenCmakeGui
-
-- go to environment variables and put this as a variable
-
+- Step 1:  
+In your C:/ directory run the following commands  
+  `git clone https://github.com/haditj66/CodeGenerator` 
+  or for ssh use 
+  `git clone git@github.com:haditj66/CodeGenerator.git` 
+ 
+- Step 2:  
+Go to environment variables and put this as a variable
 variable: CGEN  
-value: path to your cgen bin/debug folder. for example 
-C:\CodeGenerator\CodeGenerator\bin\Debug
+value: path to the cgen bin/debug folder.  
 
-also in the "Path" variable, put the same path to that bin/debug folder. 
+    C:\CodeGenerator\CodeGenerator\bin\Debug
 
-you may need to restart your pc
+also in the "Path" variable, put the  path 
+
+> C:\CodeGenerator\CodeGenerator\bin\Debug
+
+as a value.
+
+ 
+To verify installation, open a new terminal and enter cgen. You should get the help output with available commands. You may need to restart your pc if it does not show as a command.
+ 

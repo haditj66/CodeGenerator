@@ -25,6 +25,8 @@ namespace CgenMin.MacroProcesses
         public static string RunningProjectName;
         public static string RunningProjectDir;
 
+        public static bool DependingLib = false;
+
 
         public static string GetRunningDirectoryFromProjectName(string projectName)
         {
@@ -230,18 +232,29 @@ namespace CgenMin.MacroProcesses
             //          .ToArray(); 
 
 
-            //there needs to be at least one event. if there isnt, init a dummyevent.
-            //var anyEvts = AO.AllInstancesOfAO.FirstOrDefault(a => a.AOType == AOTypeEnum.Event);
-            if (AO.atLeastOneEvt == false)
-            {
-                DummyEVT.Init(1);
-            }
+
 
 
 
 
             var tt = aeProject.ListOfTests;
+
+            List<AEEvent> allevts = new List<AEEvent>();
             var eventsinlin = aeProject.EventsInLibrary;
+            allevts.AddRange(eventsinlin);
+            foreach (var projdep in aeProject.GetAllLibrariesIDependOnFlattened())
+            {
+                DependingLib = true;
+                var Dependingevts = projdep.EventsInLibrary;
+                allevts.AddRange(Dependingevts);
+                DependingLib = false;
+            }
+            //there needs to be at least one event. if there isnt, init a dummyevent. 
+            if (allevts.Count == 0)
+            {
+                DummyEVT.Init(1);
+            }
+
             var peripheralslib = aeProject.PeripheralsInLibrary;
             AEConfig aEConfig = aeProject.GenerateTestOfName(projectTest );
 

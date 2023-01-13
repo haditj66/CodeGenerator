@@ -45,7 +45,44 @@ namespace CGENTest2Project
                 .FlowIntoSensor(sensor3, AEClock_PrescalerEnum.PRESCALER1)
                 .FlowIntoFilter(new DerivativeFilter())
                 .FlowIntoFilter(new DerivativeFilter());
-                //.FlowIntoSPB(averageSPB3, 0, LinkTypeEnum.Copy);
+            //.FlowIntoSPB(averageSPB3, 0, LinkTypeEnum.Copy);
+
+
+
+
+            //AEClock aEClock1 = new AEClock("clock1", 1000);
+            //AEClock aEClock2 = new AEClock("clock2", 1000);
+            //AESensor sensor1 = new AESensor("Ultraviolet", ADC1);
+            //AESensor sensor2 = new AESensor("Rotational", ADC2); 
+
+
+
+            //AverageSPB averageSPB1 = new AverageSPB("averageSPB1", StyleOfSPB.EachSPBTask, " ", false, new SPBChannelUserDefinedCountBuffer(10));
+            //AverageSPB averageSPB2 = new AverageSPB("averageSPB2", StyleOfSPB.EachSPBTask, " ", false, new SPBChannelUserDefinedCountBuffer(5));
+
+            //Complementary complementary = new Complementary("complementary", StyleOfSPB.EachSPBTask, " ", false);
+
+
+            //OnOffUtility onOffUtility = new OnOffUtility("onOffUtility", AEPriorities.MediumPriority);
+
+
+            //aEClock1
+            //.FlowIntoSensor(sensor1, AEClock_PrescalerEnum.PRESCALER1)
+            //.FlowIntoSPB(averageSPB1, SPBChannelNum.CH0, LinkTypeEnum.Copy);
+            //aEClock1
+            //.FlowIntoSensor(sensor2, AEClock_PrescalerEnum.PRESCALER1)
+            //.FlowIntoSPB(averageSPB2, SPBChannelNum.CH0, LinkTypeEnum.Copy);
+
+            //averageSPB1.FlowIntoTDU
+            //.FlowIntoSPB(complementary, SPBChannelNum.CH0, LinkTypeEnum.Copy);
+
+            //averageSPB2
+            //.FlowIntoSPB(complementary, SPBChannelNum.CH1, LinkTypeEnum.Copy); ;
+
+            //complementary
+            //.FlowIntoFilter(new DerivativeFilter())
+            //.FlowIntoFilter(new DerivativeFilter())
+            //.FlowIntoTDU(OnOffUtility); 
 
         }
 

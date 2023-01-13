@@ -197,7 +197,7 @@ namespace CodeGenerator.FileTemplates
             {
                 var mU = Regex.Match(templateFileContents, userCode.FullBeginName+"$", RegexOptions.Multiline);
 
-                Debug.Assert(mU.Success, "could not find the UserCode section " + userCode.FullBeginName + "for file " + NameOfOutputTemplateFile + ". did you maybe change the template file where you removed that ##UserCode? if you did, you need to delete that usercode generated in the output file.");
+                Debug.Assert(mU.Success, "could not find the UserCode section " + userCode.FullBeginName + " for file " + NameOfOutputTemplateFile + ". did you maybe change the template file where you removed that ##UserCode? if you did, you need to delete that usercode generated in the output file.");
 
                 if (!userCode.Contents.IsAnEmptyLine())
                 {

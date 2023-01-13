@@ -463,6 +463,7 @@ Priority == AEPriorities.HighPriority ? "HighestPriority" : "";
         }
 
         public int ServiceBufferArgPoolSize { get; protected set; }
+        public int FilterNumIFlowFrom { get;   set; }
 
         //public AEUtilityService(string instanceNameOfTDU, string className, string fromFileThisComesFrom) : base(className, instanceNameOfTDU, AOTypeEnum.UtilityService)
         //{

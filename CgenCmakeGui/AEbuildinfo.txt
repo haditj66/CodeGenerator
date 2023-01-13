@@ -2,5 +2,7 @@ VISUALGDB_DIR==C:/Program Files (x86)/Sysprogs/VisualGDB/ninja.exe
 PLAT_TOOLCHAIN==STM32F411RE
 BuildTarget==AECoreLib
 BuildTarget==AEHalLib
+BuildTarget==commonAOs_lib
 BuildTarget==commonHalAOs_lib
-BuildTarget==commonHalAOs
+BuildTarget==blinky_lib
+BuildTarget==blinky

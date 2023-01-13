@@ -1,0 +1,18 @@
+@PageName@
+<!--  
+##UserCode_a
+-->
+
+## Table of Contents
+@TableOfContents@ 
+
+### Page Contents
+@SectionsDec@
+
+<!--  
+##UserCode_b
+ -->
+ 
+@SectionsDef@
+
+ 

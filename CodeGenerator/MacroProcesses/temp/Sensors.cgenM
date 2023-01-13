@@ -1,5 +1,7 @@
-
-# Upload Data To PC
+##Macro1 
+ ##LoopIncrement1 
+ ##ToFile C:\AERTOS\doc/concepts/observers\Sensors.md 
+# Sensors
 <!--  
 ##UserCode_a
 -->
@@ -31,7 +33,9 @@
  
 
 ### Page Contents
-- [Overview](#overview)
+- [What are sensors](#what-are-sensors)
+
+- [how to set them](#how-to-set-them)
 
 
 
@@ -39,9 +43,13 @@
 ##UserCode_b
  -->
  
-## Overview
+## What are sensors
 <!--  
- ##UserCode_overview
+ ##UserCode_whataresensors
+-->
+## how to set them
+<!--  
+ ##UserCode_howtosetthem
 -->
 
 

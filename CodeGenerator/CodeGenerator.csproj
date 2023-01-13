@@ -151,6 +151,7 @@
     <Compile Include="MacroProcesses\AESetups\SPBs\AllTDUs.cs" />
     <Compile Include="MacroProcesses\MacroProcess.cs" />
     <Compile Include="MacroProcesses\AEServiceMacro.cs" />
+    <Compile Include="MacroProcesses\AEDoc.cs" />
     <Compile Include="MacroProcesses\MyMacroProcessDer.cs" />
     <Compile Include="ProblemHandler\ICleanUp.cs" />
     <Compile Include="ProblemHandler\LibrariesForCheckedOutGit.cs" />

@@ -299,8 +299,9 @@ namespace CodeGenerator
         //static string[] command = "cmakegui".Split(' ');
         //static string[] command = "macro2 AEServiceMacro".Split(' ');
         //static string[] command = "macro2 AEInitializing".Split(' ');
+        static string[] command = "macro2 AEDoc".Split(' ');
         //static string[] command = "aeinit test".Split(' ');
-        static string[] command = "aeinit commonHalAOs".Split(' ');
+        //static string[] command = "aeinit commonHalAOs".Split(' ');
         //static string[] command = "aeselect CGENTest ".Split(' ');
         //static string[] command = "aegenerate".Split(' ');
         //static string[] command = "aeserial".Split(' ');
@@ -1593,10 +1594,10 @@ namespace CodeGenerator
                 //Console.WriteLine($"--------------------------------------\n\n");
             }
 
-            cMDToBuildTargetsForUser.SetMultipleCommands("pause");
-            string projectDir = AEInitializing.GetRunningDirectoryFromProjectName(projectName);
+            cMDToBuildTargetsForUser.SetMultipleCommands("pause"); 
             cMDToBuildTargets.ExecuteMultipleCommands_InItsOwnBatch(buildDir, "AEBuildProject");
-            cMDToBuildTargetsForUser.ExecuteMultipleCommands_InItsOwnBatch(projectDir, "AEBuildProject");
+            //string projectDir = AEInitializing.GetRunningDirectoryFromProjectName(projectName);
+            //cMDToBuildTargetsForUser.ExecuteMultipleCommands_InItsOwnBatch(projectDir, "AEBuildProject");
 
             return null;
         }

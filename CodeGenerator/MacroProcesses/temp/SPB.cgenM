@@ -1,5 +1,7 @@
-
-# Upload Data To PC
+##Macro1 
+ ##LoopIncrement1 
+ ##ToFile C:\AERTOS\doc/concepts/observers\SPB.md 
+# SPB
 <!--  
 ##UserCode_a
 -->
@@ -31,7 +33,17 @@
  
 
 ### Page Contents
-- [Overview](#overview)
+- [What are SPBs ](#what-are-spbs-)
+
+- [Sampling frequency reduces](#sampling-frequency-reduces)
+
+- [Pass by reference or copy](#pass-by-reference-or-copy)
+
+- [Channel connect limitations](#channel-connect-limitations)
+
+- [style of spb efficiencies](#style-of-spb-efficiencies)
+
+- [create your own spb](#create-your-own-spb)
 
 
 
@@ -39,9 +51,29 @@
 ##UserCode_b
  -->
  
-## Overview
+## What are SPBs 
 <!--  
- ##UserCode_overview
+ ##UserCode_whatarespbs
+-->
+## Sampling frequency reduces
+<!--  
+ ##UserCode_samplingfrequencyreduces
+-->
+## Pass by reference or copy
+<!--  
+ ##UserCode_passbyreferenceorcopy
+-->
+## Channel connect limitations
+<!--  
+ ##UserCode_channelconnectlimitations
+-->
+## style of spb efficiencies
+<!--  
+ ##UserCode_styleofspbefficiencies
+-->
+## create your own spb
+<!--  
+ ##UserCode_createyourownspb
 -->
 
 

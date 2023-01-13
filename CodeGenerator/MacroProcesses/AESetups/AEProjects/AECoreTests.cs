@@ -58,6 +58,18 @@ namespace AECoreTestsProject
         }
     }
 
+    //public class AELoopObjectTest22 : AELoopObject
+    //{
+    //    public AELoopObjectTest22(string instanceName, AEPriorities priority, int freqOfLoop)
+    //        : base("AECoreTests", instanceName, priority, freqOfLoop,
+    //              new CppFunctionArgs (
+    //                  new CppFunctionArg("SomeClassType", "someClassType",false))
+    //              )
+    //    {
+
+    //    }
+    //}
+
     public class AELoopObjectTest : AELoopObject
     {
         public AELoopObjectTest(string instanceName, AEPriorities priority, int freqOfLoop)
@@ -258,6 +270,8 @@ namespace AECoreTestsProject
         [AEEXETest]
         public void testFilters()
         {
+            
+
             AEClock aEClock = new AEClock("clock1", 100 );
 
             AESensor aESensor1 = new AESensor("sensor1", SensorResolution.Resolution16Bit, SensorDataType.uint16_T);

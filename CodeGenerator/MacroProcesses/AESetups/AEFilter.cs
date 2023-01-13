@@ -293,6 +293,17 @@ namespace CgenMin.MacroProcesses
         }
 
 
+        public void FlowIntoTDU(AEUtilityService tduToFlowTo )
+        {
+            ProblemHandle problemHandle = new ProblemHandle();
+            if (this.SPBIOriginateFrom == null)
+            {
+                problemHandle.ThereisAProblem("filter needs to originate from an spb for it to flow into a TDU");
+
+            }
+
+            this.SPBIOriginateFrom.FlowIntoTDU(tduToFlowTo, this.FilterId);
+        }
 
 
         protected override string _GenerateAEConfigSection(int numOfAOOfThisSameTypeGeneratesAlready)
